@@ -4,6 +4,7 @@ import ru.spbu.netter.model.Graph
 import tornadofx.*
 import java.io.File
 import java.io.IOException
+import java.io.FileNotFoundException
 
 
 class TxtIOHandler : Controller(), FileIOHandler {
@@ -15,68 +16,100 @@ class TxtIOHandler : Controller(), FileIOHandler {
 
 
     override fun importNetwork(graph: Graph, filePath: String) {
+        val parsingMethods = listOf(::parseEdge, ::parseVertex)
         var lineNum = 0
 
-        File(filePath).bufferedReader().useLines { lines ->
-            val iterator = lines.iterator()
+        val bufferedReader = try {
+            File(filePath).bufferedReader()
+        } catch (exception: FileNotFoundException) {
+            throw FileNotFoundException("File cannot be read: ${exception.localizedMessage}")
+        }
 
-            listOf(::parseEdge, ::parseVertex).forEach { parseColumns ->
-                while (iterator.hasNext()) {
-                    val line = iterator.next()
+        bufferedReader.use { reader ->
+            parsingMethods.forEach { parseColumns ->
+                while (reader.ready()) {
+                    val line = reader.readLine()
                     lineNum++
 
                     if (line.isEmpty()) break
 
-                    val columns = line.split(COLUMN_DELIMITER).toMutableList()
-                    parseColumns(graph, columns, lineNum).let {
-                        if (columns.size != it) throw IOException("Incorrect number of columns on line $lineNum: expected $it but was ${columns.size}")
+                    with(line.split(COLUMN_DELIMITER)) {
+                        parseColumns(graph, this, lineNum)
+                        addSkippedVertices(graph, first().toInt())
                     }
-
-                    addSkippedVertices(graph, columns[0].toInt() - 1)
                 }
             }
 
-            if (iterator.hasNext()) println("Excessive lines found after blank line $lineNum. Skipping...")
+            if (reader.ready()) println("Excessive lines found after blank line $lineNum. Skipping...")
         }
     }
 
-    private fun parseEdge(graph: Graph, columns: MutableList<String>, lineNum: Int): Int {
-        if (columns.size == EDGE_INPUT_COLUMNS_NUM) {
-            if (!columns[0].isInt() || columns[0].toInt() < FileIOHandler.MIN_VERTEX_ID ||
-                !columns[1].isInt() || columns[1].toInt() < FileIOHandler.MIN_VERTEX_ID
-            ) throw IOException("Incorrect input format on line $lineNum: both vertex ids must be non-negative integers")
-
-            graph.addEdge(columns[0].toInt(), columns[1].toInt())
-
-            if (columns[0] > columns[1]) columns[0] = columns[1].also { columns[1] = columns[0] }
-            addSkippedVertices(graph, columns[1].toInt())
+    private fun parseEdge(graph: Graph, columns: List<String>, lineNum: Int) {
+        if (columns.size != EDGE_INPUT_COLUMNS_NUM) {
+            handleError(lineNum, "expected $EDGE_INPUT_COLUMNS_NUM columns but was ${columns.size}")
         }
-        return EDGE_INPUT_COLUMNS_NUM
+
+        if (!columns[0].isInt() || !columns[1].isInt()) {
+            handleError(lineNum, "vertex ids must be integers")
+        }
+
+        val parsedId1 = columns[0].toInt()
+        val parsedId2 = columns[1].toInt()
+
+        if (parsedId1 < FileIOHandler.MIN_VERTEX_ID || parsedId2 < FileIOHandler.MIN_VERTEX_ID) {
+            handleError(lineNum, "vertex ids must be not less than ${FileIOHandler.MIN_VERTEX_ID}")
+        }
+
+        graph.addEdge(parsedId1, parsedId2)
+
+        addSkippedVertices(graph, parsedId2)
     }
 
-    private fun parseVertex(graph: Graph, columns: List<String>, lineNum: Int): Int {
-        if (columns.size == VERTEX_INPUT_COLUMNS_NUM) {
-            if (!columns[0].isInt() || columns[0].toInt() < FileIOHandler.MIN_VERTEX_ID ||
-                !columns[1].isInt() || columns[1].toInt() < FileIOHandler.MIN_COMMUNITY_ID ||
-                !columns[2].isDouble() || columns[2].toDouble() < FileIOHandler.MIN_CENTRALITY
-            ) throw IOException("Incorrect input format on line $lineNum: vertex and community ids must be non-negative integers, centrality must be a non-negative decimal")
+    private fun parseVertex(graph: Graph, columns: List<String>, lineNum: Int) {
+        if (columns.size != VERTEX_INPUT_COLUMNS_NUM) {
+            handleError(lineNum, "expected $VERTEX_INPUT_COLUMNS_NUM columns but was ${columns.size}")
+        }
 
-            graph.addVertex(columns[0].toInt()).apply {
-                community = columns[1].toInt()
-                centrality = columns[2].toDouble()
+        if (!columns[0].isInt() || !columns[1].isInt() || !columns[2].isDouble()) {
+            handleError(lineNum, "vertex id and community must be integers, centrality must be decimal")
+        }
+
+        val parsedId = columns[0].toInt().also {
+            if (it < FileIOHandler.MIN_VERTEX_ID) {
+                handleError(lineNum, "vertex id must be not less than ${FileIOHandler.MIN_VERTEX_ID}")
             }
         }
-        return VERTEX_INPUT_COLUMNS_NUM
+        val parsedCommunity = columns[1].toInt().also {
+            if (it < FileIOHandler.MIN_COMMUNITY) {
+                handleError(lineNum, "community must be not less than ${FileIOHandler.MIN_COMMUNITY}")
+            }
+        }
+        val parsedCentrality = columns[2].toDouble().also {
+            if (it < FileIOHandler.MIN_CENTRALITY) {
+                handleError(lineNum, "centrality must be not less than ${FileIOHandler.MIN_CENTRALITY}")
+            }
+        }
+
+        graph.addVertex(parsedId).apply {
+            community = parsedCommunity
+            centrality = parsedCentrality
+        }
     }
 
-    private fun addSkippedVertices(graph: Graph, fromId: Int) {
-        var prevId = fromId
+    private fun addSkippedVertices(graph: Graph, addUntilId: Int) {
+        var prevId = addUntilId - 1
         while (prevId >= FileIOHandler.MIN_VERTEX_ID && !graph.vertices.containsKey(prevId)) graph.addVertex(prevId--)
     }
 
 
     override fun exportNetwork(graph: Graph, filePath: String) {
-        File(filePath).bufferedWriter().use { writer ->
+        val bufferedWriter = try {
+            File(filePath).bufferedWriter()
+        } catch (exception: IOException) {
+            throw IOException("File cannot be written: ${exception.localizedMessage}")
+        }
+
+        bufferedWriter.use { writer ->
             for (edge in graph.edges) writer.write("${edge.v1}$COLUMN_DELIMITER${edge.v2}\n")
 
             writer.newLine()
@@ -85,5 +118,10 @@ class TxtIOHandler : Controller(), FileIOHandler {
                 writer.write("$id$COLUMN_DELIMITER$community$COLUMN_DELIMITER$centrality")
             }
         }
+    }
+
+
+    private fun handleError(lineNum: Int, message: String): Nothing {
+        throw IOException("Incorrect input format on line $lineNum: $message")
     }
 }
