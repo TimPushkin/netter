@@ -2,8 +2,12 @@ package ru.spbu.netter.model
 
 
 interface Vertex {
-    val id: Int
+    companion object {
+        internal const val DEFAULT_COMMUNITY = 0
+        internal const val DEFAULT_CENTRALITY = 1.0
+    }
 
+    val id: Int
     var community: Int
     var centrality: Double
 }

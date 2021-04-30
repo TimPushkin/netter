@@ -12,8 +12,8 @@ class UndirectedGraph : Graph {
 
 
     private data class VertexImpl(override val id: Int) : Vertex {
-        override var community = 0
-        override var centrality = 1.0
+        override var community = Vertex.DEFAULT_COMMUNITY
+        override var centrality = Vertex.DEFAULT_CENTRALITY
     }
 
     private data class UndirectedEdge(override val v1: Vertex, override val v2: Vertex) : Edge {
