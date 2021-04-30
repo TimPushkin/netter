@@ -36,8 +36,8 @@ internal class TxtIOHandlerTest {
 
         private const val correctSingleBlockInputsPath = inputsPath + "correct-single-block-inputs/"
         private const val incorrectSingleBlockInputsPath = inputsPath + "incorrect-single-block-inputs/"
-        private const val correctDualBlockInputsPath = inputsPath + "correct-two-block-inputs/"
-        private const val incorrectDualBlockInputsPath = inputsPath + "incorrect-two-block-inputs/"
+        private const val correctDualBlockInputsPath = inputsPath + "correct-dual-block-inputs/"
+        private const val incorrectDualBlockInputsPath = inputsPath + "incorrect-dual-block-inputs/"
 
         private val correctSingleBlockInputs =
             run { File(correctSingleBlockInputsPath).listFiles() ?: emptyArray<File>() }.map { it.path }
