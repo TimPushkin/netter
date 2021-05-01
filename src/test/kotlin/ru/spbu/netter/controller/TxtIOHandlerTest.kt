@@ -32,6 +32,8 @@ internal class TxtIOHandlerTest {
 
         private const val PARAMETERIZED_TEST_NAME = "{displayName} <-- {arguments}"
 
+        private const val OUTPUT_FILE_PATH = "out/test/txt-io-handler-test.txt"
+
         private const val INPUTS_PATH = "src/test/resources/txt-inputs/"
 
         private const val CORRECT_SINGLE_BLOCK_INPUTS_PATH = INPUTS_PATH + "correct-single-block-inputs/"
@@ -70,9 +72,9 @@ internal class TxtIOHandlerTest {
 
     private fun Graph.edgesAsPairs() = edges.map { it.run { Pair(v1.id, v2.id) } }
 
-    fun verifyCorrectInput(graph: Graph, inputPath: String) {
-        val expectedEdges = mutableSetOf<Pair<Int, Int>>()
-        val expectedVertices = mutableMapOf<Int, Triple<Int, Int, Double>>()
+    private fun readNetworkInput(inputPath: String): Pair<MutableSet<Pair<Int, Int>>, MutableMap<Int, Triple<Int, Int, Double>>> {
+        val edges = mutableSetOf<Pair<Int, Int>>()
+        val vertices = mutableMapOf<Int, Triple<Int, Int, Double>>()
 
         File(inputPath).bufferedReader().use { reader ->
             while (reader.ready()) {
@@ -83,10 +85,10 @@ internal class TxtIOHandlerTest {
                     val id1 = get(0).toInt()
                     val id2 = get(1).toInt()
 
-                    if (!expectedEdges.contains(Pair(id2, id1))) expectedEdges.add(Pair(id1, id2))
+                    if (!edges.contains(Pair(id2, id1))) edges.add(Pair(id1, id2))
 
-                    expectedVertices[id1] = Triple(id1, Vertex.DEFAULT_COMMUNITY, Vertex.DEFAULT_CENTRALITY)
-                    expectedVertices[id2] = Triple(id2, Vertex.DEFAULT_COMMUNITY, Vertex.DEFAULT_CENTRALITY)
+                    vertices[id1] = Triple(id1, Vertex.DEFAULT_COMMUNITY, Vertex.DEFAULT_CENTRALITY)
+                    vertices[id2] = Triple(id2, Vertex.DEFAULT_COMMUNITY, Vertex.DEFAULT_CENTRALITY)
                 }
             }
 
@@ -97,17 +99,22 @@ internal class TxtIOHandlerTest {
                 line.split(COLUMN_DELIMITER).run {
                     val id = get(0).toInt()
 
-                    expectedVertices[id] = Triple(id, get(1).toInt(), get(2).toDouble())
+                    vertices[id] = Triple(id, get(1).toInt(), get(2).toDouble())
                 }
             }
         }
 
         var i = 0
-        while (i < expectedVertices.size) {
-            if (!expectedVertices.contains(i)) expectedVertices[i] =
-                Triple(i, Vertex.DEFAULT_COMMUNITY, Vertex.DEFAULT_CENTRALITY)
+        while (i < vertices.size) {
+            if (!vertices.contains(i)) vertices[i] = Triple(i, Vertex.DEFAULT_COMMUNITY, Vertex.DEFAULT_CENTRALITY)
             i++
         }
+
+        return Pair(edges, vertices)
+    }
+
+    fun verifyInput(graph: Graph, inputPath: String) {
+        val (expectedEdges, expectedVertices) = readNetworkInput(inputPath)
 
         assertIterableEquals(
             expectedEdges.sortedWith(compareBy({ it.first }, { it.second })),
@@ -116,6 +123,20 @@ internal class TxtIOHandlerTest {
         assertIterableEquals(
             expectedVertices.values.sortedBy { it.first },
             graph.verticesAsTriples().sortedBy { it.first }
+        )
+    }
+
+    fun verifyOutput(inputPath: String, outputPath: String) {
+        val (expectedEdges, expectedVertices) = readNetworkInput(inputPath)
+        val (actualEdges, actualVertices) = readNetworkInput(outputPath)
+
+        assertIterableEquals(
+            expectedEdges.sortedWith(compareBy({ it.first }, { it.second })),
+            actualEdges.sortedWith(compareBy({ it.first }, { it.second }))
+        )
+        assertIterableEquals(
+            expectedVertices.values.sortedBy { it.first },
+            actualVertices.values.sortedBy { it.first }
         )
     }
 
@@ -130,19 +151,30 @@ internal class TxtIOHandlerTest {
 
     @Nested
     inner class ImportNetwork {
-
         @ParameterizedTest(name = PARAMETERIZED_TEST_NAME)
         @ArgumentsSource(CorrectInputsProvider::class)
-        fun `import correct data - the data is in the graph`(inputFilename: String) {
-            TxtIOHandler().importNetwork(graph, inputFilename)
+        fun `import correct data - the data is in the graph`(inputFilePath: String) {
+            TxtIOHandler().importNetwork(graph, inputFilePath)
 
-            verifyCorrectInput(graph, inputFilename)
+            verifyInput(graph, inputFilePath)
         }
 
         @ParameterizedTest(name = PARAMETERIZED_TEST_NAME)
         @ArgumentsSource(IncorrectInputsProvider::class)
-        fun `import incorrect data - throws IOException`(inputFilename: String) {
-            assertThrows<IOException> { TxtIOHandler().importNetwork(graph, inputFilename) }
+        fun `import incorrect data - throws IOException`(inputFilePath: String) {
+            assertThrows<IOException> { TxtIOHandler().importNetwork(graph, inputFilePath) }
+        }
+    }
+
+    @Nested
+    inner class ExportNetwork {
+        @ParameterizedTest(name = PARAMETERIZED_TEST_NAME)
+        @ArgumentsSource(CorrectInputsProvider::class)
+        fun `import and export network - output file contains imported data`(inputFilePath: String) {
+            TxtIOHandler().importNetwork(graph, inputFilePath)
+            TxtIOHandler().exportNetwork(graph, OUTPUT_FILE_PATH)
+
+            verifyOutput(inputFilePath, OUTPUT_FILE_PATH)
         }
     }
 }
