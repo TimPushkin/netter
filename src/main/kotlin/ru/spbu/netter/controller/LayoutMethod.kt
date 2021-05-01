@@ -1,12 +1,13 @@
 package ru.spbu.netter.controller
 
 import ru.spbu.netter.model.Graph
-import ru.spbu.netter.model.Vertex
 import javafx.geometry.Point2D
 
 
 interface LayoutMethod {
-    val direct: Map<Int, Point2D>
-
-    fun layout(graph: Graph, center: Point2D, radiusVertex: Double)
+    fun layout(
+        graph: Graph,
+        center: Point2D = Point2D(0.0, 0.0),
+        k: Double = 1.0
+    ): ArrayList<Point2D>
 }

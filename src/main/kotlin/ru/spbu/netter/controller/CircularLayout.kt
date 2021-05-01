@@ -9,27 +9,31 @@ import kotlin.math.sqrt
 
 
 class CircularLayout : Controller(), LayoutMethod {
-    override val direct = mutableMapOf<Int, Point2D>()
 
     override fun layout(
         graph: Graph,
         center: Point2D,
-        radiusVertex: Double // TODO radiusVertex - размер вершины на изображении
-    ) {
+        k: Double
+    ): ArrayList<Point2D> {
+
         if (graph.isEmpty()) {
-            println("there is nothing to draw") // TODO logging
-            return
+            println("there is nothing to draw") // TODO(logging)
+            return arrayListOf()
         }
+
         println("Placing vertices in a circular shape...")
 
+        val direct = ArrayList<Point2D>(graph.vertices.size)
+
         val angle = Math.toRadians(360.0 / graph.vertices.size)
-        val radius = 3 * radiusVertex * sqrt(1 / 2 / (1 - cos(angle)))
+        val radius = k * sqrt(2 / (1 - cos(angle)))
         var prev = Point2D(0.0, radius)
 
         graph.vertices.keys.onEach {
             direct[it] = prev
             prev = prev.rotate(center, angle)
         }
+        return direct
     }
 
     private fun Point2D.rotate(center: Point2D, angle: Double): Point2D {

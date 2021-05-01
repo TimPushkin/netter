@@ -6,9 +6,13 @@ import tornadofx.*
 
 
 class SmartLayout : Controller(), LayoutMethod {
-    override val direct = mutableMapOf<Int, Point2D>()
+    override fun layout(
+        graph: Graph,
+        center: Point2D,
+        k: Double
+    ): ArrayList<Point2D> {
 
-    override fun layout(graph: Graph, center: Point2D, radiusVertex: Double) {
         println("Placing vertices in a nice shape...")
+        return arrayListOf()
     }
 }
