@@ -6,7 +6,7 @@ import ru.spbu.netter.model.Graph
 interface FileIOHandler {
     companion object {
         internal const val MIN_VERTEX_ID = 0
-        internal const val MIN_COMMUNITY_ID = 0
+        internal const val MIN_COMMUNITY = 0
         internal const val MIN_CENTRALITY = 0.0
     }
 
