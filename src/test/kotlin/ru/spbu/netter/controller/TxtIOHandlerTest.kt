@@ -19,47 +19,47 @@ import kotlin.streams.asStream
 
 
 internal class TxtIOHandlerTest {
-
     lateinit var graph: Graph
 
 
-    // Parameterized tests supplementary data
-
     companion object {
-        private const val parameterizedTestName = "{displayName} <-- {arguments}"
+        // TxtIOHandler constants
+
+        private const val COLUMN_DELIMITER = " "
 
 
-        private const val columnDelimiter = " "
+        // Parameterized tests supplementary data
 
+        private const val PARAMETERIZED_TEST_NAME = "{displayName} <-- {arguments}"
 
-        private const val inputsPath = "src/test/resources/txt-inputs/"
+        private const val INPUTS_PATH = "src/test/resources/txt-inputs/"
 
-        private const val correctSingleBlockInputsPath = inputsPath + "correct-single-block-inputs/"
-        private const val incorrectSingleBlockInputsPath = inputsPath + "incorrect-single-block-inputs/"
-        private const val correctDualBlockInputsPath = inputsPath + "correct-dual-block-inputs/"
-        private const val incorrectDualBlockInputsPath = inputsPath + "incorrect-dual-block-inputs/"
+        private const val CORRECT_SINGLE_BLOCK_INPUTS_PATH = INPUTS_PATH + "correct-single-block-inputs/"
+        private const val INCORRECT_SINGLE_BLOCK_INPUTS_PATH = INPUTS_PATH + "incorrect-single-block-inputs/"
+        private const val CORRECT_DUAL_BLOCK_INPUTS_PATH = INPUTS_PATH + "correct-dual-block-inputs/"
+        private const val INCORRECT_DUAL_BLOCK_INPUTS_PATH = INPUTS_PATH + "incorrect-dual-block-inputs/"
 
-        private val correctSingleBlockInputs =
-            run { File(correctSingleBlockInputsPath).listFiles() ?: emptyArray<File>() }.map { it.path }
-        private val incorrectSingleBlockInputs =
-            run { File(incorrectSingleBlockInputsPath).listFiles() ?: emptyArray<File>() }.map { it.path }
-        private val correctDualBlockInputs =
-            run { File(correctDualBlockInputsPath).listFiles() ?: emptyArray<File>() }.map { it.path }
-        private val incorrectDualBlockInputs =
-            run { File(incorrectDualBlockInputsPath).listFiles() ?: emptyArray<File>() }.map { it.path }
+        private val CORRECT_SINGLE_BLOCK_INPUTS =
+            run { File(CORRECT_SINGLE_BLOCK_INPUTS_PATH).listFiles() ?: emptyArray<File>() }.map { it.path }
+        private val INCORRECT_SINGLE_BLOCK_INPUTS =
+            run { File(INCORRECT_SINGLE_BLOCK_INPUTS_PATH).listFiles() ?: emptyArray<File>() }.map { it.path }
+        private val CORRECT_DUAL_BLOCK_INPUTS =
+            run { File(CORRECT_DUAL_BLOCK_INPUTS_PATH).listFiles() ?: emptyArray<File>() }.map { it.path }
+        private val INCORRECT_DUAL_BLOCK_INPUTS =
+            run { File(INCORRECT_DUAL_BLOCK_INPUTS_PATH).listFiles() ?: emptyArray<File>() }.map { it.path }
 
-        val correctInputs = correctSingleBlockInputs + correctDualBlockInputs
-        val incorrectInputs = incorrectSingleBlockInputs + incorrectDualBlockInputs
+        private val CORRECT_INPUTS = CORRECT_SINGLE_BLOCK_INPUTS + CORRECT_DUAL_BLOCK_INPUTS
+        private val INCORRECT_INPUTS = INCORRECT_SINGLE_BLOCK_INPUTS + INCORRECT_DUAL_BLOCK_INPUTS
 
 
         object CorrectInputsProvider : ArgumentsProvider {
             override fun provideArguments(context: ExtensionContext?) =
-                correctInputs.map { Arguments.of(it) }.asSequence().asStream()
+                CORRECT_INPUTS.map { Arguments.of(it) }.asSequence().asStream()
         }
 
         object IncorrectInputsProvider : ArgumentsProvider {
             override fun provideArguments(context: ExtensionContext?) =
-                incorrectInputs.map { Arguments.of(it) }.asSequence().asStream()
+                INCORRECT_INPUTS.map { Arguments.of(it) }.asSequence().asStream()
         }
     }
 
@@ -79,7 +79,7 @@ internal class TxtIOHandlerTest {
                 val line = reader.readLine()
                 if (line.isEmpty()) break
 
-                line.split(columnDelimiter).run {
+                line.split(COLUMN_DELIMITER).run {
                     val id1 = get(0).toInt()
                     val id2 = get(1).toInt()
 
@@ -94,7 +94,7 @@ internal class TxtIOHandlerTest {
                 val line = reader.readLine()
                 if (line.isEmpty()) break
 
-                line.split(columnDelimiter).run {
+                line.split(COLUMN_DELIMITER).run {
                     val id = get(0).toInt()
 
                     expectedVertices[id] = Triple(id, get(1).toInt(), get(2).toDouble())
@@ -131,7 +131,7 @@ internal class TxtIOHandlerTest {
     @Nested
     inner class ImportNetwork {
 
-        @ParameterizedTest(name = parameterizedTestName)
+        @ParameterizedTest(name = PARAMETERIZED_TEST_NAME)
         @ArgumentsSource(CorrectInputsProvider::class)
         fun `import correct data - the data is in the graph`(inputFilename: String) {
             TxtIOHandler().importNetwork(graph, inputFilename)
@@ -139,7 +139,7 @@ internal class TxtIOHandlerTest {
             verifyCorrectInput(graph, inputFilename)
         }
 
-        @ParameterizedTest(name = parameterizedTestName)
+        @ParameterizedTest(name = PARAMETERIZED_TEST_NAME)
         @ArgumentsSource(IncorrectInputsProvider::class)
         fun `import incorrect data - throws IOException`(inputFilename: String) {
             assertThrows<IOException> { TxtIOHandler().importNetwork(graph, inputFilename) }
