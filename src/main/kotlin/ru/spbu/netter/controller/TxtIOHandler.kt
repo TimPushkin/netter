@@ -5,6 +5,7 @@ import tornadofx.*
 import java.io.File
 import java.io.IOException
 import java.io.FileNotFoundException
+import java.nio.file.Files
 
 
 class TxtIOHandler : Controller(), FileIOHandler {
@@ -46,18 +47,18 @@ class TxtIOHandler : Controller(), FileIOHandler {
 
     private fun parseEdge(graph: Graph, columns: List<String>, lineNum: Int) {
         if (columns.size != EDGE_INPUT_COLUMNS_NUM) {
-            handleError(lineNum, "expected $EDGE_INPUT_COLUMNS_NUM columns but was ${columns.size}")
+            handleInputError(lineNum, "expected $EDGE_INPUT_COLUMNS_NUM columns but was ${columns.size}")
         }
 
         if (!columns[0].isInt() || !columns[1].isInt()) {
-            handleError(lineNum, "vertex ids must be integers")
+            handleInputError(lineNum, "vertex ids must be integers")
         }
 
         val parsedId1 = columns[0].toInt()
         val parsedId2 = columns[1].toInt()
 
         if (parsedId1 < FileIOHandler.MIN_VERTEX_ID || parsedId2 < FileIOHandler.MIN_VERTEX_ID) {
-            handleError(lineNum, "vertex ids must be not less than ${FileIOHandler.MIN_VERTEX_ID}")
+            handleInputError(lineNum, "vertex ids must be not less than ${FileIOHandler.MIN_VERTEX_ID}")
         }
 
         graph.addEdge(parsedId1, parsedId2)
@@ -67,26 +68,26 @@ class TxtIOHandler : Controller(), FileIOHandler {
 
     private fun parseVertex(graph: Graph, columns: List<String>, lineNum: Int) {
         if (columns.size != VERTEX_INPUT_COLUMNS_NUM) {
-            handleError(lineNum, "expected $VERTEX_INPUT_COLUMNS_NUM columns but was ${columns.size}")
+            handleInputError(lineNum, "expected $VERTEX_INPUT_COLUMNS_NUM columns but was ${columns.size}")
         }
 
         if (!columns[0].isInt() || !columns[1].isInt() || !columns[2].isDouble()) {
-            handleError(lineNum, "vertex id and community must be integers, centrality must be decimal")
+            handleInputError(lineNum, "vertex id and community must be integers, centrality must be decimal")
         }
 
         val parsedId = columns[0].toInt().also {
             if (it < FileIOHandler.MIN_VERTEX_ID) {
-                handleError(lineNum, "vertex id must be not less than ${FileIOHandler.MIN_VERTEX_ID}")
+                handleInputError(lineNum, "vertex id must be not less than ${FileIOHandler.MIN_VERTEX_ID}")
             }
         }
         val parsedCommunity = columns[1].toInt().also {
             if (it < FileIOHandler.MIN_COMMUNITY) {
-                handleError(lineNum, "community must be not less than ${FileIOHandler.MIN_COMMUNITY}")
+                handleInputError(lineNum, "community must be not less than ${FileIOHandler.MIN_COMMUNITY}")
             }
         }
         val parsedCentrality = columns[2].toDouble().also {
             if (it < FileIOHandler.MIN_CENTRALITY) {
-                handleError(lineNum, "centrality must be not less than ${FileIOHandler.MIN_CENTRALITY}")
+                handleInputError(lineNum, "centrality must be not less than ${FileIOHandler.MIN_CENTRALITY}")
             }
         }
 
@@ -101,27 +102,36 @@ class TxtIOHandler : Controller(), FileIOHandler {
         while (prevId >= FileIOHandler.MIN_VERTEX_ID && !graph.vertices.containsKey(prevId)) graph.addVertex(prevId--)
     }
 
+    private fun handleInputError(lineNum: Int, message: String): Nothing {
+        throw IOException("Incorrect input format on line $lineNum: $message")
+    }
+
 
     override fun exportNetwork(graph: Graph, filePath: String) {
+        val file = File(filePath)
+
+        try {
+            Files.createDirectories(file.toPath().parent)
+        } catch (exception: Exception) {
+            throw IOException("Output file's parent dir cannot be created: ${exception.localizedMessage}")
+        }
+
         val bufferedWriter = try {
-            File(filePath).bufferedWriter()
+            file.bufferedWriter()
         } catch (exception: IOException) {
-            throw IOException("File cannot be written: ${exception.localizedMessage}")
+            throw IOException("Output file cannot be written: ${exception.localizedMessage}")
         }
 
         bufferedWriter.use { writer ->
-            for (edge in graph.edges) writer.write("${edge.v1}$COLUMN_DELIMITER${edge.v2}\n")
+            for (edge in graph.edges) with(edge) {
+                writer.write("${v1.id}$COLUMN_DELIMITER${v2.id}\n")
+            }
 
             writer.newLine()
 
             for (entry in graph.vertices) with(entry.value) {
-                writer.write("$id$COLUMN_DELIMITER$community$COLUMN_DELIMITER$centrality")
+                writer.write("$id$COLUMN_DELIMITER$community$COLUMN_DELIMITER$centrality\n")
             }
         }
-    }
-
-
-    private fun handleError(lineNum: Int, message: String): Nothing {
-        throw IOException("Incorrect input format on line $lineNum: $message")
     }
 }
