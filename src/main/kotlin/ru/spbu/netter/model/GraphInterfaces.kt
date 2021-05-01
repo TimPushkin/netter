@@ -20,4 +20,6 @@ interface Graph {
     fun addVertex(id: Int): Vertex
 
     fun addEdge(id1: Int, id2: Int): Edge
+
+    fun isEmpty(): Boolean
 }
