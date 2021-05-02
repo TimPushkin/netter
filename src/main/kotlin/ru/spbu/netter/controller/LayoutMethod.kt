@@ -8,6 +8,6 @@ interface LayoutMethod {
     fun layout(
         graph: Graph,
         center: Point2D = Point2D(0.0, 0.0),
-        k: Double = 1.0
+        repulsion: Double = 1.0
     ): ArrayList<Point2D>
 }

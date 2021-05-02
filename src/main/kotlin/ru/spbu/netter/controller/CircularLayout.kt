@@ -13,7 +13,7 @@ class CircularLayout : Controller(), LayoutMethod {
     override fun layout(
         graph: Graph,
         center: Point2D,
-        k: Double
+        repulsion: Double
     ): ArrayList<Point2D> {
 
         if (graph.isEmpty()) {
@@ -23,20 +23,20 @@ class CircularLayout : Controller(), LayoutMethod {
 
         println("Placing vertices in a circular shape...")
 
-        val direct = ArrayList<Point2D>(graph.vertices.size)
+        val coordinates = ArrayList<Point2D>(graph.vertices.size)
 
         val angle = Math.toRadians(360.0 / graph.vertices.size)
-        val radius = k * sqrt(2 / (1 - cos(angle)))
-        var prev = Point2D(0.0, radius)
+        val radius = repulsion * sqrt(2 / (1 - cos(angle)))
+        var curr = Point2D(0.0, radius)
 
         graph.vertices.keys.onEach {
-            direct[it] = prev
-            prev = prev.rotate(center, angle)
+            coordinates[it] = curr
+            curr = curr.rotated(center, angle)
         }
-        return direct
+        return coordinates
     }
 
-    private fun Point2D.rotate(center: Point2D, angle: Double): Point2D {
+    private fun Point2D.rotated(center: Point2D, angle: Double): Point2D {
         val sin = sin(angle)
         val cos = cos(angle)
 

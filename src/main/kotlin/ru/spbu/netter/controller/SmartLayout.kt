@@ -9,7 +9,7 @@ class SmartLayout : Controller(), LayoutMethod {
     override fun layout(
         graph: Graph,
         center: Point2D,
-        k: Double
+        repulsion: Double
     ): ArrayList<Point2D> {
 
         println("Placing vertices in a nice shape...")
