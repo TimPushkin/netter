@@ -12,7 +12,7 @@ class SmartLayout : Controller(), LayoutMethod {
         repulsion: Double
     ): ArrayList<Point2D> {
 
-        println("Placing vertices in a nice shape...")
+        println("Placing vertices in a nice shape with repulsion $repulsion...")
         return arrayListOf()
     }
 }

@@ -17,11 +17,11 @@ class CircularLayout : Controller(), LayoutMethod {
     ): ArrayList<Point2D> {
 
         if (graph.isEmpty()) {
-            println("there is nothing to draw") // TODO(logging)
+            println("there is nothing to draw")
             return arrayListOf()
         }
 
-        println("Placing vertices in a circular shape...")
+        println("Placing vertices in a circular shape with repulsion $repulsion...")
 
         val coordinates = ArrayList<Point2D>(graph.vertices.size)
 
