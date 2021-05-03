@@ -14,11 +14,11 @@ class MainView : View() {
 
     override val root = vbox {
         button("Layout").setOnAction {
-            smartLayout.layout(graph)
+            smartLayout.layOut(graph)
         }
     }
 
     init {
-        defaultLayout.layout(graph)
+        defaultLayout.layOut(graph)
     }
 }
