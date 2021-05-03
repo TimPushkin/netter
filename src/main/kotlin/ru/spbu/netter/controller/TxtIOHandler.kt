@@ -15,13 +15,12 @@ class TxtIOHandler : Controller(), FileIOHandler {
         private const val VERTEX_INPUT_COLUMNS_NUM = 3
     }
 
-
-    override fun importNetwork(graph: Graph, filePath: String) {
+    override fun importNetwork(graph: Graph, file: File) {
         val parsingMethods = listOf(::parseEdge, ::parseVertex)
         var lineNum = 0
 
         val bufferedReader = try {
-            File(filePath).bufferedReader()
+            file.bufferedReader()
         } catch (exception: FileNotFoundException) {
             throw FileNotFoundException("File cannot be read: ${exception.localizedMessage}")
         }
@@ -106,10 +105,7 @@ class TxtIOHandler : Controller(), FileIOHandler {
         throw IOException("Incorrect input format on line $lineNum: $message")
     }
 
-
-    override fun exportNetwork(graph: Graph, filePath: String) {
-        val file = File(filePath)
-
+    override fun exportNetwork(graph: Graph, file: File) {
         try {
             Files.createDirectories(file.toPath().parent)
         } catch (exception: Exception) {
