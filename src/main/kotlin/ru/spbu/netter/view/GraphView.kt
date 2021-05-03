@@ -20,8 +20,8 @@ class GraphView(val graph: Graph) : Group() {
     }
 
     init {
-        vertices.values.forEach { add(it) }
         edges.values.forEach { add(it) }
+        vertices.values.forEach { add(it) }
     }
 
     fun applyLayout(coordinates: Array<Point2D>) {

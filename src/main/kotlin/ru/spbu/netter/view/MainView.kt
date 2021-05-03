@@ -171,7 +171,7 @@ class RepulsionInputForm : Fragment("Repulsion input") {
 
         fieldset {
             field("Enter repulsion:") {
-                enteredRepulsion = textfield("10.0")
+                enteredRepulsion = textfield("20.0")
             }
         }
 

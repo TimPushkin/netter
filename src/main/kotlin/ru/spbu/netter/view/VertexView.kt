@@ -17,8 +17,8 @@ class VertexView(val vertex: Vertex, x: Double, y: Double, var colorsNum: Intege
     }
 
     companion object {
-        private const val MIN_RADIUS = 1.0
-        private const val RADIUS_SCALING = 1.0
+        private const val MIN_RADIUS = 5.0
+        private const val RADIUS_SCALING = 1.5
 
         private const val WEB_COLOR_RADIX = 16
         private const val MAX_WEB_COLOR = 0xFFFFFF
@@ -27,10 +27,9 @@ class VertexView(val vertex: Vertex, x: Double, y: Double, var colorsNum: Intege
 
     private fun calculateRadius() = MIN_RADIUS + vertex.centrality * RADIUS_SCALING
 
-    private fun calculateColor(): Color =
-        Color.web(
-            "#" + (MAX_WEB_COLOR / colorsNum.value * vertex.community)
-                .toString(WEB_COLOR_RADIX)
-                .padStart(MAX_WEB_COLOR_LEN, '0')
-        )
+    private fun calculateColor() = Color.web(
+        "#" + (MAX_WEB_COLOR / (colorsNum.value + 1) * (vertex.community + 1))
+            .toString(WEB_COLOR_RADIX)
+            .padStart(MAX_WEB_COLOR_LEN, '0')
+    )
 }
