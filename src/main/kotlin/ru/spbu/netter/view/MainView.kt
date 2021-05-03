@@ -87,7 +87,7 @@ class RepulsionInputForm : Fragment("Input repulsion") {
 
         buttonbar {
             button("OK").setOnAction {
-                layoutMethod.layout(graph, repulsion = repulsion.text.toDouble())
+                layoutMethod.layOut(graph, repulsion = repulsion.text.toDouble())
                 close()
             }
         }

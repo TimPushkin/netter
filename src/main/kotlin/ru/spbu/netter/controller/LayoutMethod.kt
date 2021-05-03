@@ -5,9 +5,9 @@ import javafx.geometry.Point2D
 
 
 interface LayoutMethod {
-    fun layout(
+    fun layOut(
         graph: Graph,
         center: Point2D = Point2D(0.0, 0.0),
         repulsion: Double = 1.0
-    ): ArrayList<Point2D>
+    ): Array<Point2D>
 }

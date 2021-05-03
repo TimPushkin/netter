@@ -10,20 +10,15 @@ import kotlin.math.sqrt
 
 class CircularLayout : Controller(), LayoutMethod {
 
-    override fun layout(
-        graph: Graph,
-        center: Point2D,
-        repulsion: Double
-    ): ArrayList<Point2D> {
-
+    override fun layOut(graph: Graph, center: Point2D, repulsion: Double): Array<Point2D> {
         if (graph.isEmpty()) {
-            println("there is nothing to draw")
-            return arrayListOf()
+            println("There is nothing to lay out: graph $graph is empty")
+            return emptyArray()
         }
 
         println("Placing vertices in a circular shape with repulsion $repulsion...")
 
-        val coordinates = ArrayList<Point2D>(graph.vertices.size)
+        val coordinates = Array(graph.vertices.size) { Point2D(0.0, 0.0) }
 
         val angle = Math.toRadians(360.0 / graph.vertices.size)
         val radius = repulsion * sqrt(2 / (1 - cos(angle)))
@@ -33,6 +28,7 @@ class CircularLayout : Controller(), LayoutMethod {
             coordinates[it] = curr
             curr = curr.rotated(center, angle)
         }
+
         return coordinates
     }
 
@@ -45,6 +41,7 @@ class CircularLayout : Controller(), LayoutMethod {
             tmp.x * cos - tmp.y * sin,
             tmp.x * sin + tmp.y * cos,
         )
+
         return rotated.add(center)
     }
 }
