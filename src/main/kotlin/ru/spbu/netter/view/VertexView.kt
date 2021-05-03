@@ -7,7 +7,7 @@ import javafx.scene.shape.Circle
 import ru.spbu.netter.model.Vertex
 
 
-class VertexView(val vertex: Vertex, x: Double, y: Double, var colorsNum: IntegerProperty) : Circle() {
+class VertexView(private val vertex: Vertex, x: Double, y: Double, var colorsNum: IntegerProperty) : Circle() {
 
     init {
         super.setCenterX(x)
