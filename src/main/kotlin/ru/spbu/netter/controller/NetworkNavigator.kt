@@ -17,28 +17,29 @@ class NetworkNavigator : Controller(), NetworkNavigationHandler {
     override fun handleMouseDragged(event: MouseEvent) {
         if (!event.isPrimaryButtonDown) return
 
-        getGraphView(event).apply {
+        getGraphView(event)?.apply {
             translateX = event.x
             translateY = event.y
-        }
 
-        event.consume()
+            event.consume()
+        }
     }
 
     override fun handleScroll(event: ScrollEvent) {
-        getGraphView(event).apply {
+        getGraphView(event)?.apply {
             scaleX = (scaleX + event.deltaY * ZOOM_SCALING).takeIf { it >= MIN_ZOOM } ?: MIN_ZOOM
             scaleY = scaleX
-        }
 
-        event.consume()
+            event.consume()
+        }
     }
 
-    private fun getGraphView(event: InputEvent): GraphView {
+    private fun getGraphView(event: InputEvent): GraphView? {
         require(event.source is Pane) { "Unsupported event source: expected a Pane but was ${event.source::class}" }
-        require((event.source as Pane).children.size == 1) { "Unsupported event source children: expected 1 child but was ${(event.source as Pane).children.size}" }
-        require((event.source as Pane).children[0] is GraphView) { "Unsupported event source child: expected a GraphView but was ${(event.source as Pane).children[0]}" }
 
-        return (event.source as Pane).children[0] as GraphView
+        with((event.source as Pane).children) {
+            require(isNotEmpty()) { "Unsupported event source children: collection $this is empty" }
+            return if (first() is GraphView) first() as GraphView else null
+        }
     }
 }

@@ -10,14 +10,15 @@ class NavigationSpace : View() {
 
     override val root = pane {
         label("Import a network to be displayed here")
+    }.apply {
+        setOnMouseDragged { it?.let { navigator.handleMouseDragged(it) } }
+        setOnScroll { it?.let { navigator.handleScroll(it) } }
     }
 
     fun replaceNetwork(graph: GraphView) {
         root.apply {
             children.clear()
             add(graph)
-            setOnMouseDragged { it?.let { navigator.handleMouseDragged(it) } }
-            setOnScroll { it?.let { navigator.handleScroll(it) } }
         }
     }
 }
