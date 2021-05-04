@@ -13,7 +13,11 @@ import java.io.File
 
 class MainView : View("Netter") {
     private lateinit var graphView: GraphView
+
     private val fileIOHandlerNames = listOf("Plain text", "Neo4J", "SQLite")
+
+    private val navigationSpace: NavigationSpace by inject()
+
     private val defaultLayout: LayoutMethod by inject<CircularLayout>()
     private val smartLayout: LayoutMethod by inject<SmartLayout>()
 
@@ -32,7 +36,7 @@ class MainView : View("Netter") {
                         graphView = GraphView(graph).apply {
                             applyLayout(defaultLayout.layOut(graph, repulsion = it))
                         }
-                        center = graphView
+                        navigationSpace.replaceNetwork(graphView)
                     }
                 }
             }
@@ -89,7 +93,7 @@ class MainView : View("Netter") {
             }
         }
 
-        center = label("Import a network to be shown here")
+        center<NavigationSpace>()
     }
 
     private fun getFile(): Pair<FileIOHandler?, File?> {
