@@ -24,6 +24,8 @@ class MainView : View("Netter") {
     override val root = borderpane {
         setPrefSize(960.0, 540.0)
 
+        center<NavigationSpace>()
+
         left = vbox {
             button("Import network").setOnAction {
                 val graph = UndirectedGraph()
@@ -92,8 +94,6 @@ class MainView : View("Netter") {
                 )
             }
         }
-
-        center<NavigationSpace>()
     }
 
     private fun getFile(): Pair<FileIOHandler?, File?> {
