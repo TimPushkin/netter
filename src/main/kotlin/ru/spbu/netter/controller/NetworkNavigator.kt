@@ -1,5 +1,6 @@
 package ru.spbu.netter.controller
 
+import javafx.geometry.Point2D
 import javafx.scene.input.InputEvent
 import javafx.scene.input.MouseEvent
 import javafx.scene.input.ScrollEvent
@@ -9,17 +10,29 @@ import tornadofx.*
 
 
 class NetworkNavigator : Controller(), NetworkNavigationHandler {
+    lateinit var prevMousePressedPoint: Point2D
+
     companion object {
         private const val MIN_ZOOM = 0.2
         private const val ZOOM_SCALING = 0.01
+    }
+
+    override fun handleMousePressed(event: MouseEvent) {
+        if (!event.isPrimaryButtonDown) return
+
+        prevMousePressedPoint = Point2D(event.x, event.y)
+
+        event.consume()
     }
 
     override fun handleMouseDragged(event: MouseEvent) {
         if (!event.isPrimaryButtonDown) return
 
         getGraphView(event)?.apply {
-            translateX = event.x
-            translateY = event.y
+            translateX += event.x - prevMousePressedPoint.x
+            translateY += event.y - prevMousePressedPoint.y
+
+            prevMousePressedPoint = Point2D(event.x, event.y)
 
             event.consume()
         }

@@ -10,6 +10,7 @@ class NavigationSpace : View() {
     private val navigator: NetworkNavigationHandler = find<NetworkNavigator>()
 
     override val root = pane().apply {
+        setOnMousePressed { it?.let { navigator.handleMousePressed(it) } }
         setOnMouseDragged { it?.let { navigator.handleMouseDragged(it) } }
         setOnScroll { it?.let { navigator.handleScroll(it) } }
     }
