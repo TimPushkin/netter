@@ -20,6 +20,11 @@ class CircularLayout : Controller(), LayoutMethod {
 
         val coordinates = Array(graph.vertices.size) { Point2D(0.0, 0.0) }
 
+        if (graph.vertices.size == 1) {
+            coordinates[0] = center
+            return coordinates
+        }
+
         val angle = Math.toRadians(360.0 / graph.vertices.size)
         val radius = repulsion * sqrt(2 / (1 - cos(angle)))
         var curr = Point2D(0.0, radius)
