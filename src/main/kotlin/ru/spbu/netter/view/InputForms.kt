@@ -62,7 +62,11 @@ class RepulsionInputForm : Fragment("Repulsion input") {
                 if (enteredRepulsion.text.isDouble()) {
                     repulsion.text = enteredRepulsion.text
                     close()
-                } else alert(Alert.AlertType.INFORMATION, "Wrong repulsion input", "Repulsion must be a decimal number")
+                } else alert(
+                    Alert.AlertType.INFORMATION,
+                    "Wrong repulsion input",
+                    "Repulsion must be a decimal number",
+                )
             }
         }
     }

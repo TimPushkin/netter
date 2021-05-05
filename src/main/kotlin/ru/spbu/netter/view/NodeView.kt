@@ -5,12 +5,12 @@ import javafx.beans.property.IntegerProperty
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.scene.text.TextBoundsType
-import ru.spbu.netter.model.Vertex
+import ru.spbu.netter.model.Node
 import tornadofx.*
 
 
-class VertexView(private val vertex: Vertex, x: Double, y: Double, var colorsNum: IntegerProperty) : Circle(x, y, 0.0) {
-    val label = text(vertex.id.toString()) {
+class NodeView(private val node: Node, x: Double, y: Double, var colorsNum: IntegerProperty) : Circle(x, y, 0.0) {
+    val label = text(node.id.toString()) {
         scaleXProperty().bind(radiusProperty() * LABEL_SCALING)
         scaleYProperty().bind(radiusProperty() * LABEL_SCALING)
 
@@ -22,8 +22,8 @@ class VertexView(private val vertex: Vertex, x: Double, y: Double, var colorsNum
     }
 
     init {
-        radiusProperty().bind(Bindings.createDoubleBinding(::calculateRadius, vertex.centralityProperty))
-        fillProperty().bind(Bindings.createObjectBinding(::calculateColor, colorsNum, vertex.communityProperty))
+        radiusProperty().bind(Bindings.createDoubleBinding(::calculateRadius, node.centralityProperty))
+        fillProperty().bind(Bindings.createObjectBinding(::calculateColor, colorsNum, node.communityProperty))
         strokeProperty().bind(Bindings.createObjectBinding(calculateColor()::darker, fillProperty()))
         strokeWidthProperty().bind(radiusProperty() * STROKE_SCALING)
     }
@@ -41,10 +41,10 @@ class VertexView(private val vertex: Vertex, x: Double, y: Double, var colorsNum
         private const val MAX_WEB_COLOR_LEN = 6
     }
 
-    private fun calculateRadius() = MIN_RADIUS + vertex.centrality * RADIUS_SCALING
+    private fun calculateRadius() = MIN_RADIUS + node.centrality * RADIUS_SCALING
 
     private fun calculateColor() = Color.web(
-        "#" + (MAX_WEB_COLOR / (colorsNum.value + 1) * (vertex.community + 1))
+        "#" + (MAX_WEB_COLOR / (colorsNum.value + 1) * (node.community + 1))
             .toString(WEB_COLOR_RADIX)
             .padStart(MAX_WEB_COLOR_LEN, '0')
     )

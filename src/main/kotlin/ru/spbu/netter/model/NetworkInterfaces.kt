@@ -4,7 +4,7 @@ import javafx.beans.property.DoubleProperty
 import javafx.beans.property.IntegerProperty
 
 
-interface Vertex {
+interface Node {
     val id: Int
 
     val communityProperty: IntegerProperty
@@ -19,20 +19,18 @@ interface Vertex {
     }
 }
 
-interface Edge {
-    val v1: Vertex
-    val v2: Vertex
+interface Link {
+    val v1: Node
+    val v2: Node
 }
 
-interface Graph {
-    val vertices: Map<Int, Vertex>
-    val edges: Collection<Edge>
+interface Network {
+    val nodes: Map<Int, Node>
+    val links: Collection<Link>
 
-    fun addVertex(id: Int): Vertex
+    fun addNode(id: Int): Node
 
-    fun addEdge(id1: Int, id2: Int): Edge
-
-    fun clear()
+    fun addLink(id1: Int, id2: Int): Link
 
     fun isEmpty(): Boolean
 }

@@ -4,14 +4,15 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.Alert
 import javafx.scene.control.TextField
 import ru.spbu.netter.controller.*
-import ru.spbu.netter.model.UndirectedGraph
+import ru.spbu.netter.model.Network
+import ru.spbu.netter.model.UndirectedNetwork
 import tornadofx.*
 import java.io.File
 import java.io.IOException
 
 
 class MainView : View("Netter") {
-    private lateinit var graphView: GraphView
+    private lateinit var networkView: NetworkView
 
     private val fileIOHandlerNames = listOf("Plain text", "Neo4J", "SQLite")
 
@@ -27,32 +28,32 @@ class MainView : View("Netter") {
 
         left = vbox {
             button("Import network").setOnAction {
-                val graph = UndirectedGraph()
+                val network: Network = UndirectedNetwork()
                 val (fileIOHandler, file) = getFile()
 
                 if (fileIOHandler != null && file != null) {
                     try {
-                        fileIOHandler.importNetwork(graph, file)
+                        fileIOHandler.importNetwork(network, file)
                     } catch (exception: IOException) {
                         alert(Alert.AlertType.ERROR, "Network import failed", exception.localizedMessage)
                         return@setOnAction
                     }
 
                     getRepulsion()?.let {
-                        graphView = GraphView(graph).apply {
-                            applyLayout(defaultLayout.layOut(graph, repulsion = it))
+                        networkView = NetworkView(network).apply {
+                            applyLayout(defaultLayout.layOut(network, repulsion = it))
                         }
-                        navigationSpace.replaceNetwork(graphView)
+                        navigationSpace.replaceNetwork(networkView)
                     }
                 }
             }
 
             button("Export network").setOnAction {
-                if (this@MainView::graphView.isInitialized) {
+                if (this@MainView::networkView.isInitialized) {
                     val (fileIOHandler, file) = getFile()
                     if (fileIOHandler != null && file != null) {
                         try {
-                            fileIOHandler.exportNetwork(graphView.graph, file)
+                            fileIOHandler.exportNetwork(networkView.network, file)
                         } catch (exception: IOException) {
                             alert(Alert.AlertType.ERROR, "Network export failed", exception.localizedMessage)
                             return@setOnAction
@@ -66,8 +67,10 @@ class MainView : View("Netter") {
             }
 
             button("Apply smart layout").setOnAction {
-                if (this@MainView::graphView.isInitialized) {
-                    getRepulsion()?.let { graphView.applyLayout(smartLayout.layOut(graphView.graph, repulsion = it)) }
+                if (this@MainView::networkView.isInitialized) {
+                    getRepulsion()?.let {
+                        networkView.applyLayout(smartLayout.layOut(networkView.network, repulsion = it))
+                    }
                 } else alert(
                     Alert.AlertType.INFORMATION,
                     "Nothing to lay out",
@@ -76,8 +79,10 @@ class MainView : View("Netter") {
             }
 
             button("Apply default layout").setOnAction {
-                if (this@MainView::graphView.isInitialized) {
-                    getRepulsion()?.let { graphView.applyLayout(defaultLayout.layOut(graphView.graph, repulsion = it)) }
+                if (this@MainView::networkView.isInitialized) {
+                    getRepulsion()?.let {
+                        networkView.applyLayout(defaultLayout.layOut(networkView.network, repulsion = it))
+                    }
                 } else alert(
                     Alert.AlertType.INFORMATION,
                     "Nothing to lay out",
@@ -86,7 +91,7 @@ class MainView : View("Netter") {
             }
 
             button("Display communities").setOnAction {
-                if (this@MainView::graphView.isInitialized) {
+                if (this@MainView::networkView.isInitialized) {
                     println("Todo")
                 } else alert(
                     Alert.AlertType.INFORMATION,
@@ -96,7 +101,7 @@ class MainView : View("Netter") {
             }
 
             button("Display centrality").setOnAction {
-                if (this@MainView::graphView.isInitialized) {
+                if (this@MainView::networkView.isInitialized) {
                     println("Todo")
                 } else alert(
                     Alert.AlertType.INFORMATION,

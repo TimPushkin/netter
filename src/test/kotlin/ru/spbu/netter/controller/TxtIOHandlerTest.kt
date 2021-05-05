@@ -1,7 +1,7 @@
 package ru.spbu.netter.controller
 
-import ru.spbu.netter.model.Graph
-import ru.spbu.netter.model.UndirectedGraph
+import ru.spbu.netter.model.Network
+import ru.spbu.netter.model.UndirectedNetwork
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -12,14 +12,14 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
-import ru.spbu.netter.model.Vertex
+import ru.spbu.netter.model.Node
 import java.io.File
 import java.io.IOException
 import kotlin.streams.asStream
 
 
 internal class TxtIOHandlerTest {
-    lateinit var graph: Graph
+    lateinit var network: Network
 
     companion object {
         // TxtIOHandler constants
@@ -65,13 +65,13 @@ internal class TxtIOHandlerTest {
 
     // Helper functions
 
-    private fun Graph.verticesAsTriples() = vertices.map { it.value.run { Triple(id, community, centrality) } }
+    private fun Network.nodesAsTriples() = nodes.map { it.value.run { Triple(id, community, centrality) } }
 
-    private fun Graph.edgesAsPairs() = edges.map { it.run { Pair(v1.id, v2.id) } }
+    private fun Network.linksAsPairs() = links.map { it.run { Pair(v1.id, v2.id) } }
 
     private fun readNetworkInput(inputFile: File): Pair<MutableSet<Pair<Int, Int>>, MutableMap<Int, Triple<Int, Int, Double>>> {
-        val edges = mutableSetOf<Pair<Int, Int>>()
-        val vertices = mutableMapOf<Int, Triple<Int, Int, Double>>()
+        val links = mutableSetOf<Pair<Int, Int>>()
+        val nodes = mutableMapOf<Int, Triple<Int, Int, Double>>()
 
         inputFile.bufferedReader().use { reader ->
             while (reader.ready()) {
@@ -82,10 +82,10 @@ internal class TxtIOHandlerTest {
                     val id1 = get(0).toInt()
                     val id2 = get(1).toInt()
 
-                    if (!edges.contains(Pair(id2, id1))) edges.add(Pair(id1, id2))
+                    if (!links.contains(Pair(id2, id1))) links.add(Pair(id1, id2))
 
-                    vertices[id1] = Triple(id1, Vertex.DEFAULT_COMMUNITY, Vertex.DEFAULT_CENTRALITY)
-                    vertices[id2] = Triple(id2, Vertex.DEFAULT_COMMUNITY, Vertex.DEFAULT_CENTRALITY)
+                    nodes[id1] = Triple(id1, Node.DEFAULT_COMMUNITY, Node.DEFAULT_CENTRALITY)
+                    nodes[id2] = Triple(id2, Node.DEFAULT_COMMUNITY, Node.DEFAULT_CENTRALITY)
                 }
             }
 
@@ -96,44 +96,44 @@ internal class TxtIOHandlerTest {
                 line.split(COLUMN_DELIMITER).run {
                     val id = get(0).toInt()
 
-                    vertices[id] = Triple(id, get(1).toInt(), get(2).toDouble())
+                    nodes[id] = Triple(id, get(1).toInt(), get(2).toDouble())
                 }
             }
         }
 
         var i = 0
-        while (i < vertices.size) {
-            if (!vertices.contains(i)) vertices[i] = Triple(i, Vertex.DEFAULT_COMMUNITY, Vertex.DEFAULT_CENTRALITY)
+        while (i < nodes.size) {
+            if (!nodes.contains(i)) nodes[i] = Triple(i, Node.DEFAULT_COMMUNITY, Node.DEFAULT_CENTRALITY)
             i++
         }
 
-        return Pair(edges, vertices)
+        return Pair(links, nodes)
     }
 
-    fun verifyInput(graph: Graph, inputFile: File) {
-        val (expectedEdges, expectedVertices) = readNetworkInput(inputFile)
+    fun verifyInput(network: Network, inputFile: File) {
+        val (expectedLinks, expectedNodes) = readNetworkInput(inputFile)
 
         assertIterableEquals(
-            expectedEdges.sortedWith(compareBy({ it.first }, { it.second })),
-            graph.edgesAsPairs().sortedWith(compareBy({ it.first }, { it.second }))
+            expectedLinks.sortedWith(compareBy({ it.first }, { it.second })),
+            network.linksAsPairs().sortedWith(compareBy({ it.first }, { it.second }))
         )
         assertIterableEquals(
-            expectedVertices.values.sortedBy { it.first },
-            graph.verticesAsTriples().sortedBy { it.first }
+            expectedNodes.values.sortedBy { it.first },
+            network.nodesAsTriples().sortedBy { it.first }
         )
     }
 
     fun verifyOutput(inputFile: File, outputFile: File) {
-        val (expectedEdges, expectedVertices) = readNetworkInput(inputFile)
-        val (actualEdges, actualVertices) = readNetworkInput(outputFile)
+        val (expectedLinks, expectedNodes) = readNetworkInput(inputFile)
+        val (actualLinks, actualNodes) = readNetworkInput(outputFile)
 
         assertIterableEquals(
-            expectedEdges.sortedWith(compareBy({ it.first }, { it.second })),
-            actualEdges.sortedWith(compareBy({ it.first }, { it.second }))
+            expectedLinks.sortedWith(compareBy({ it.first }, { it.second })),
+            actualLinks.sortedWith(compareBy({ it.first }, { it.second }))
         )
         assertIterableEquals(
-            expectedVertices.values.sortedBy { it.first },
-            actualVertices.values.sortedBy { it.first }
+            expectedNodes.values.sortedBy { it.first },
+            actualNodes.values.sortedBy { it.first }
         )
     }
 
@@ -141,7 +141,7 @@ internal class TxtIOHandlerTest {
 
     @BeforeEach
     fun setUp() {
-        graph = UndirectedGraph()
+        network = UndirectedNetwork()
     }
 
 
@@ -149,16 +149,16 @@ internal class TxtIOHandlerTest {
     inner class ImportNetwork {
         @ParameterizedTest(name = PARAMETERIZED_TEST_NAME)
         @ArgumentsSource(CorrectInputsProvider::class)
-        fun `import correct data - the data is in the graph`(inputFile: File) {
-            TxtIOHandler().importNetwork(graph, inputFile)
+        fun `import correct data - the data is in the network`(inputFile: File) {
+            TxtIOHandler().importNetwork(network, inputFile)
 
-            verifyInput(graph, inputFile)
+            verifyInput(network, inputFile)
         }
 
         @ParameterizedTest(name = PARAMETERIZED_TEST_NAME)
         @ArgumentsSource(IncorrectInputsProvider::class)
         fun `import incorrect data - throws IOException`(inputFile: File) {
-            assertThrows<IOException> { TxtIOHandler().importNetwork(graph, inputFile) }
+            assertThrows<IOException> { TxtIOHandler().importNetwork(network, inputFile) }
         }
     }
 
@@ -167,8 +167,8 @@ internal class TxtIOHandlerTest {
         @ParameterizedTest(name = PARAMETERIZED_TEST_NAME)
         @ArgumentsSource(CorrectInputsProvider::class)
         fun `import and export network - output file contains imported data`(inputFile: File) {
-            TxtIOHandler().importNetwork(graph, inputFile)
-            TxtIOHandler().exportNetwork(graph, File(OUTPUT_FILE_PATH))
+            TxtIOHandler().importNetwork(network, inputFile)
+            TxtIOHandler().exportNetwork(network, File(OUTPUT_FILE_PATH))
 
             verifyOutput(inputFile, File(OUTPUT_FILE_PATH))
         }

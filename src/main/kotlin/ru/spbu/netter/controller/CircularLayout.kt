@@ -1,6 +1,6 @@
 package ru.spbu.netter.controller
 
-import ru.spbu.netter.model.Graph
+import ru.spbu.netter.model.Network
 import javafx.geometry.Point2D
 import tornadofx.*
 import kotlin.math.cos
@@ -10,26 +10,26 @@ import kotlin.math.sqrt
 
 class CircularLayout : Controller(), LayoutMethod {
 
-    override fun layOut(graph: Graph, center: Point2D, repulsion: Double): Array<Point2D> {
-        if (graph.isEmpty()) {
-            println("There is nothing to lay out: graph $graph is empty")
+    override fun layOut(network: Network, center: Point2D, repulsion: Double): Array<Point2D> {
+        if (network.isEmpty()) {
+            println("There is nothing to lay out: network $network is empty")
             return emptyArray()
         }
 
-        println("Placing vertices in a circular shape with repulsion $repulsion...")
+        println("Placing nodes in a circular shape with repulsion $repulsion...")
 
-        val coordinates = Array(graph.vertices.size) { Point2D(0.0, 0.0) }
+        val coordinates = Array(network.nodes.size) { Point2D(0.0, 0.0) }
 
-        if (graph.vertices.size == 1) {
+        if (network.nodes.size == 1) {
             coordinates[0] = center
             return coordinates
         }
 
-        val angle = Math.toRadians(360.0 / graph.vertices.size)
+        val angle = Math.toRadians(360.0 / network.nodes.size)
         val radius = repulsion * sqrt(2 / (1 - cos(angle)))
         var curr = Point2D(0.0, radius)
 
-        graph.vertices.keys.onEach {
+        network.nodes.keys.onEach {
             coordinates[it] = curr
             curr = curr.rotated(center, angle)
         }

@@ -4,7 +4,7 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.input.ScrollEvent
 
 
-interface NetworkNavigationHandler {
+interface NetworkEventHandler {
 
     fun handleMousePressed(event: MouseEvent)
 
