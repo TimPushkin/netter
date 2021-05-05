@@ -7,6 +7,7 @@ import ru.spbu.netter.controller.*
 import ru.spbu.netter.model.UndirectedGraph
 import tornadofx.*
 import java.io.File
+import java.io.IOException
 
 
 class MainView : View("Netter") {
@@ -30,7 +31,12 @@ class MainView : View("Netter") {
                 val (fileIOHandler, file) = getFile()
 
                 if (fileIOHandler != null && file != null) {
-                    fileIOHandler.importNetwork(graph, file)
+                    try {
+                        fileIOHandler.importNetwork(graph, file)
+                    } catch (exception: IOException) {
+                        alert(Alert.AlertType.ERROR, "Network import failed", exception.localizedMessage)
+                        return@setOnAction
+                    }
 
                     getRepulsion()?.let {
                         graphView = GraphView(graph).apply {
@@ -44,7 +50,14 @@ class MainView : View("Netter") {
             button("Export network").setOnAction {
                 if (this@MainView::graphView.isInitialized) {
                     val (fileIOHandler, file) = getFile()
-                    if (fileIOHandler != null && file != null) fileIOHandler.exportNetwork(graphView.graph, file)
+                    if (fileIOHandler != null && file != null) {
+                        try {
+                            fileIOHandler.exportNetwork(graphView.graph, file)
+                        } catch (exception: IOException) {
+                            alert(Alert.AlertType.ERROR, "Network export failed", exception.localizedMessage)
+                            return@setOnAction
+                        }
+                    }
                 } else alert(
                     Alert.AlertType.INFORMATION,
                     "Nothing to export",
