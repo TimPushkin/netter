@@ -4,21 +4,37 @@ import javafx.beans.binding.Bindings
 import javafx.beans.property.IntegerProperty
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
+import javafx.scene.text.TextBoundsType
 import ru.spbu.netter.model.Vertex
+import tornadofx.*
 
 
-class VertexView(private val vertex: Vertex, x: Double, y: Double, var colorsNum: IntegerProperty) : Circle() {
+class VertexView(private val vertex: Vertex, x: Double, y: Double, var colorsNum: IntegerProperty) : Circle(x, y, 0.0) {
+    val label = text(vertex.id.toString()) {
+        scaleXProperty().bind(radiusProperty() * LABEL_SCALING)
+        scaleYProperty().bind(radiusProperty() * LABEL_SCALING)
+
+        boundsType = TextBoundsType.LOGICAL_VERTICAL_CENTER
+        xProperty().bind(centerXProperty() - layoutBounds.width / 2)
+
+        boundsType = TextBoundsType.VISUAL
+        yProperty().bind(centerYProperty() + layoutBounds.height / 2)
+    }
 
     init {
-        super.setCenterX(x)
-        super.setCenterY(y)
-        super.radiusProperty().bind(Bindings.createDoubleBinding(::calculateRadius, vertex.centralityProperty))
-        super.fillProperty().bind(Bindings.createObjectBinding(::calculateColor, colorsNum, vertex.communityProperty))
+        radiusProperty().bind(Bindings.createDoubleBinding(::calculateRadius, vertex.centralityProperty))
+        fillProperty().bind(Bindings.createObjectBinding(::calculateColor, colorsNum, vertex.communityProperty))
+        strokeProperty().bind(Bindings.createObjectBinding(calculateColor()::darker, fillProperty()))
+        strokeWidthProperty().bind(radiusProperty() * STROKE_SCALING)
     }
 
     companion object {
+        private const val LABEL_SCALING = 0.12
+
         private const val MIN_RADIUS = 5.0
         private const val RADIUS_SCALING = 1.5
+
+        private const val STROKE_SCALING = 0.2
 
         private const val WEB_COLOR_RADIX = 16
         private const val MAX_WEB_COLOR = 0xFFFFFF

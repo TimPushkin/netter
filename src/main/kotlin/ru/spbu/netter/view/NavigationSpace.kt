@@ -1,6 +1,5 @@
 package ru.spbu.netter.view
 
-import javafx.beans.binding.Bindings
 import ru.spbu.netter.controller.NetworkNavigationHandler
 import ru.spbu.netter.controller.NetworkNavigator
 import tornadofx.*
@@ -17,24 +16,16 @@ class NavigationSpace : View() {
 
     init {
         root += label("Import a network to be displayed here").apply {
-            translateXProperty().bind(
-                Bindings.createDoubleBinding({ calculateRootCenterX() - width / 2 }, root.widthProperty())
-            )
-            translateYProperty().bind(
-                Bindings.createDoubleBinding({ calculateRootCenterY() - height / 2 }, root.heightProperty())
-            )
+            translateXProperty().bind(root.widthProperty() / 2)
+            translateYProperty().bind(root.heightProperty() / 2)
         }
     }
 
     fun replaceNetwork(graph: GraphView) {
         root.children.clear()
         root += graph.apply {
-            translateX = calculateRootCenterX()
-            translateY = calculateRootCenterY()
+            translateX = root.width / 2
+            translateY = root.height / 2
         }
     }
-
-    private fun calculateRootCenterX() = root.width / 2
-
-    private fun calculateRootCenterY() = root.height / 2
 }
