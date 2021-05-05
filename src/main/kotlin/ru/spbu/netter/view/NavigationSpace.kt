@@ -16,8 +16,8 @@ class NavigationSpace : View() {
 
     init {
         root += label("Import a network to be displayed here").apply {
-            translateXProperty().bind(root.widthProperty() / 2)
-            translateYProperty().bind(root.heightProperty() / 2)
+            translateXProperty().bind((root.widthProperty() - widthProperty()) / 2)
+            translateYProperty().bind((root.heightProperty() - heightProperty()) / 2)
         }
     }
 
