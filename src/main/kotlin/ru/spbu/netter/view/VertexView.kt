@@ -24,6 +24,8 @@ class VertexView(private val vertex: Vertex, x: Double, y: Double, var colorsNum
     init {
         radiusProperty().bind(Bindings.createDoubleBinding(::calculateRadius, vertex.centralityProperty))
         fillProperty().bind(Bindings.createObjectBinding(::calculateColor, colorsNum, vertex.communityProperty))
+        strokeProperty().bind(Bindings.createObjectBinding(calculateColor()::darker, fillProperty()))
+        strokeWidthProperty().bind(radiusProperty() * STROKE_SCALING)
     }
 
     companion object {
@@ -31,6 +33,8 @@ class VertexView(private val vertex: Vertex, x: Double, y: Double, var colorsNum
 
         private const val MIN_RADIUS = 5.0
         private const val RADIUS_SCALING = 1.5
+
+        private const val STROKE_SCALING = 0.2
 
         private const val WEB_COLOR_RADIX = 16
         private const val MAX_WEB_COLOR = 0xFFFFFF
