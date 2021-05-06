@@ -21,6 +21,8 @@ class MainView : View("Netter") {
     private val defaultLayout: LayoutMethod by inject<CircularLayout>()
     private val smartLayout: LayoutMethod by inject<SmartLayout>()
 
+    private val communityDetector: CommunityDetector by inject<LeidenCommunityDetector>()
+
     override val root = borderpane {
         setPrefSize(960.0, 540.0)
 
@@ -92,7 +94,7 @@ class MainView : View("Netter") {
 
             button("Display communities").setOnAction {
                 if (this@MainView::networkView.isInitialized) {
-                    println("Todo")
+                    communityDetector.detectCommunities(networkView.network)
                 } else alert(
                     Alert.AlertType.INFORMATION,
                     "Nothing to inspect",
