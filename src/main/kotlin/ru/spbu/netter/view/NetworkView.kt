@@ -9,7 +9,14 @@ import tornadofx.*
 
 
 class NetworkView(val network: Network) : Group() {
-    private val colorsNumProperty = SimpleIntegerProperty(this, "colorsNum", calculateColorsNum())
+    private val colorsNumProperty = SimpleIntegerProperty(this, "colorsNum", calculateColorsNum()).apply {
+        bind(
+            Bindings.createObjectBinding(
+                ::calculateColorsNum,
+                *network.nodes.values.map { it.communityProperty }.toTypedArray()
+            )
+        )
+    }
 
     private val nodes = network.nodes.values.associateWith { NodeView(it, 0.0, 0.0, colorsNumProperty) }
     private val links = network.links.associateWith {
@@ -19,13 +26,6 @@ class NetworkView(val network: Network) : Group() {
     }
 
     init {
-        colorsNumProperty.bind(
-            Bindings.createObjectBinding(
-                ::calculateColorsNum,
-                *network.nodes.values.map { it.communityProperty }.toTypedArray()
-            )
-        )
-
         links.values.forEach { add(it) }
         nodes.values.forEach {
             add(it)

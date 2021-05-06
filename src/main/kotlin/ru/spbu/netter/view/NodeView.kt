@@ -23,9 +23,9 @@ class NodeView(private val node: Node, x: Double, y: Double, var colorsNum: Inte
 
     init {
         radiusProperty().bind(Bindings.createDoubleBinding(::calculateRadius, node.centralityProperty))
-        fillProperty().bind(Bindings.createObjectBinding(::calculateColor, colorsNum, node.communityProperty))
-        strokeProperty().bind(Bindings.createObjectBinding(calculateColor()::darker, fillProperty()))
-        strokeWidthProperty().bind(radiusProperty() * STROKE_SCALING)
+        strokeWidthProperty().bind(Bindings.createDoubleBinding(::calculateStrokeWidth, radiusProperty()))
+        fillProperty().bind(Bindings.createObjectBinding(::calculateFillColor, colorsNum, node.communityProperty))
+        strokeProperty().bind(Bindings.createObjectBinding(::calculateStrokeColor, fillProperty()))
     }
 
     companion object {
@@ -43,9 +43,13 @@ class NodeView(private val node: Node, x: Double, y: Double, var colorsNum: Inte
 
     private fun calculateRadius() = MIN_RADIUS + node.centrality * RADIUS_SCALING
 
-    private fun calculateColor() = Color.web(
+    private fun calculateStrokeWidth() = radius * STROKE_SCALING
+
+    private fun calculateFillColor() = Color.web(
         "#" + (MAX_WEB_COLOR / (colorsNum.value + 1) * (node.community + 1))
             .toString(WEB_COLOR_RADIX)
             .padStart(MAX_WEB_COLOR_LEN, '0')
     )
+
+    private fun calculateStrokeColor() = calculateFillColor().darker()
 }
