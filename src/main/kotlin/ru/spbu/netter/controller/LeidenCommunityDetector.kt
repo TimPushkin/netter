@@ -10,27 +10,26 @@ import java.util.*
 
 class LeidenCommunityDetector : Controller(), CommunityDetector {
     companion object {
-        // Higher resolutions lead to more communities, while lower resolutions lead to fewer communities
-        const val RESOLUTION = 0.2
-
         // The number of iterations of the algorithm. If equals 0, the algorithm runs until no improvements are possible
         const val ITERATIONS_NUM = 0
 
-        // Sets the randomness used by the algorithm in its refinement phase
+        // Sets the randomness factor used by the algorithm in its refinement phase
         const val RANDOMNESS = 1e-2
     }
 
-    override fun detectCommunities(network: Network) {
+    override fun detectCommunities(network: Network, resolution: Double) {
         if (network.isEmpty()) {
             println("There is nothing to inspect: network $network is empty")
             return
         }
 
+        println("Detecting communities with resolution $resolution...")
+
         val convertedNetwork = convertNetwork(network)
         val clustering = Clustering(convertedNetwork.nNodes)
-        val leidenAlgorithm = LeidenAlgorithm(RESOLUTION, ITERATIONS_NUM, RANDOMNESS, Random())
 
-        println("Detecting communities with resolution ${leidenAlgorithm.resolution}...")
+        require(resolution > 0) { "Wrong resolution: resolution must be positive but was $resolution" }
+        val leidenAlgorithm = LeidenAlgorithm(resolution, ITERATIONS_NUM, RANDOMNESS, Random())
 
         leidenAlgorithm.improveClustering(convertedNetwork, clustering)
 

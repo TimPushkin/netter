@@ -94,7 +94,7 @@ class MainView : View("Netter") {
 
             button("Display communities").setOnAction {
                 if (this@MainView::networkView.isInitialized) {
-                    communityDetector.detectCommunities(networkView.network)
+                    getResolution()?.let { communityDetector.detectCommunities(networkView.network, it) }
                 } else alert(
                     Alert.AlertType.INFORMATION,
                     "Nothing to inspect",
@@ -140,6 +140,16 @@ class MainView : View("Netter") {
     private fun getRepulsion(): Double? {
         with(TextField()) {
             find<RepulsionInputForm>(mapOf(RepulsionInputForm::repulsion to this)).openModal(
+                block = true,
+                resizable = false,
+            )
+            return text.toDoubleOrNull()
+        }
+    }
+
+    private fun getResolution(): Double? {
+        with(TextField()) {
+            find<ResolutionInputForm>(mapOf(ResolutionInputForm::resolution to this)).openModal(
                 block = true,
                 resizable = false,
             )

@@ -71,3 +71,30 @@ class RepulsionInputForm : Fragment("Repulsion input") {
         }
     }
 }
+
+class ResolutionInputForm : Fragment("Resolution input") {
+    val resolution: TextField by param()
+
+    override val root = form {
+        var enteredResolution = TextField()
+
+        fieldset {
+            field("Enter resolution:") {
+                enteredResolution = textfield("0.2")
+            }
+        }
+
+        buttonbar {
+            button("OK").setOnAction {
+                if (enteredResolution.text.isDouble() && enteredResolution.text.toDouble() > 0) {
+                    resolution.text = enteredResolution.text
+                    close()
+                } else alert(
+                    Alert.AlertType.INFORMATION,
+                    "Wrong resolution input",
+                    "Resolution must be a positive decimal number",
+                )
+            }
+        }
+    }
+}
