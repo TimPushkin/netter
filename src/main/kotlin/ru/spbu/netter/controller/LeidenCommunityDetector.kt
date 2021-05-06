@@ -21,9 +21,16 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
     }
 
     override fun detectCommunities(network: Network) {
+        if (network.isEmpty()) {
+            println("There is nothing to inspect: network $network is empty")
+            return
+        }
+
         val convertedNetwork = convertNetwork(network)
         val clustering = Clustering(convertedNetwork.nNodes)
         val leidenAlgorithm = LeidenAlgorithm(RESOLUTION, ITERATIONS_NUM, RANDOMNESS, Random())
+
+        println("Detecting communities with resolution ${leidenAlgorithm.resolution}...")
 
         leidenAlgorithm.improveClustering(convertedNetwork, clustering)
 
