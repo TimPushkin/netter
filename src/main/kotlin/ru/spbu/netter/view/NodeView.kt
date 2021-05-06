@@ -9,7 +9,8 @@ import ru.spbu.netter.model.Node
 import tornadofx.*
 
 
-class NodeView(private val node: Node, x: Double, y: Double, var colorsNum: IntegerProperty) : Circle(x, y, 0.0) {
+class NodeView(private val node: Node, x: Double, y: Double, private val colorsNum: IntegerProperty) :
+    Circle(x, y, 0.0) {
     val label = text(node.id.toString()) {
         scaleXProperty().bind(radiusProperty() * LABEL_SCALING)
         scaleYProperty().bind(radiusProperty() * LABEL_SCALING)
