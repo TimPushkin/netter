@@ -1,8 +1,8 @@
 package ru.spbu.netter.view
 
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.Alert
-import javafx.scene.control.TextField
 import ru.spbu.netter.controller.*
 import ru.spbu.netter.model.Network
 import ru.spbu.netter.model.UndirectedNetwork
@@ -34,7 +34,7 @@ class MainView : View("Netter") {
                 menu("Import") {
                     item("As plain text").action { importFromFile(txtIOHandler) }
 
-                    item("As Neo4J database").action { TODO("Neo4J") }
+                    item("As Neo4J database").action { importFromNeo4J() }
 
                     item("As SQLite database").action { TODO("SQLite") }
                 }
@@ -100,6 +100,24 @@ class MainView : View("Netter") {
         }
     }
 
+    private fun importFromNeo4J() {
+        val connectURL = SimpleStringProperty()
+        val username = SimpleStringProperty()
+        val password = SimpleStringProperty()
+
+        find<Neo4JCredentialsInputForm>(
+            mapOf(
+                Neo4JCredentialsInputForm::connectURL to connectURL,
+                Neo4JCredentialsInputForm::username to username,
+                Neo4JCredentialsInputForm::password to password,
+            )
+        ).openModal(block = true, resizable = false)
+
+        if (connectURL.value != null && username.value != null && password.value != null) {
+            println("${connectURL.value} ${username.value} ${password.value}")
+        }
+    }
+
     private fun exportFromFile(fileIOHandler: FileIOHandler) {
         val file = chooseFile("Select a file for export...", emptyArray(), mode = FileChooserMode.Single).firstOrNull()
 
@@ -116,22 +134,22 @@ class MainView : View("Netter") {
     }
 
     private fun getRepulsion(): Double? {
-        with(TextField()) {
+        with(SimpleStringProperty()) {
             find<RepulsionInputForm>(mapOf(RepulsionInputForm::repulsion to this)).openModal(
                 block = true,
                 resizable = false,
             )
-            return text.toDoubleOrNull()
+            return value?.toDoubleOrNull()
         }
     }
 
     private fun getResolution(): Double? {
-        with(TextField()) {
+        with(SimpleStringProperty()) {
             find<ResolutionInputForm>(mapOf(ResolutionInputForm::resolution to this)).openModal(
                 block = true,
                 resizable = false,
             )
-            return text.toDoubleOrNull()
+            return value?.toDoubleOrNull()
         }
     }
 }
