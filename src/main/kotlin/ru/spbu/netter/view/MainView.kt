@@ -1,22 +1,23 @@
 package ru.spbu.netter.view
 
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.control.Alert
 import javafx.scene.control.TextField
 import ru.spbu.netter.controller.*
 import ru.spbu.netter.model.Network
 import ru.spbu.netter.model.UndirectedNetwork
 import tornadofx.*
-import java.io.File
 import java.io.IOException
 
 
 class MainView : View("Netter") {
     private lateinit var networkView: NetworkView
-
-    private val fileIOHandlerNames = listOf("Plain text", "Neo4J", "SQLite")
+    private val isNetworkImportedProperty = SimpleBooleanProperty(this, "isNetworkImported", false)
+    private var isNetworkImported by isNetworkImportedProperty
 
     private val navigationSpace: NavigationSpace by inject()
+
+    private val txtIOHandler: FileIOHandler by inject<TxtIOHandler>()
 
     private val defaultLayout: LayoutMethod by inject<CircularLayout>()
     private val smartLayout: LayoutMethod by inject<SmartLayout>()
@@ -28,113 +29,90 @@ class MainView : View("Netter") {
 
         center<NavigationSpace>()
 
-        left = vbox {
-            button("Import network").setOnAction {
-                val network: Network = UndirectedNetwork()
-                val (fileIOHandler, file) = getFile()
+        top = menubar {
+            menu("File") {
+                menu("Import") {
+                    item("As plain text").action { importFromFile(txtIOHandler) }
 
-                if (fileIOHandler != null && file != null) {
-                    try {
-                        fileIOHandler.importNetwork(network, file)
-                    } catch (exception: IOException) {
-                        alert(Alert.AlertType.ERROR, "Network import failed", exception.localizedMessage)
-                        return@setOnAction
-                    }
+                    item("As Neo4J database").action { TODO("Neo4J") }
 
-                    getRepulsion()?.let {
-                        networkView = NetworkView(network).apply {
-                            applyLayout(defaultLayout.layOut(network, repulsion = it))
-                        }
-                        navigationSpace.replaceNetwork(networkView)
-                    }
+                    item("As SQLite database").action { TODO("SQLite") }
                 }
+
+                menu("Export") {
+                    item("As plain text").action { exportFromFile(txtIOHandler) }
+
+                    item("As Neo4J database").action { TODO("Neo4J") }
+
+                    item("As SQLite database").action { TODO("SQLite") }
+                }.apply { disableProperty().bind(!isNetworkImportedProperty) }
             }
 
-            button("Export network").setOnAction {
-                if (this@MainView::networkView.isInitialized) {
-                    val (fileIOHandler, file) = getFile()
-                    if (fileIOHandler != null && file != null) {
-                        try {
-                            fileIOHandler.exportNetwork(networkView.network, file)
-                        } catch (exception: IOException) {
-                            alert(Alert.AlertType.ERROR, "Network export failed", exception.localizedMessage)
-                            return@setOnAction
-                        }
-                    }
-                } else alert(
-                    Alert.AlertType.INFORMATION,
-                    "Nothing to export",
-                    "To export a network you need to import one first",
-                )
-            }
-
-            button("Apply smart layout").setOnAction {
-                if (this@MainView::networkView.isInitialized) {
-                    getRepulsion()?.let {
-                        networkView.applyLayout(smartLayout.layOut(networkView.network, repulsion = it))
-                    }
-                } else alert(
-                    Alert.AlertType.INFORMATION,
-                    "Nothing to lay out",
-                    "To lay out a network you need to import one first",
-                )
-            }
-
-            button("Apply default layout").setOnAction {
-                if (this@MainView::networkView.isInitialized) {
+            menu("Network") {
+                item("Default layout").action {
                     getRepulsion()?.let {
                         networkView.applyLayout(defaultLayout.layOut(networkView.network, repulsion = it))
                     }
-                } else alert(
-                    Alert.AlertType.INFORMATION,
-                    "Nothing to lay out",
-                    "To lay out a network you need to import one first",
-                )
-            }
+                }
 
-            button("Display communities").setOnAction {
-                if (this@MainView::networkView.isInitialized) {
+                item("Smart layout").action {
+                    getRepulsion()?.let {
+                        networkView.applyLayout(smartLayout.layOut(networkView.network, repulsion = it))
+                    }
+                }
+
+                item("Detect communities").action {
                     getResolution()?.let { communityDetector.detectCommunities(networkView.network, it) }
-                } else alert(
-                    Alert.AlertType.INFORMATION,
-                    "Nothing to inspect",
-                    "To inspect a network you need to import one first",
-                )
-            }
+                }
 
-            button("Display centrality").setOnAction {
-                if (this@MainView::networkView.isInitialized) {
+                item("Detect centrality").action {
                     println("Todo")
-                } else alert(
-                    Alert.AlertType.INFORMATION,
-                    "Nothing to inspect",
-                    "To inspect a network you need to import one first",
-                )
+                }
+            }.apply { disableProperty().bind(!isNetworkImportedProperty) }
+
+            menu("Help") {
+                item("Netter at GitHub").action { hostServices.showDocument("https://github.com/TimPushkin/netter") }
             }
         }
     }
 
-    private fun getFile(): Pair<FileIOHandler?, File?> {
-        val fileIOHandlerName = TextField()
-        val file = SimpleObjectProperty<File?>(null)
+    private fun importFromFile(fileIOHandler: FileIOHandler) {
+        val file = chooseFile("Select a file to import...", emptyArray(), mode = FileChooserMode.Single).firstOrNull()
 
-        find<FileInputForm>(
-            mapOf(
-                FileInputForm::fileIOHandlerNames to fileIOHandlerNames,
-                FileInputForm::fileIOHandlerName to fileIOHandlerName,
-                FileInputForm::file to file,
-            )
-        ).openModal(block = true, resizable = false)
+        if (file == null) {
+            alert(Alert.AlertType.INFORMATION, "No file selected", "You need to select a file to import")
+            return
+        }
 
-        return if (file.value != null && fileIOHandlerName.text in fileIOHandlerNames) {
-            val fileIOHandler = when (fileIOHandlerName.text) {
-                fileIOHandlerNames[0] -> find<TxtIOHandler>()
-                fileIOHandlerNames[1] -> TODO("Neo4J")
-                fileIOHandlerNames[2] -> TODO("SQLite")
-                else -> throw IllegalStateException("Unknown file IO handler selected: ${fileIOHandlerName.text}")
-            }
-            Pair(fileIOHandler, file.value)
-        } else Pair(null, null)
+        val network: Network = UndirectedNetwork()
+
+        try {
+            fileIOHandler.importNetwork(network, file)
+        } catch (exception: IOException) {
+            alert(Alert.AlertType.ERROR, "Network import failed", exception.localizedMessage)
+            return
+        }
+
+        getRepulsion()?.let {
+            networkView = NetworkView(network).apply { applyLayout(defaultLayout.layOut(network, repulsion = it)) }
+            isNetworkImported = true
+            navigationSpace.replaceNetwork(networkView)
+        }
+    }
+
+    private fun exportFromFile(fileIOHandler: FileIOHandler) {
+        val file = chooseFile("Select a file for export...", emptyArray(), mode = FileChooserMode.Single).firstOrNull()
+
+        if (file == null) {
+            alert(Alert.AlertType.INFORMATION, "No file selected", "You need to select a file for export")
+            return
+        }
+
+        try {
+            fileIOHandler.exportNetwork(networkView.network, file)
+        } catch (exception: IOException) {
+            alert(Alert.AlertType.ERROR, "Network export failed", exception.localizedMessage)
+        }
     }
 
     private fun getRepulsion(): Double? {
