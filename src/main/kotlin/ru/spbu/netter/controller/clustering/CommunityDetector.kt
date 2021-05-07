@@ -1,4 +1,4 @@
-package ru.spbu.netter.controller
+package ru.spbu.netter.controller.clustering
 
 import ru.spbu.netter.model.Network
 
