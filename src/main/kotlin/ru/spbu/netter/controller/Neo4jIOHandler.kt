@@ -111,9 +111,9 @@ class Neo4jIOHandler : Controller(), UriIOHandler {
                 handleInputError("id labels must be not less than ${FileIOHandler.MIN_NODE_ID}")
             }
 
-            network.addLink(parsedId1, parsedId2)
-
             addSkippedNodes(network, max(parsedId1, parsedId2))
+
+            network.addLink(parsedId1, parsedId2)
         }
     }
 
