@@ -27,7 +27,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler {
                 parseLink(network, links)
             } catch (ex: Exception) {
                 //tx.rollback()
-                throw Exception("Network cannot be read: ${ex.localizedMessage}")
+                throw IOException("Network cannot be read: ${ex.localizedMessage}")
             }
         }
 
@@ -67,7 +67,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler {
                 }
             } catch (ex: Exception) {
                 tx.rollback()
-                throw Exception("Network cannot be recorded: ${ex.localizedMessage}")
+                throw IOException("Network cannot be recorded: ${ex.localizedMessage}")
             }
         }
 
@@ -81,16 +81,16 @@ class Neo4jIOHandler : Controller(), UriIOHandler {
             val parsedCommunity = node["community"].asInt()
             val parsedCentrality = node["centrality"].asDouble()
 
-            if (parsedId < FileIOHandler.MIN_NODE_ID) {
-                handleInputError("id label must be not less than ${FileIOHandler.MIN_NODE_ID}")
+            if (parsedId < UriIOHandler.MIN_NODE_ID) {
+                handleInputError("id label must be not less than ${UriIOHandler.MIN_NODE_ID}")
             }
 
-            if (parsedCommunity < FileIOHandler.MIN_COMMUNITY) {
-                handleInputError("community label must be not less than ${FileIOHandler.MIN_COMMUNITY}")
+            if (parsedCommunity < UriIOHandler.MIN_COMMUNITY) {
+                handleInputError("community label must be not less than ${UriIOHandler.MIN_COMMUNITY}")
             }
 
-            if (parsedCentrality < FileIOHandler.MIN_CENTRALITY) {
-                handleInputError("centrality label must be not less than ${FileIOHandler.MIN_CENTRALITY}")
+            if (parsedCentrality < UriIOHandler.MIN_CENTRALITY) {
+                handleInputError("centrality label must be not less than ${UriIOHandler.MIN_CENTRALITY}")
             }
 
             network.addNode(parsedId).apply {
@@ -107,8 +107,8 @@ class Neo4jIOHandler : Controller(), UriIOHandler {
             val parsedId1 = link["id1"].asInt()
             val parsedId2 = link["id2"].asInt()
 
-            if (parsedId1 < FileIOHandler.MIN_NODE_ID || parsedId2 < FileIOHandler.MIN_NODE_ID) {
-                handleInputError("id labels must be not less than ${FileIOHandler.MIN_NODE_ID}")
+            if (parsedId1 < UriIOHandler.MIN_NODE_ID || parsedId2 < UriIOHandler.MIN_NODE_ID) {
+                handleInputError("id labels must be not less than ${UriIOHandler.MIN_NODE_ID}")
             }
 
             addSkippedNodes(network, max(parsedId1, parsedId2))
@@ -119,7 +119,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler {
 
     private fun addSkippedNodes(network: Network, addUntilId: Int) {
         var prevId = addUntilId - 1
-        while (prevId >= FileIOHandler.MIN_NODE_ID && !network.nodes.containsKey(prevId)) network.addNode(prevId--)
+        while (prevId >= UriIOHandler.MIN_NODE_ID && !network.nodes.containsKey(prevId)) network.addNode(prevId--)
     }
 
     private fun handleInputError(message: String): Nothing {
