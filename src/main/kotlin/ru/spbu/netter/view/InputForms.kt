@@ -7,19 +7,19 @@ import javafx.scene.control.TextField
 import tornadofx.*
 
 
-class Neo4JCredentialsInputForm : Fragment("Credentials input") {
-    val connectURL: StringProperty by param()
+class UriCredentialsInputForm : Fragment("URI credentials input") {
+    val uri: StringProperty by param()
     val username: StringProperty by param()
     val password: StringProperty by param()
 
-    private lateinit var enteredConnectURL: TextField
+    private lateinit var enteredUri: TextField
     private lateinit var enteredUsername: TextField
     private lateinit var enteredPassword: PasswordField
 
     override val root = form {
         fieldset {
-            field("Connect URL:") {
-                enteredConnectURL = textfield()
+            field("URI:") {
+                enteredUri = textfield()
             }
 
             field("Username:") {
@@ -34,10 +34,10 @@ class Neo4JCredentialsInputForm : Fragment("Credentials input") {
         buttonbar {
             button("OK").setOnAction {
                 when {
-                    enteredConnectURL.text.isEmpty() -> alert(
+                    enteredUri.text.isEmpty() -> alert(
                         Alert.AlertType.INFORMATION,
-                        "Wrong connect URL input",
-                        "Connect URL cannot be empty",
+                        "Wrong URI input",
+                        "URI cannot be empty",
                     )
                     enteredUsername.text.isEmpty() -> alert(
                         Alert.AlertType.INFORMATION,
@@ -50,7 +50,7 @@ class Neo4JCredentialsInputForm : Fragment("Credentials input") {
                         "Password cannot be empty",
                     )
                     else -> {
-                        connectURL.value = enteredConnectURL.text
+                        uri.value = enteredUri.text
                         username.value = enteredUsername.text
                         password.value = enteredPassword.text
                         close()

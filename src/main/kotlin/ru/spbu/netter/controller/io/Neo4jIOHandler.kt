@@ -11,8 +11,8 @@ import kotlin.math.max
 
 class Neo4jIOHandler : Controller(), UriIOHandler {
 
-    override fun importNetwork(network: Network, uri: String, user: String, password: String) {
-        val driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password))
+    override fun importNetwork(network: Network, uri: String, username: String, password: String) {
+        val driver = GraphDatabase.driver(uri, AuthTokens.basic(username, password))
         val session = driver.session()
 
         session.readTransaction { tx ->
@@ -36,8 +36,8 @@ class Neo4jIOHandler : Controller(), UriIOHandler {
         driver.close()
     }
 
-    override fun exportNetwork(network: Network, uri: String, user: String, password: String) {
-        val driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password))
+    override fun exportNetwork(network: Network, uri: String, username: String, password: String) {
+        val driver = GraphDatabase.driver(uri, AuthTokens.basic(username, password))
         val session = driver.session()
 
         session.writeTransaction { tx ->

@@ -21,7 +21,7 @@ interface FileIOHandler : IOHandler {
 
 interface UriIOHandler : IOHandler {
 
-    fun importNetwork(network: Network, uri: String, user: String, password: String)
+    fun importNetwork(network: Network, uri: String, username: String, password: String)
 
-    fun exportNetwork(network: Network, uri: String, user: String, password: String)
+    fun exportNetwork(network: Network, uri: String, username: String, password: String)
 }

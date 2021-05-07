@@ -3,13 +3,9 @@ package ru.spbu.netter.view
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.Alert
-import ru.spbu.netter.controller.clustering.CommunityDetector
-import ru.spbu.netter.controller.clustering.LeidenCommunityDetector
-import ru.spbu.netter.controller.io.FileIOHandler
-import ru.spbu.netter.controller.io.TxtIOHandler
-import ru.spbu.netter.controller.layout.CircularLayout
-import ru.spbu.netter.controller.layout.LayoutMethod
-import ru.spbu.netter.controller.layout.SmartLayout
+import ru.spbu.netter.controller.clustering.*
+import ru.spbu.netter.controller.io.*
+import ru.spbu.netter.controller.layout.*
 import ru.spbu.netter.model.Network
 import ru.spbu.netter.model.UndirectedNetwork
 import tornadofx.*
@@ -24,6 +20,7 @@ class MainView : View("Netter") {
     private val navigationSpace: NavigationSpace by inject()
 
     private val txtIOHandler: FileIOHandler by inject<TxtIOHandler>()
+    private val neo4jIOHandler: UriIOHandler by inject<Neo4jIOHandler>()
 
     private val defaultLayout: LayoutMethod by inject<CircularLayout>()
     private val smartLayout: LayoutMethod by inject<SmartLayout>()
@@ -40,7 +37,7 @@ class MainView : View("Netter") {
                 menu("Import") {
                     item("As plain text").action { importFromFile(txtIOHandler) }
 
-                    item("As Neo4J database").action { importFromNeo4J() }
+                    item("As Neo4j database").action { importFromUri(neo4jIOHandler) }
 
                     item("As SQLite database").action { TODO("SQLite") }
                 }
@@ -48,7 +45,7 @@ class MainView : View("Netter") {
                 menu("Export") {
                     item("As plain text").action { exportFromFile(txtIOHandler) }
 
-                    item("As Neo4J database").action { TODO("Neo4J") }
+                    item("As Neo4j database").action { exportFromUri(neo4jIOHandler) }
 
                     item("As SQLite database").action { TODO("SQLite") }
                 }.apply { disableProperty().bind(!isNetworkImportedProperty) }
@@ -82,23 +79,9 @@ class MainView : View("Netter") {
         }
     }
 
-    private fun importFromFile(fileIOHandler: FileIOHandler) {
-        val file = chooseFile("Select a file to import...", emptyArray(), mode = FileChooserMode.Single).firstOrNull()
+    // NetworkView initialization
 
-        if (file == null) {
-            alert(Alert.AlertType.INFORMATION, "No file selected", "You need to select a file to import")
-            return
-        }
-
-        val network: Network = UndirectedNetwork()
-
-        try {
-            fileIOHandler.importNetwork(network, file)
-        } catch (exception: IOException) {
-            alert(Alert.AlertType.ERROR, "Network import failed", exception.localizedMessage)
-            return
-        }
-
+    private fun initNetworkView(network: Network) {
         getRepulsion()?.let {
             networkView = NetworkView(network).apply { applyLayout(defaultLayout.layOut(network, repulsion = it)) }
             isNetworkImported = true
@@ -106,37 +89,22 @@ class MainView : View("Netter") {
         }
     }
 
-    private fun importFromNeo4J() {
-        val connectURL = SimpleStringProperty()
+    // Input forms handling
+
+    private fun getUriCredentials(): Triple<String?, String?, String?> {
+        val uri = SimpleStringProperty()
         val username = SimpleStringProperty()
         val password = SimpleStringProperty()
 
-        find<Neo4JCredentialsInputForm>(
+        find<UriCredentialsInputForm>(
             mapOf(
-                Neo4JCredentialsInputForm::connectURL to connectURL,
-                Neo4JCredentialsInputForm::username to username,
-                Neo4JCredentialsInputForm::password to password,
+                UriCredentialsInputForm::uri to uri,
+                UriCredentialsInputForm::username to username,
+                UriCredentialsInputForm::password to password,
             )
         ).openModal(block = true, resizable = false)
 
-        if (connectURL.value != null && username.value != null && password.value != null) {
-            println("${connectURL.value} ${username.value} ${password.value}")
-        }
-    }
-
-    private fun exportFromFile(fileIOHandler: FileIOHandler) {
-        val file = chooseFile("Select a file for export...", emptyArray(), mode = FileChooserMode.Single).firstOrNull()
-
-        if (file == null) {
-            alert(Alert.AlertType.INFORMATION, "No file selected", "You need to select a file for export")
-            return
-        }
-
-        try {
-            fileIOHandler.exportNetwork(networkView.network, file)
-        } catch (exception: IOException) {
-            alert(Alert.AlertType.ERROR, "Network export failed", exception.localizedMessage)
-        }
+        return Triple(uri.value, username.value, password.value)
     }
 
     private fun getRepulsion(): Double? {
@@ -156,6 +124,84 @@ class MainView : View("Netter") {
                 resizable = false,
             )
             return value?.toDoubleOrNull()
+        }
+    }
+
+    // IO using a file
+
+    private fun importFromFile(fileIOHandler: FileIOHandler) {
+        val file = chooseFile("Select a file to import...", emptyArray(), mode = FileChooserMode.Single).firstOrNull()
+
+        if (file == null) {
+            alert(Alert.AlertType.INFORMATION, "No file selected", "You need to select a file to import")
+            return
+        }
+
+        val network: Network = UndirectedNetwork()
+        try {
+            fileIOHandler.importNetwork(network, file)
+        } catch (exception: IOException) {
+            alert(Alert.AlertType.ERROR, "Network import failed", exception.localizedMessage)
+            return
+        }
+        initNetworkView(network)
+    }
+
+    private fun exportFromFile(fileIOHandler: FileIOHandler) {
+        val file = chooseFile("Select a file for export...", emptyArray(), mode = FileChooserMode.Single).firstOrNull()
+
+        if (file == null) {
+            alert(Alert.AlertType.INFORMATION, "No file selected", "You need to select a file for export")
+            return
+        }
+
+        try {
+            fileIOHandler.exportNetwork(networkView.network, file)
+        } catch (exception: IOException) {
+            alert(Alert.AlertType.ERROR, "Network export failed", exception.localizedMessage)
+        }
+    }
+
+    // IO using URI
+
+    private fun importFromUri(uriIOHandler: UriIOHandler) {
+        val (uri, username, password) = getUriCredentials()
+
+        if (uri == null || username == null || password == null) {
+            alert(
+                Alert.AlertType.INFORMATION,
+                "Credentials not provided",
+                "You need to provide all credentials to import from URI",
+            )
+            return
+        }
+
+        val network: Network = UndirectedNetwork()
+        try {
+            uriIOHandler.importNetwork(network, uri, username, password)
+        } catch (exception: IOException) {
+            alert(Alert.AlertType.ERROR, "Network import failed", exception.localizedMessage)
+            return
+        }
+        initNetworkView(network)
+    }
+
+    private fun exportFromUri(uriIOHandler: UriIOHandler) {
+        val (uri, username, password) = getUriCredentials()
+
+        if (uri == null || username == null || password == null) {
+            alert(
+                Alert.AlertType.INFORMATION,
+                "Credentials not provided",
+                "You need to provide all credentials to import from URI",
+            )
+            return
+        }
+
+        try {
+            uriIOHandler.exportNetwork(networkView.network, uri, username, password)
+        } catch (exception: IOException) {
+            alert(Alert.AlertType.ERROR, "Network export failed", exception.localizedMessage)
         }
     }
 }
