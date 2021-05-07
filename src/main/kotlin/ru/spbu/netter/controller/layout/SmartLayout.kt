@@ -1,4 +1,4 @@
-package ru.spbu.netter.controller
+package ru.spbu.netter.controller.layout
 
 import javafx.geometry.Point2D
 import ru.spbu.netter.model.Network
