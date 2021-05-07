@@ -13,6 +13,8 @@ repositories {
     mavenCentral()
 }
 
+val neo4jDriverVersion: String by project
+
 dependencies {
     implementation(kotlin("reflect"))
 
@@ -20,6 +22,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation("no.tornado:tornadofx:1.7.20")
+
+    implementation("org.neo4j.driver", "neo4j-java-driver", neo4jDriverVersion)
 }
 
 application {
