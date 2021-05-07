@@ -1,4 +1,4 @@
-package ru.spbu.netter.controller
+package ru.spbu.netter.controller.io
 
 import org.neo4j.driver.AuthTokens
 import org.neo4j.driver.GraphDatabase
