@@ -3,7 +3,13 @@ package ru.spbu.netter.view
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.Alert
-import ru.spbu.netter.controller.*
+import ru.spbu.netter.controller.clustering.CommunityDetector
+import ru.spbu.netter.controller.clustering.LeidenCommunityDetector
+import ru.spbu.netter.controller.io.FileIOHandler
+import ru.spbu.netter.controller.io.TxtIOHandler
+import ru.spbu.netter.controller.layout.CircularLayout
+import ru.spbu.netter.controller.layout.LayoutMethod
+import ru.spbu.netter.controller.layout.SmartLayout
 import ru.spbu.netter.model.Network
 import ru.spbu.netter.model.UndirectedNetwork
 import tornadofx.*

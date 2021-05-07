@@ -1,4 +1,4 @@
-package ru.spbu.netter.controller
+package ru.spbu.netter.controller.io
 
 import ru.spbu.netter.model.Network
 import tornadofx.*

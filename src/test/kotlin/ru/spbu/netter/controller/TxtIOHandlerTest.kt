@@ -12,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
+import ru.spbu.netter.controller.io.TxtIOHandler
 import ru.spbu.netter.model.Node
 import java.io.File
 import java.io.IOException
