@@ -20,9 +20,9 @@ class NetworkView(val network: Network) : Group() {
 
     private val nodes = network.nodes.values.associateWith { NodeView(it, 0.0, 0.0, colorsNumProperty) }
     private val links = network.links.associateWith {
-        val v1 = nodes[it.n1] ?: throw IllegalStateException("NodeView not found for node ${it.n1}")
-        val v2 = nodes[it.n2] ?: throw IllegalStateException("NodeView not found for node ${it.n2}")
-        LinkView(v1, v2)
+        val n1 = nodes[it.n1] ?: throw IllegalStateException("NodeView not found for node ${it.n1}")
+        val n2 = nodes[it.n2] ?: throw IllegalStateException("NodeView not found for node ${it.n2}")
+        LinkView(n1, n2)
     }
 
     init {

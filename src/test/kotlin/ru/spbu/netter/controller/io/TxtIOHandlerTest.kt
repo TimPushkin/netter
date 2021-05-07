@@ -67,7 +67,7 @@ internal class TxtIOHandlerTest {
 
     private fun Network.nodesAsTriples() = nodes.map { it.value.run { Triple(id, community, centrality) } }
 
-    private fun Network.linksAsPairs() = links.map { it.run { Pair(v1.id, v2.id) } }
+    private fun Network.linksAsPairs() = links.map { it.run { Pair(n1.id, n2.id) } }
 
     private fun readNetworkInput(inputFile: File): Pair<MutableSet<Pair<Int, Int>>, MutableMap<Int, Triple<Int, Int, Double>>> {
         val links = mutableSetOf<Pair<Int, Int>>()

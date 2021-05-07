@@ -8,6 +8,7 @@ import tornadofx.Controller
 import java.io.IOException
 import kotlin.math.max
 
+
 class Neo4jIOHandler : Controller(), UriIOHandler {
 
     override fun importNetwork(network: Network, uri: String, user: String, password: String) {

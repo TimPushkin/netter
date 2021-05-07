@@ -41,7 +41,7 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
             return LeidenNetwork(
                 network.nodes.size,
                 false,
-                arrayOf(IntArray(size) { this[it].v1.id }, IntArray(size) { this[it].v2.id }),
+                arrayOf(IntArray(size) { this[it].n1.id }, IntArray(size) { this[it].n2.id }),
                 false,
                 false,
             )
