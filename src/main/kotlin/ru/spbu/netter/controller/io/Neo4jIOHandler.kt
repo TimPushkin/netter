@@ -81,16 +81,16 @@ class Neo4jIOHandler : Controller(), UriIOHandler {
             val parsedCommunity = node["community"].asInt()
             val parsedCentrality = node["centrality"].asDouble()
 
-            if (parsedId < UriIOHandler.MIN_NODE_ID) {
-                handleInputError("id label must be not less than ${UriIOHandler.MIN_NODE_ID}")
+            if (parsedId < IOHandler.MIN_NODE_ID) {
+                handleInputError("id label must be not less than ${IOHandler.MIN_NODE_ID}")
             }
 
-            if (parsedCommunity < UriIOHandler.MIN_COMMUNITY) {
-                handleInputError("community label must be not less than ${UriIOHandler.MIN_COMMUNITY}")
+            if (parsedCommunity < IOHandler.MIN_COMMUNITY) {
+                handleInputError("community label must be not less than ${IOHandler.MIN_COMMUNITY}")
             }
 
-            if (parsedCentrality < UriIOHandler.MIN_CENTRALITY) {
-                handleInputError("centrality label must be not less than ${UriIOHandler.MIN_CENTRALITY}")
+            if (parsedCentrality < IOHandler.MIN_CENTRALITY) {
+                handleInputError("centrality label must be not less than ${IOHandler.MIN_CENTRALITY}")
             }
 
             network.addNode(parsedId).apply {
@@ -107,8 +107,8 @@ class Neo4jIOHandler : Controller(), UriIOHandler {
             val parsedId1 = link["id1"].asInt()
             val parsedId2 = link["id2"].asInt()
 
-            if (parsedId1 < UriIOHandler.MIN_NODE_ID || parsedId2 < UriIOHandler.MIN_NODE_ID) {
-                handleInputError("id labels must be not less than ${UriIOHandler.MIN_NODE_ID}")
+            if (parsedId1 < IOHandler.MIN_NODE_ID || parsedId2 < IOHandler.MIN_NODE_ID) {
+                handleInputError("id labels must be not less than ${IOHandler.MIN_NODE_ID}")
             }
 
             addSkippedNodes(network, max(parsedId1, parsedId2))
@@ -119,7 +119,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler {
 
     private fun addSkippedNodes(network: Network, addUntilId: Int) {
         var prevId = addUntilId - 1
-        while (prevId >= UriIOHandler.MIN_NODE_ID && !network.nodes.containsKey(prevId)) network.addNode(prevId--)
+        while (prevId >= IOHandler.MIN_NODE_ID && !network.nodes.containsKey(prevId)) network.addNode(prevId--)
     }
 
     private fun handleInputError(message: String): Nothing {

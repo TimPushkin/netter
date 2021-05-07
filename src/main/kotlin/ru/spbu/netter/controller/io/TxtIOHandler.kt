@@ -56,8 +56,8 @@ class TxtIOHandler : Controller(), FileIOHandler {
         val parsedId1 = columns[0].toInt()
         val parsedId2 = columns[1].toInt()
 
-        if (parsedId1 < FileIOHandler.MIN_NODE_ID || parsedId2 < FileIOHandler.MIN_NODE_ID) {
-            handleInputError(lineNum, "node ids must be not less than ${FileIOHandler.MIN_NODE_ID}")
+        if (parsedId1 < IOHandler.MIN_NODE_ID || parsedId2 < IOHandler.MIN_NODE_ID) {
+            handleInputError(lineNum, "node ids must be not less than ${IOHandler.MIN_NODE_ID}")
         }
 
         network.addLink(parsedId1, parsedId2)
@@ -75,18 +75,18 @@ class TxtIOHandler : Controller(), FileIOHandler {
         }
 
         val parsedId = columns[0].toInt().also {
-            if (it < FileIOHandler.MIN_NODE_ID) {
-                handleInputError(lineNum, "node id must be not less than ${FileIOHandler.MIN_NODE_ID}")
+            if (it < IOHandler.MIN_NODE_ID) {
+                handleInputError(lineNum, "node id must be not less than ${IOHandler.MIN_NODE_ID}")
             }
         }
         val parsedCommunity = columns[1].toInt().also {
-            if (it < FileIOHandler.MIN_COMMUNITY) {
-                handleInputError(lineNum, "community must be not less than ${FileIOHandler.MIN_COMMUNITY}")
+            if (it < IOHandler.MIN_COMMUNITY) {
+                handleInputError(lineNum, "community must be not less than ${IOHandler.MIN_COMMUNITY}")
             }
         }
         val parsedCentrality = columns[2].toDouble().also {
-            if (it < FileIOHandler.MIN_CENTRALITY) {
-                handleInputError(lineNum, "centrality must be not less than ${FileIOHandler.MIN_CENTRALITY}")
+            if (it < IOHandler.MIN_CENTRALITY) {
+                handleInputError(lineNum, "centrality must be not less than ${IOHandler.MIN_CENTRALITY}")
             }
         }
 
@@ -98,7 +98,7 @@ class TxtIOHandler : Controller(), FileIOHandler {
 
     private fun addSkippedNodes(network: Network, addUntilId: Int) {
         var prevId = addUntilId - 1
-        while (prevId >= FileIOHandler.MIN_NODE_ID && !network.nodes.containsKey(prevId)) network.addNode(prevId--)
+        while (prevId >= IOHandler.MIN_NODE_ID && !network.nodes.containsKey(prevId)) network.addNode(prevId--)
     }
 
     private fun handleInputError(lineNum: Int, message: String): Nothing {
