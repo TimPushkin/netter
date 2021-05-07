@@ -23,11 +23,11 @@ class UndirectedNetwork : Network {
         override var centrality by centralityProperty
     }
 
-    private data class UndirectedLink(override val v1: Node, override val v2: Node) : Link {
+    private data class UndirectedLink(override val n1: Node, override val n2: Node) : Link {
 
         override fun equals(other: Any?) =
-            if (other is UndirectedLink) v1 == other.v1 && v2 == other.v2 || v1 == other.v2 && v2 == other.v1 else false
+            if (other is UndirectedLink) n1 == other.n1 && n2 == other.n2 || n1 == other.n2 && n2 == other.n1 else false
 
-        override fun hashCode() = v1.hashCode() xor v2.hashCode()
+        override fun hashCode() = n1.hashCode() xor n2.hashCode()
     }
 }

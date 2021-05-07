@@ -120,7 +120,7 @@ class TxtIOHandler : Controller(), FileIOHandler {
 
         bufferedWriter.use { writer ->
             for (link in network.links) with(link) {
-                writer.write("${v1.id}$COLUMN_DELIMITER${v2.id}\n")
+                writer.write("${n1.id}$COLUMN_DELIMITER${n2.id}\n")
             }
 
             writer.newLine()

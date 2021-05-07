@@ -20,8 +20,8 @@ interface Node {
 }
 
 interface Link {
-    val v1: Node
-    val v2: Node
+    val n1: Node
+    val n2: Node
 }
 
 interface Network {
