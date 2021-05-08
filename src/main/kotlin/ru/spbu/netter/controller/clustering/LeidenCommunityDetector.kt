@@ -1,11 +1,15 @@
 package ru.spbu.netter.controller.clustering
 
+import mu.KotlinLogging
 import nl.cwts.networkanalysis.Clustering
 import nl.cwts.networkanalysis.LeidenAlgorithm
 import nl.cwts.networkanalysis.Network as LeidenNetwork
 import ru.spbu.netter.model.Network
 import tornadofx.Controller
 import java.util.*
+
+
+private val logger = KotlinLogging.logger {}
 
 
 class LeidenCommunityDetector : Controller(), CommunityDetector {
@@ -19,11 +23,11 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
 
     override fun detectCommunities(network: Network, resolution: Double) {
         if (network.isEmpty()) {
-            println("There is nothing to inspect: network $network is empty")
+            logger.info { "There is nothing to inspect: network $network is empty" }
             return
         }
 
-        println("Detecting communities with resolution $resolution...")
+        logger.info { "Detecting communities with resolution $resolution..." }
 
         val convertedNetwork = convertNetwork(network)
         val clustering = Clustering(convertedNetwork.nNodes)

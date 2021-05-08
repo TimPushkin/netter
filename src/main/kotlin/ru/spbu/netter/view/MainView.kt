@@ -68,7 +68,7 @@ class MainView : View("Netter") {
                 }
 
                 item("Detect centrality").action {
-                    println("Todo")
+                    // TODO
                 }
             }.apply { disableProperty().bind(!isNetworkImportedProperty) }
 

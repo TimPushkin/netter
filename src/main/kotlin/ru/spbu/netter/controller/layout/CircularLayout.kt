@@ -2,21 +2,25 @@ package ru.spbu.netter.controller.layout
 
 import ru.spbu.netter.model.Network
 import javafx.geometry.Point2D
+import mu.KotlinLogging
 import tornadofx.*
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
 
+private val logger = KotlinLogging.logger {}
+
+
 class CircularLayout : Controller(), LayoutMethod {
 
     override fun layOut(network: Network, center: Point2D, repulsion: Double): Array<Point2D> {
         if (network.isEmpty()) {
-            println("There is nothing to lay out: network $network is empty")
+            logger.info { "There is nothing to lay out: network $network is empty" }
             return emptyArray()
         }
 
-        println("Placing nodes in a circular shape with repulsion $repulsion...")
+        logger.info { "Placing nodes in a circular shape with repulsion $repulsion..." }
 
         val coordinates = Array(network.nodes.size) { Point2D(0.0, 0.0) }
 

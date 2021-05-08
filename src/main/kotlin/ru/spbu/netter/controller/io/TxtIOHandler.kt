@@ -1,10 +1,14 @@
 package ru.spbu.netter.controller.io
 
+import mu.KotlinLogging
 import ru.spbu.netter.model.Network
 import tornadofx.*
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Files
+
+
+private val logger = KotlinLogging.logger {}
 
 
 class TxtIOHandler : Controller(), FileIOHandler {
@@ -41,7 +45,7 @@ class TxtIOHandler : Controller(), FileIOHandler {
                 }
             }
 
-            if (reader.ready()) println("Excessive lines found after blank line $lineNum. Skipping...")
+            if (reader.ready()) logger.warn { "Excessive lines found after blank line $lineNum. Skipping..." }
         }
     }
 
@@ -75,20 +79,20 @@ class TxtIOHandler : Controller(), FileIOHandler {
             handleInputError(lineNum, "node id and community must be integers, centrality must be decimal")
         }
 
-        val parsedId = columns[0].toInt().also {
-            if (it < IOHandler.MIN_NODE_ID) {
-                handleInputError(lineNum, "node id must be not less than ${IOHandler.MIN_NODE_ID}")
-            }
+        val parsedId = columns[0].toInt()
+        val parsedCommunity = columns[1].toInt()
+        val parsedCentrality = columns[2].toDouble()
+
+        if (parsedId  < IOHandler.MIN_NODE_ID) {
+            handleInputError(lineNum, "node id must be not less than ${IOHandler.MIN_NODE_ID}")
         }
-        val parsedCommunity = columns[1].toInt().also {
-            if (it < IOHandler.MIN_COMMUNITY) {
-                handleInputError(lineNum, "community must be not less than ${IOHandler.MIN_COMMUNITY}")
-            }
+
+        if (parsedCommunity < IOHandler.MIN_COMMUNITY) {
+            handleInputError(lineNum, "community must be not less than ${IOHandler.MIN_COMMUNITY}")
         }
-        val parsedCentrality = columns[2].toDouble().also {
-            if (it < IOHandler.MIN_CENTRALITY) {
-                handleInputError(lineNum, "centrality must be not less than ${IOHandler.MIN_CENTRALITY}")
-            }
+
+        if (parsedCentrality < IOHandler.MIN_CENTRALITY) {
+            handleInputError(lineNum, "centrality must be not less than ${IOHandler.MIN_CENTRALITY}")
         }
 
         network.addNode(parsedId).apply {
