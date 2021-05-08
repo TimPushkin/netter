@@ -17,14 +17,14 @@ class Neo4jIOHandler : Controller(), UriIOHandler {
 
         session.readTransaction { tx ->
             try {
-                val nodes =
-                    tx.run("MATCH (n:Node) " +
-                            "RETURN n.id AS id, n.community AS community, n.centrality AS centrality")
+                val nodes = tx.run(
+                    "MATCH (n:Node) " + "RETURN n.id AS id, n.community AS community, n.centrality AS centrality"
+                )
                 parseNode(network, nodes)
 
-                val links =
-                    tx.run("MATCH (n1)-->(n2) " +
-                            "RETURN n1.id AS id1, n2.id AS id2")
+                val links = tx.run(
+                    "MATCH (n1)-->(n2) " + "RETURN n1.id AS id1, n2.id AS id2"
+                )
                 parseLink(network, links)
             } catch (ex: Exception) {
                 //tx.rollback()

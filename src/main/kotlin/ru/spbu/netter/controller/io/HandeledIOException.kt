@@ -3,7 +3,7 @@ package ru.spbu.netter.controller.io
 import java.io.IOException
 
 
-class HandledIOException: IOException {
+class HandledIOException : IOException {
 
     constructor() : super()
 
