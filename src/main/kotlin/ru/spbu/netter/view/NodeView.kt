@@ -37,20 +37,14 @@ class NodeView(private val node: Node, x: Double, y: Double, private val colorsN
 
         private const val STROKE_SCALING = 0.2
 
-        private const val WEB_COLOR_RADIX = 16
-        private const val MAX_WEB_COLOR = 0xFFFFFF
-        private const val MAX_WEB_COLOR_LEN = 6
+        private const val MAX_HUE = 360.0
     }
 
     private fun calculateRadius() = MIN_RADIUS + node.centrality * RADIUS_SCALING
 
     private fun calculateStrokeWidth() = radius * STROKE_SCALING
 
-    private fun calculateFillColor() = Color.web(
-        "#" + (MAX_WEB_COLOR / (colorsNum.value + 1) * (node.community + 1))
-            .toString(WEB_COLOR_RADIX)
-            .padStart(MAX_WEB_COLOR_LEN, '0')
-    )
+    private fun calculateFillColor() = Color.hsb(MAX_HUE / (colorsNum.value + 1) * (node.community + 1), 1.0, 1.0)
 
     private fun calculateStrokeColor() = calculateFillColor().darker()
 }
