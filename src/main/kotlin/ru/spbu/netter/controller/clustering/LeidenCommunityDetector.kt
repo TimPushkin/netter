@@ -15,10 +15,10 @@ private val logger = KotlinLogging.logger {}
 class LeidenCommunityDetector : Controller(), CommunityDetector {
     companion object {
         // The number of iterations of the algorithm. If equals 0, the algorithm runs until no improvements are possible
-        const val ITERATIONS_NUM = 0
+        private const val ITERATIONS_NUM = 0
 
         // Sets the randomness factor used by the algorithm in its refinement phase
-        const val RANDOMNESS = 1e-2
+        private const val RANDOMNESS = 1e-2
     }
 
     override fun detectCommunities(network: Network, resolution: Double) {
