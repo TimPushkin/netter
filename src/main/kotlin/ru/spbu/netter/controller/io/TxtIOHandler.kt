@@ -3,7 +3,6 @@ package ru.spbu.netter.controller.io
 import ru.spbu.netter.model.Network
 import tornadofx.*
 import java.io.File
-import java.io.IOException
 import java.io.FileNotFoundException
 import java.nio.file.Files
 
@@ -21,8 +20,10 @@ class TxtIOHandler : Controller(), FileIOHandler {
 
         val bufferedReader = try {
             file.bufferedReader()
-        } catch (exception: FileNotFoundException) {
-            throw HandledIOException("File cannot be read: ${exception.localizedMessage}")
+        } catch (ex: FileNotFoundException) {
+            throw HandledIOException("Input file not found", ex)
+        } catch (ex: SecurityException) {
+            throw HandledIOException("Input file cannot be read: no read access", ex)
         }
 
         bufferedReader.use { reader ->
@@ -108,14 +109,16 @@ class TxtIOHandler : Controller(), FileIOHandler {
     override fun exportNetwork(network: Network, file: File) {
         try {
             Files.createDirectories(file.toPath().parent)
-        } catch (exception: Exception) {
-            throw HandledIOException("Output file's parent dir cannot be created: ${exception.localizedMessage}")
+        } catch (ex: SecurityException) {
+            throw HandledIOException("Parent dir ${file.toPath().parent} cannot be created: no read-write access", ex)
         }
 
         val bufferedWriter = try {
             file.bufferedWriter()
-        } catch (exception: IOException) {
-            throw HandledIOException("Output file cannot be written: ${exception.localizedMessage}")
+        } catch (ex: FileNotFoundException) {
+            throw HandledIOException("Output file cannot be opened or created", ex)
+        } catch (ex: SecurityException) {
+            throw HandledIOException("Output file cannot be written: no write access", ex)
         }
 
         bufferedWriter.use { writer ->

@@ -139,8 +139,8 @@ class MainView : View("Netter") {
         val network: Network = UndirectedNetwork()
         try {
             fileIOHandler.importNetwork(network, file)
-        } catch (exception: HandledIOException) {
-            alert(Alert.AlertType.ERROR, "Network import failed", exception.localizedMessage)
+        } catch (ex: HandledIOException) {
+            alert(Alert.AlertType.ERROR, "Network import failed", ex.localizedMessage)
             return
         }
         initNetworkView(network)
@@ -156,8 +156,8 @@ class MainView : View("Netter") {
 
         try {
             fileIOHandler.exportNetwork(networkView.network, file)
-        } catch (exception: HandledIOException) {
-            alert(Alert.AlertType.ERROR, "Network export failed", exception.localizedMessage)
+        } catch (ex: HandledIOException) {
+            alert(Alert.AlertType.ERROR, "Network export failed", ex.localizedMessage)
         }
     }
 
@@ -178,8 +178,8 @@ class MainView : View("Netter") {
         val network: Network = UndirectedNetwork()
         try {
             uriIOHandler.importNetwork(network, uri, username, password)
-        } catch (exception: HandledIOException) {
-            alert(Alert.AlertType.ERROR, "Network import failed", exception.localizedMessage)
+        } catch (ex: HandledIOException) {
+            alert(Alert.AlertType.ERROR, "Network import failed", ex.localizedMessage)
             return
         }
         initNetworkView(network)
@@ -199,8 +199,8 @@ class MainView : View("Netter") {
 
         try {
             uriIOHandler.exportNetwork(networkView.network, uri, username, password)
-        } catch (exception: HandledIOException) {
-            alert(Alert.AlertType.ERROR, "Network export failed", exception.localizedMessage)
+        } catch (ex: HandledIOException) {
+            alert(Alert.AlertType.ERROR, "Network export failed", ex.localizedMessage)
         }
     }
 }
