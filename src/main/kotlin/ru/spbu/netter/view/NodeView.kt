@@ -27,6 +27,7 @@ class NodeView(private val node: Node, x: Double, y: Double, private val colorsN
         strokeWidthProperty().bind(Bindings.createDoubleBinding(::calculateStrokeWidth, radiusProperty()))
         fillProperty().bind(Bindings.createObjectBinding(::calculateFillColor, colorsNum, node.communityProperty))
         strokeProperty().bind(Bindings.createObjectBinding(::calculateStrokeColor, fillProperty()))
+        label.fillProperty().bind(Bindings.createObjectBinding(::calculateLabelColor, fillProperty()))
     }
 
     companion object {
@@ -38,6 +39,7 @@ class NodeView(private val node: Node, x: Double, y: Double, private val colorsN
         private const val STROKE_SCALING = 0.2
 
         private const val MAX_HUE = 360.0
+        private const val BRIGHTNESS_BOUNDARY = 0.25
     }
 
     private fun calculateRadius() = MIN_RADIUS + node.centrality * RADIUS_SCALING
@@ -47,4 +49,7 @@ class NodeView(private val node: Node, x: Double, y: Double, private val colorsN
     private fun calculateFillColor() = Color.hsb(MAX_HUE / (colorsNum.value + 1) * (node.community + 1), 1.0, 1.0)
 
     private fun calculateStrokeColor() = calculateFillColor().darker()
+
+    private fun calculateLabelColor() =
+        if (calculateFillColor().grayscale().brightness >= BRIGHTNESS_BOUNDARY) Color.BLACK else Color.WHITE
 }
