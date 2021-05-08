@@ -9,7 +9,6 @@ import ru.spbu.netter.controller.layout.*
 import ru.spbu.netter.model.Network
 import ru.spbu.netter.model.UndirectedNetwork
 import tornadofx.*
-import java.io.IOException
 
 
 class MainView : View("Netter") {
@@ -140,7 +139,7 @@ class MainView : View("Netter") {
         val network: Network = UndirectedNetwork()
         try {
             fileIOHandler.importNetwork(network, file)
-        } catch (exception: IOException) {
+        } catch (exception: HandledIOException) {
             alert(Alert.AlertType.ERROR, "Network import failed", exception.localizedMessage)
             return
         }
@@ -157,7 +156,7 @@ class MainView : View("Netter") {
 
         try {
             fileIOHandler.exportNetwork(networkView.network, file)
-        } catch (exception: IOException) {
+        } catch (exception: HandledIOException) {
             alert(Alert.AlertType.ERROR, "Network export failed", exception.localizedMessage)
         }
     }
@@ -179,7 +178,7 @@ class MainView : View("Netter") {
         val network: Network = UndirectedNetwork()
         try {
             uriIOHandler.importNetwork(network, uri, username, password)
-        } catch (exception: IOException) {
+        } catch (exception: HandledIOException) {
             alert(Alert.AlertType.ERROR, "Network import failed", exception.localizedMessage)
             return
         }
@@ -200,7 +199,7 @@ class MainView : View("Netter") {
 
         try {
             uriIOHandler.exportNetwork(networkView.network, uri, username, password)
-        } catch (exception: IOException) {
+        } catch (exception: HandledIOException) {
             alert(Alert.AlertType.ERROR, "Network export failed", exception.localizedMessage)
         }
     }
