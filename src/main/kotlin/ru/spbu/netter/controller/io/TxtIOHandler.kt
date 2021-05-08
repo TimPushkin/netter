@@ -22,7 +22,7 @@ class TxtIOHandler : Controller(), FileIOHandler {
         val bufferedReader = try {
             file.bufferedReader()
         } catch (exception: FileNotFoundException) {
-            throw FileNotFoundException("File cannot be read: ${exception.localizedMessage}")
+            throw HandledIOException("File cannot be read: ${exception.localizedMessage}")
         }
 
         bufferedReader.use { reader ->
@@ -102,20 +102,20 @@ class TxtIOHandler : Controller(), FileIOHandler {
     }
 
     private fun handleInputError(lineNum: Int, message: String): Nothing {
-        throw IOException("Incorrect input format on line $lineNum: $message")
+        throw HandledIOException("Incorrect input format on line $lineNum: $message")
     }
 
     override fun exportNetwork(network: Network, file: File) {
         try {
             Files.createDirectories(file.toPath().parent)
         } catch (exception: Exception) {
-            throw IOException("Output file's parent dir cannot be created: ${exception.localizedMessage}")
+            throw HandledIOException("Output file's parent dir cannot be created: ${exception.localizedMessage}")
         }
 
         val bufferedWriter = try {
             file.bufferedWriter()
         } catch (exception: IOException) {
-            throw IOException("Output file cannot be written: ${exception.localizedMessage}")
+            throw HandledIOException("Output file cannot be written: ${exception.localizedMessage}")
         }
 
         bufferedWriter.use { writer ->
