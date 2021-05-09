@@ -9,7 +9,7 @@ import ru.spbu.netter.model.Node
 import tornadofx.*
 
 
-class NodeView(private val node: Node, x: Double, y: Double, private val colorsNum: IntegerProperty) :
+class NodeView(val node: Node, x: Double, y: Double, private val colorsNum: IntegerProperty) :
     Circle(x, y, 0.0) {
     val label = text(node.id.toString()) {
         scaleXProperty().bind(radiusProperty() * LABEL_SCALING)
@@ -27,6 +27,7 @@ class NodeView(private val node: Node, x: Double, y: Double, private val colorsN
         strokeWidthProperty().bind(Bindings.createDoubleBinding(::calculateStrokeWidth, radiusProperty()))
         fillProperty().bind(Bindings.createObjectBinding(::calculateFillColor, colorsNum, node.communityProperty))
         strokeProperty().bind(Bindings.createObjectBinding(::calculateStrokeColor, fillProperty()))
+        label.fillProperty().bind(Bindings.createObjectBinding(::calculateLabelColor, fillProperty()))
     }
 
     companion object {
@@ -37,20 +38,18 @@ class NodeView(private val node: Node, x: Double, y: Double, private val colorsN
 
         private const val STROKE_SCALING = 0.2
 
-        private const val WEB_COLOR_RADIX = 16
-        private const val MAX_WEB_COLOR = 0xFFFFFF
-        private const val MAX_WEB_COLOR_LEN = 6
+        private const val MAX_HUE = 360.0
+        private const val BRIGHTNESS_BOUNDARY = 0.25
     }
 
     private fun calculateRadius() = MIN_RADIUS + node.centrality * RADIUS_SCALING
 
     private fun calculateStrokeWidth() = radius * STROKE_SCALING
 
-    private fun calculateFillColor() = Color.web(
-        "#" + (MAX_WEB_COLOR / (colorsNum.value + 1) * (node.community + 1))
-            .toString(WEB_COLOR_RADIX)
-            .padStart(MAX_WEB_COLOR_LEN, '0')
-    )
+    private fun calculateFillColor() = Color.hsb(MAX_HUE / (colorsNum.value + 1) * (node.community + 1), 1.0, 1.0)
 
     private fun calculateStrokeColor() = calculateFillColor().darker()
+
+    private fun calculateLabelColor() =
+        if (calculateFillColor().grayscale().brightness >= BRIGHTNESS_BOUNDARY) Color.BLACK else Color.WHITE
 }

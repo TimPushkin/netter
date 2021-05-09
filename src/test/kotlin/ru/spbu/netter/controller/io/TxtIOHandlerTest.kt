@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
 import ru.spbu.netter.model.Node
 import java.io.File
-import java.io.IOException
 import kotlin.streams.asStream
 
 
@@ -157,8 +156,8 @@ internal class TxtIOHandlerTest {
 
         @ParameterizedTest(name = PARAMETERIZED_TEST_NAME)
         @ArgumentsSource(IncorrectInputsProvider::class)
-        fun `import incorrect data - throws IOException`(inputFile: File) {
-            assertThrows<IOException> { TxtIOHandler().importNetwork(network, inputFile) }
+        fun `import incorrect data - throws HandledIOException`(inputFile: File) {
+            assertThrows<HandledIOException> { TxtIOHandler().importNetwork(network, inputFile) }
         }
     }
 

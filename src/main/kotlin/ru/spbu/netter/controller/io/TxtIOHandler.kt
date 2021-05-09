@@ -1,11 +1,14 @@
 package ru.spbu.netter.controller.io
 
+import mu.KotlinLogging
 import ru.spbu.netter.model.Network
 import tornadofx.*
 import java.io.File
-import java.io.IOException
 import java.io.FileNotFoundException
 import java.nio.file.Files
+
+
+private val logger = KotlinLogging.logger {}
 
 
 class TxtIOHandler : Controller(), FileIOHandler {
@@ -21,8 +24,10 @@ class TxtIOHandler : Controller(), FileIOHandler {
 
         val bufferedReader = try {
             file.bufferedReader()
-        } catch (exception: FileNotFoundException) {
-            throw HandledIOException("File cannot be read: ${exception.localizedMessage}")
+        } catch (ex: FileNotFoundException) {
+            throw HandledIOException("Input file not found", ex)
+        } catch (ex: SecurityException) {
+            throw HandledIOException("Input file cannot be read: no read access", ex)
         }
 
         bufferedReader.use { reader ->
@@ -40,7 +45,7 @@ class TxtIOHandler : Controller(), FileIOHandler {
                 }
             }
 
-            if (reader.ready()) println("Excessive lines found after blank line $lineNum. Skipping...")
+            if (reader.ready()) logger.warn { "Excessive lines found after blank line $lineNum. Skipping..." }
         }
     }
 
@@ -74,20 +79,20 @@ class TxtIOHandler : Controller(), FileIOHandler {
             handleInputError(lineNum, "node id and community must be integers, centrality must be decimal")
         }
 
-        val parsedId = columns[0].toInt().also {
-            if (it < IOHandler.MIN_NODE_ID) {
-                handleInputError(lineNum, "node id must be not less than ${IOHandler.MIN_NODE_ID}")
-            }
+        val parsedId = columns[0].toInt()
+        val parsedCommunity = columns[1].toInt()
+        val parsedCentrality = columns[2].toDouble()
+
+        if (parsedId  < IOHandler.MIN_NODE_ID) {
+            handleInputError(lineNum, "node id must be not less than ${IOHandler.MIN_NODE_ID}")
         }
-        val parsedCommunity = columns[1].toInt().also {
-            if (it < IOHandler.MIN_COMMUNITY) {
-                handleInputError(lineNum, "community must be not less than ${IOHandler.MIN_COMMUNITY}")
-            }
+
+        if (parsedCommunity < IOHandler.MIN_COMMUNITY) {
+            handleInputError(lineNum, "community must be not less than ${IOHandler.MIN_COMMUNITY}")
         }
-        val parsedCentrality = columns[2].toDouble().also {
-            if (it < IOHandler.MIN_CENTRALITY) {
-                handleInputError(lineNum, "centrality must be not less than ${IOHandler.MIN_CENTRALITY}")
-            }
+
+        if (parsedCentrality < IOHandler.MIN_CENTRALITY) {
+            handleInputError(lineNum, "centrality must be not less than ${IOHandler.MIN_CENTRALITY}")
         }
 
         network.addNode(parsedId).apply {
@@ -108,14 +113,16 @@ class TxtIOHandler : Controller(), FileIOHandler {
     override fun exportNetwork(network: Network, file: File) {
         try {
             Files.createDirectories(file.toPath().parent)
-        } catch (exception: Exception) {
-            throw HandledIOException("Output file's parent dir cannot be created: ${exception.localizedMessage}")
+        } catch (ex: SecurityException) {
+            throw HandledIOException("Parent dir ${file.toPath().parent} cannot be created: no read-write access", ex)
         }
 
         val bufferedWriter = try {
             file.bufferedWriter()
-        } catch (exception: IOException) {
-            throw HandledIOException("Output file cannot be written: ${exception.localizedMessage}")
+        } catch (ex: FileNotFoundException) {
+            throw HandledIOException("Output file cannot be opened or created", ex)
+        } catch (ex: SecurityException) {
+            throw HandledIOException("Output file cannot be written: no write access", ex)
         }
 
         bufferedWriter.use { writer ->

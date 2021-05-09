@@ -27,16 +27,21 @@ class NetworkView(val network: Network) : Group() {
 
     init {
         links.values.forEach { add(it) }
-        nodes.values.forEach {
-            add(it)
-            add(it.label)
-        }
+        placeNodesInCentralityOrder()
     }
 
     fun applyLayout(coordinates: Array<Point2D>) {
         nodes.values.forEachIndexed { i, nodeView ->
             nodeView.centerX = coordinates[i].x
             nodeView.centerY = coordinates[i].y
+        }
+    }
+
+    fun placeNodesInCentralityOrder() {
+        children.retainAll { it is LinkView }
+        nodes.values.sortedByDescending { it.node.centrality }.forEach {
+            add(it)
+            add(it.label)
         }
     }
 
