@@ -71,6 +71,7 @@ class MainView : View("Netter") {
 
                 item("Inspect for centrality").action {
                     centralityIdentifier.identifyCentrality(networkView.network)
+                    networkView.placeNodesInCentralityOrder()
                 }
             }.apply { disableProperty().bind(!isNetworkImportedProperty) }
 
