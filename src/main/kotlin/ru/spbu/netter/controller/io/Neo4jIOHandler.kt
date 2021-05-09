@@ -1,5 +1,6 @@
 package ru.spbu.netter.controller.io
 
+import mu.KotlinLogging
 import org.neo4j.driver.AuthTokens
 import org.neo4j.driver.Driver
 import org.neo4j.driver.GraphDatabase
@@ -10,6 +11,9 @@ import ru.spbu.netter.model.Network
 import tornadofx.Controller
 import java.io.Closeable
 import kotlin.math.max
+
+
+private val logger = KotlinLogging.logger {}
 
 
 class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
@@ -31,9 +35,13 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                                     "RETURN n.id AS id, n.community AS community, n.centrality AS centrality"
                         )
                     parseNode(network, nodes)
-                } catch (exception: Exception) {
-                    throw when (exception) {
-                        is HandledIOException -> exception
+
+                    logger.info { "Successful read nodes" }
+                } catch (ex: Exception) {
+                    logger.error(ex) { "Cannot read nodes" }
+
+                    throw when (ex) {
+                        is HandledIOException -> ex
                         else -> {
                             tx.rollback()
                             HandledIOException("Unable to read nodes")
@@ -49,9 +57,13 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                                     "RETURN n1.id AS id1, n2.id AS id2"
                         )
                     parseLink(network, links)
-                } catch (exception: Exception) {
-                    throw when (exception) {
-                        is HandledIOException -> exception
+
+                    logger.info { "Successful read links" }
+                } catch (ex: Exception) {
+                    logger.error(ex) { "Cannot read links" }
+
+                    throw when (ex) {
+                        is HandledIOException -> ex
                         else -> {
                             tx.rollback()
                             HandledIOException("Unable to read links")
@@ -59,12 +71,16 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                     }
                 }
             }
-        } catch (exception: Exception) {
-            throw when (exception) {
-                is HandledIOException -> exception
+
+            logger.info { "Successful read graph" }
+        } catch (ex: Exception) {
+            logger.error(ex) { "Cannot read graph" }
+
+            throw when (ex) {
+                is HandledIOException -> ex
                 is AuthenticationException -> HandledIOException("Wrong username or password")
                 is ClientException -> HandledIOException("Make sure you are trying to connect to the bolt:// URI scheme")
-                else -> HandledIOException("Server error: ${exception.localizedMessage}", exception)
+                else -> HandledIOException("Server error: ${ex.localizedMessage}", ex)
             }
 
         }
@@ -78,7 +94,11 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
             session.writeTransaction { tx ->
                 try {
                     tx.run("MATCH (n) DETACH DELETE n ")
-                } catch (exception: Exception) {
+
+                    logger.info { "Successful clean database" }
+                } catch (ex: Exception) {
+                    logger.error(ex) { "Cannot clean database" }
+
                     tx.rollback()
                     throw HandledIOException("Unable to clean database")
                 }
@@ -93,7 +113,11 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                                 "centrality" to centrality
                             ) as Map<String, Any>?
                         )
-                    } catch (exception: Exception) {
+
+                        logger.info { "Successful record nodes" }
+                    } catch (ex: Exception) {
+                        logger.error(ex) { "Cannot record nodes" }
+
                         tx.rollback()
                         throw HandledIOException("Unable to record nodes")
                     }
@@ -110,18 +134,26 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                                 "id2" to n2.id
                             ) as Map<String, Any>?
                         )
-                    } catch (exception: Exception) {
+
+                        logger.info { "Successful record links" }
+                    } catch (ex: Exception) {
+                        logger.error(ex) { "Cannot record links" }
+
                         tx.rollback()
                         throw HandledIOException("Unable to record links")
                     }
                 }
             }
-        } catch (exception: Exception) {
-            throw when (exception) {
-                is HandledIOException -> exception
+
+            logger.info { "Successful record graph" }
+        } catch (ex: Exception) {
+            logger.error(ex) { "Cannot record graph" }
+
+            throw when (ex) {
+                is HandledIOException -> ex
                 is AuthenticationException -> HandledIOException("Wrong username or password")
                 is ClientException -> HandledIOException("Make sure you are trying to connect to the bolt:// URI scheme")
-                else -> HandledIOException("Network cannot be recorded: ${exception.localizedMessage}")
+                else -> HandledIOException("Network cannot be recorded: ${ex.localizedMessage}")
             }
         }
     }
@@ -129,16 +161,20 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
     private fun openDriver(uri: String, username: String, password: String) {
         try {
             driver = GraphDatabase.driver(uri, AuthTokens.basic(username, password))
-        } catch (exception: Exception) {
-            throw when (exception) {
+
+            logger.info { "Successful connection to the $uri" }
+        } catch (ex: Exception) {
+            logger.error(ex) { "Cannot connect to the $uri" }
+
+            throw when (ex) {
                 is java.lang.IllegalArgumentException -> HandledIOException("Wrong URI")
                 is ServiceUnavailableException -> HandledIOException(
                     "Unable to connect, " +
                             "ensure the database is running and that there is a working network connection to it.",
-                    exception
+                    ex
                 )
                 is SessionExpiredException -> HandledIOException("Session failed, try restarting the app")
-                else -> HandledIOException("Connection failed: ${exception.localizedMessage}")
+                else -> HandledIOException("Connection failed: ${ex.localizedMessage}")
             }
         }
     }
@@ -211,7 +247,11 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
     override fun close() {
         try {
             driver.close()
-        } catch (exception: Neo4jException) {
+
+            logger.info { "Successful disconnection from server" }
+        } catch (ex: Neo4jException) {
+            logger.error(ex) { "Cannot disconnection from server" }
+
             throw HandledIOException("Unable to close connection")
         }
     }
