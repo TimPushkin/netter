@@ -4,7 +4,7 @@ import javafx.beans.property.SimpleBooleanProperty
 import ru.spbu.netter.controller.NetworkEventHandler
 import ru.spbu.netter.controller.NetworkNavigator
 import ru.spbu.netter.controller.centrality.CentralityIdentifier
-import ru.spbu.netter.controller.centrality.DegreeCentralityIdentifier
+import ru.spbu.netter.controller.centrality.HarmonicCentralityIdentifier
 import ru.spbu.netter.controller.clustering.CommunityDetector
 import ru.spbu.netter.controller.clustering.LeidenCommunityDetector
 import ru.spbu.netter.controller.layout.CircularLayout
@@ -22,7 +22,7 @@ class NavigationSpace : View() {
     private val defaultLayout: LayoutMethod by inject<CircularLayout>()
     private val smartLayout: LayoutMethod by inject<SmartLayout>()
     private val communityDetector: CommunityDetector by inject<LeidenCommunityDetector>()
-    private val centralityIdentifier: CentralityIdentifier by inject<DegreeCentralityIdentifier>()
+    private val centralityIdentifier: CentralityIdentifier by inject<HarmonicCentralityIdentifier>()
 
     private val navigator: NetworkEventHandler = find<NetworkNavigator>()
 
