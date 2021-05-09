@@ -162,9 +162,9 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
         try {
             driver = GraphDatabase.driver(uri, AuthTokens.basic(username, password))
 
-            logger.info { "Successful connection to the $uri" }
+            logger.info { "Successful connection to the server at $uri address" }
         } catch (ex: Exception) {
-            logger.error(ex) { "Cannot connect to the $uri" }
+            logger.error(ex) { "Cannot connect to the server at $uri address" }
 
             throw when (ex) {
                 is java.lang.IllegalArgumentException -> HandledIOException("Wrong URI")
