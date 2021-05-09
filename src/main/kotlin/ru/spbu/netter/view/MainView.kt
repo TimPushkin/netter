@@ -3,11 +3,11 @@ package ru.spbu.netter.view
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.Alert
+import ru.spbu.netter.controller.centrality.*
 import ru.spbu.netter.controller.clustering.*
 import ru.spbu.netter.controller.io.*
 import ru.spbu.netter.controller.layout.*
-import ru.spbu.netter.model.Network
-import ru.spbu.netter.model.UndirectedNetwork
+import ru.spbu.netter.model.*
 import tornadofx.*
 
 
@@ -25,6 +25,8 @@ class MainView : View("Netter") {
     private val smartLayout: LayoutMethod by inject<SmartLayout>()
 
     private val communityDetector: CommunityDetector by inject<LeidenCommunityDetector>()
+
+    private val centralityIdentifier: CentralityIdentifier by inject<DegreeCentralityIdentifier>()
 
     override val root = borderpane {
         setPrefSize(960.0, 540.0)
@@ -63,12 +65,12 @@ class MainView : View("Netter") {
                     }
                 }
 
-                item("Detect communities").action {
+                item("Inspect for communities").action {
                     getResolution()?.let { communityDetector.detectCommunities(networkView.network, it) }
                 }
 
-                item("Detect centrality").action {
-                    // TODO
+                item("Inspect for centrality").action {
+                    centralityIdentifier.identifyCentrality(networkView.network)
                 }
             }.apply { disableProperty().bind(!isNetworkImportedProperty) }
 
