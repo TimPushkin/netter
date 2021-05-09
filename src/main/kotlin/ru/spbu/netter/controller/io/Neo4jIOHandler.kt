@@ -5,6 +5,7 @@ import org.neo4j.driver.Driver
 import org.neo4j.driver.GraphDatabase
 import org.neo4j.driver.Result
 import org.neo4j.driver.exceptions.*
+import org.neo4j.driver.exceptions.value.Uncoercible
 import ru.spbu.netter.model.Network
 import tornadofx.Controller
 import java.io.Closeable
@@ -114,9 +115,6 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                         throw HandledIOException("Unable to record links")
                     }
                 }
-
-                //throw HandledIOException("Network cannot be recorded: ${ex.localizedMessage}")
-
             }
         } catch (exception: Exception) {
             throw when (exception) {
@@ -146,44 +144,62 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
     }
 
     private fun parseNode(network: Network, nodes: Result) {
-        nodes.forEach { node ->
-            val parsedId = node["id"].asInt()
-            val parsedCommunity = node["community"].asInt()
-            val parsedCentrality = node["centrality"].asDouble()
+        try {
+            nodes.forEach { node ->
+                val parsedId = node["id"].asInt()
+                val parsedCommunity = node["community"].asInt()
+                val parsedCentrality = node["centrality"].asDouble()
 
-            if (parsedId < IOHandler.MIN_NODE_ID) {
-                throw HandledIOException("id label must be not less than ${IOHandler.MIN_NODE_ID}")
+                if (parsedId < IOHandler.MIN_NODE_ID) {
+                    throw HandledIOException("id label must be not less than ${IOHandler.MIN_NODE_ID}")
+                }
+
+                if (parsedCommunity < IOHandler.MIN_COMMUNITY) {
+                    throw HandledIOException("community label must be not less than ${IOHandler.MIN_COMMUNITY}")
+                }
+
+                if (parsedCentrality < IOHandler.MIN_CENTRALITY) {
+                    throw HandledIOException("centrality label must be not less than ${IOHandler.MIN_CENTRALITY}")
+                }
+
+                network.addNode(parsedId).apply {
+                    community = parsedCommunity
+                    centrality = parsedCentrality
+                }
+
+                addSkippedNodes(network, parsedId)
             }
 
-            if (parsedCommunity < IOHandler.MIN_COMMUNITY) {
-                throw HandledIOException("community label must be not less than ${IOHandler.MIN_COMMUNITY}")
+        } catch (ex: Exception) {
+            throw when (ex) {
+                is Uncoercible -> HandledIOException("Invalid label nodes in the database")
+                is HandledIOException -> ex
+                else -> HandledIOException("Parsing nodes failed")
             }
-
-            if (parsedCentrality < IOHandler.MIN_CENTRALITY) {
-                throw HandledIOException("centrality label must be not less than ${IOHandler.MIN_CENTRALITY}")
-            }
-
-            network.addNode(parsedId).apply {
-                community = parsedCommunity
-                centrality = parsedCentrality
-            }
-
-            addSkippedNodes(network, parsedId)
         }
     }
 
     private fun parseLink(network: Network, links: Result) {
-        links.forEach { link ->
-            val parsedId1 = link["id1"].asInt()
-            val parsedId2 = link["id2"].asInt()
+        try {
+            links.forEach { link ->
+                val parsedId1 = link["id1"].asInt()
+                val parsedId2 = link["id2"].asInt()
 
-            if (parsedId1 < IOHandler.MIN_NODE_ID || parsedId2 < IOHandler.MIN_NODE_ID) {
-                throw HandledIOException("id labels must be not less than ${IOHandler.MIN_NODE_ID}")
+                if (parsedId1 < IOHandler.MIN_NODE_ID || parsedId2 < IOHandler.MIN_NODE_ID) {
+                    throw HandledIOException("id labels must be not less than ${IOHandler.MIN_NODE_ID}")
+                }
+
+                addSkippedNodes(network, max(parsedId1, parsedId2))
+
+                network.addLink(parsedId1, parsedId2)
             }
 
-            addSkippedNodes(network, max(parsedId1, parsedId2))
-
-            network.addLink(parsedId1, parsedId2)
+        } catch (ex: Exception) {
+            throw when (ex) {
+                is Uncoercible -> HandledIOException("Invalid label links in the database")
+                is HandledIOException -> ex
+                else -> HandledIOException("Parsing links failed")
+            }
         }
     }
 
