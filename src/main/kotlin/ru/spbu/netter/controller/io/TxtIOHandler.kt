@@ -10,13 +10,12 @@ import java.nio.file.Files
 
 private val logger = KotlinLogging.logger {}
 
+private const val COLUMN_DELIMITER = " "
+private const val LINK_INPUT_COLUMNS_NUM = 2
+private const val NODE_INPUT_COLUMNS_NUM = 3
+
 
 class TxtIOHandler : Controller(), FileIOHandler {
-    companion object {
-        private const val COLUMN_DELIMITER = " "
-        private const val LINK_INPUT_COLUMNS_NUM = 2
-        private const val NODE_INPUT_COLUMNS_NUM = 3
-    }
 
     override fun importNetwork(network: Network, file: File) {
         val parsingMethods = listOf(::parseLink, ::parseNode)

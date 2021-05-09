@@ -9,13 +9,12 @@ import ru.spbu.netter.view.NetworkView
 import tornadofx.*
 
 
+private const val MIN_ZOOM = 0.2
+private const val ZOOM_SCALING = 0.01
+
+
 class NetworkNavigator : Controller(), NetworkEventHandler {
     lateinit var prevMousePressedPoint: Point2D
-
-    companion object {
-        private const val MIN_ZOOM = 0.2
-        private const val ZOOM_SCALING = 0.01
-    }
 
     override fun handleMousePressed(event: MouseEvent) {
         if (!event.isPrimaryButtonDown) return
