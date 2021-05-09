@@ -1,32 +1,17 @@
 package ru.spbu.netter.view
 
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.control.Alert
-import ru.spbu.netter.controller.centrality.*
-import ru.spbu.netter.controller.clustering.*
 import ru.spbu.netter.controller.io.*
-import ru.spbu.netter.controller.layout.*
 import ru.spbu.netter.model.*
 import tornadofx.*
 
 
 class MainView : View("Netter") {
-    private lateinit var networkView: NetworkView
-    private val isNetworkImportedProperty = SimpleBooleanProperty(this, "isNetworkImported", false)
-    private var isNetworkImported by isNetworkImportedProperty
-
     private val navigationSpace: NavigationSpace by inject()
 
     private val txtIOHandler: FileIOHandler by inject<TxtIOHandler>()
     private val neo4jIOHandler: UriIOHandler by inject<Neo4jIOHandler>()
-
-    private val defaultLayout: LayoutMethod by inject<CircularLayout>()
-    private val smartLayout: LayoutMethod by inject<SmartLayout>()
-
-    private val communityDetector: CommunityDetector by inject<LeidenCommunityDetector>()
-
-    private val centralityIdentifier: CentralityIdentifier by inject<DegreeCentralityIdentifier>()
 
     override val root = borderpane {
         setPrefSize(960.0, 540.0)
@@ -49,31 +34,26 @@ class MainView : View("Netter") {
                     item("As Neo4j database").action { exportFromUri(neo4jIOHandler) }
 
                     item("As SQLite database").action { TODO("SQLite") }
-                }.apply { disableProperty().bind(!isNetworkImportedProperty) }
+                }.apply { disableProperty().bind(!navigationSpace.isNetworkImportedProperty) }
             }
 
             menu("Network") {
                 item("Default layout").action {
-                    getRepulsion()?.let {
-                        networkView.applyLayout(defaultLayout.layOut(networkView.network, repulsion = it))
-                    }
+                    getRepulsion()?.let { navigationSpace.applyDefaultLayout(it) }
                 }
 
                 item("Smart layout").action {
-                    getRepulsion()?.let {
-                        networkView.applyLayout(smartLayout.layOut(networkView.network, repulsion = it))
-                    }
+                    getRepulsion()?.let { navigationSpace.applySmartLayout(it) }
                 }
 
                 item("Inspect for communities").action {
-                    getResolution()?.let { communityDetector.detectCommunities(networkView.network, it) }
+                    getResolution()?.let { navigationSpace.inspectForCommunities(it) }
                 }
 
                 item("Inspect for centrality").action {
-                    centralityIdentifier.identifyCentrality(networkView.network)
-                    networkView.placeNodesInCentralityOrder()
+                    navigationSpace.inspectForCentrality()
                 }
-            }.apply { disableProperty().bind(!isNetworkImportedProperty) }
+            }.apply { disableProperty().bind(!navigationSpace.isNetworkImportedProperty) }
 
             menu("Help") {
                 item("Netter at GitHub").action { hostServices.showDocument("https://github.com/TimPushkin/netter") }
@@ -81,14 +61,10 @@ class MainView : View("Netter") {
         }
     }
 
-    // NetworkView initialization
+    // NavigationSpace initialization
 
-    private fun initNetworkView(network: Network) {
-        getRepulsion()?.let {
-            networkView = NetworkView(network).apply { applyLayout(defaultLayout.layOut(network, repulsion = it)) }
-            isNetworkImported = true
-            navigationSpace.replaceNetwork(networkView)
-        }
+    private fun initNavigationSpace(network: Network) {
+        getRepulsion()?.let { navigationSpace.initNetworkView(network, it) }
     }
 
     // Input forms handling
@@ -146,7 +122,7 @@ class MainView : View("Netter") {
             alert(Alert.AlertType.ERROR, "Network import failed", ex.localizedMessage)
             return
         }
-        initNetworkView(network)
+        initNavigationSpace(network)
     }
 
     private fun exportFromFile(fileIOHandler: FileIOHandler) {
@@ -158,7 +134,7 @@ class MainView : View("Netter") {
         }
 
         try {
-            fileIOHandler.exportNetwork(networkView.network, file)
+            fileIOHandler.exportNetwork(navigationSpace.networkView.network, file)
         } catch (ex: HandledIOException) {
             alert(Alert.AlertType.ERROR, "Network export failed", ex.localizedMessage)
         }
@@ -185,7 +161,7 @@ class MainView : View("Netter") {
             alert(Alert.AlertType.ERROR, "Network import failed", ex.localizedMessage)
             return
         }
-        initNetworkView(network)
+        initNavigationSpace(network)
     }
 
     private fun exportFromUri(uriIOHandler: UriIOHandler) {
@@ -201,7 +177,7 @@ class MainView : View("Netter") {
         }
 
         try {
-            uriIOHandler.exportNetwork(networkView.network, uri, username, password)
+            uriIOHandler.exportNetwork(navigationSpace.networkView.network, uri, username, password)
         } catch (ex: HandledIOException) {
             alert(Alert.AlertType.ERROR, "Network export failed", ex.localizedMessage)
         }
