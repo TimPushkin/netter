@@ -10,5 +10,5 @@ interface LayoutMethod {
         network: Network,
         center: Point2D = Point2D(0.0, 0.0),
         repulsion: Double = 10.0
-    ): Array<Point2D>
+    ): List<Point2D>
 }

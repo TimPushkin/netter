@@ -9,7 +9,7 @@ import ru.spbu.netter.controller.clustering.CommunityDetector
 import ru.spbu.netter.controller.clustering.LeidenCommunityDetector
 import ru.spbu.netter.controller.layout.CircularLayout
 import ru.spbu.netter.controller.layout.LayoutMethod
-import ru.spbu.netter.controller.layout.SmartLayout
+import ru.spbu.netter.controller.layout.ForceAtlas2Layout
 import ru.spbu.netter.model.Network
 import tornadofx.*
 
@@ -20,7 +20,7 @@ class NavigationSpace : View() {
     private var isNetworkImported by isNetworkImportedProperty
 
     private val defaultLayout: LayoutMethod by inject<CircularLayout>()
-    private val smartLayout: LayoutMethod by inject<SmartLayout>()
+    private val smartLayout: LayoutMethod by inject<ForceAtlas2Layout>()
     private val communityDetector: CommunityDetector by inject<LeidenCommunityDetector>()
     private val centralityIdentifier: CentralityIdentifier by inject<DegreeCentralityIdentifier>()
 
