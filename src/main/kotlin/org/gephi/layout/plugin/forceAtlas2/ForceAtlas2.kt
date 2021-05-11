@@ -23,7 +23,6 @@ class ForceAtlas2(
 ) {
     private val faNodes = mutableListOf<FaNode>()
     private val faLinks = mutableListOf<FaLink>()
-    private val degrees = Array(network.nodes.size) { 0 }
 
     private var speed = 1.0
     private var speedEfficiency = 1.0
@@ -35,6 +34,8 @@ class ForceAtlas2(
     private val pool = Executors.newFixedThreadPool(threadCount)
 
     init {
+        val degrees = MutableList(network.nodes.size) { 0 }
+
         for (link in network.links) {
             faLinks += FaLink(link)
 
@@ -42,12 +43,15 @@ class ForceAtlas2(
             if (link.n1.id != link.n2.id) degrees[link.n2.id]++
         }
 
-        for (node in network.nodes.values) faNodes += FaNode(node).apply { mass = 1.0 + degrees[node.id] }
+        for (node in network.nodes.values) faNodes += FaNode(node).apply {
+            degree = degrees[node.id]
+            mass = 1.0 + degree
+        }
     }
 
     fun start() {
         for (faNode in faNodes) faNode.apply {
-            mass = 1.0 + degrees[node.id]
+            mass = 1.0 + degree
             oldDx = dx
             oldDy = dy
             dx = 0.0

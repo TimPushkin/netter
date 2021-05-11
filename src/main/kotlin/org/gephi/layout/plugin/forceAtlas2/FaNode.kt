@@ -6,6 +6,8 @@ import ru.spbu.netter.model.Node
 class FaNode(val node: Node) {
     var size = 1.0
 
+    var degree = 0
+
     var x = ((0.01 + Math.random()) * 1000) - 500
     var y = ((0.01 + Math.random()) * 1000) - 500
 
