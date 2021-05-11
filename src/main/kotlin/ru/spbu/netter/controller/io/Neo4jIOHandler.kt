@@ -28,62 +28,47 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
 
         try {
             session.readTransaction { tx ->
-                try {
-                    nodes =
-                        tx.run(
-                            "MATCH (n:Node) " +
-                                    "RETURN n.id AS id, n.community AS community, n.centrality AS centrality"
-                        )
-                    parseNode(network, nodes)
+                nodes = tx.run(
+                    "MATCH (n:Node) " +
+                            "RETURN n.id AS id, n.community AS community, n.centrality AS centrality"
+                )
 
-                    logger.info { "Successful read nodes" }
-                } catch (ex: Exception) {
-                    logger.error(ex) { "Cannot read nodes" }
-
-                    throw when (ex) {
-                        is HandledIOException -> ex
-                        else -> {
-                            tx.rollback()
-                            HandledIOException("Unable to read nodes")
-                        }
-                    }
-                }
+                parseNode(network, nodes)
             }
+
+            logger.info { "Nodes were successfully read" }
+
+
             session.readTransaction { tx ->
-                try {
-                    links =
-                        tx.run(
-                            "MATCH (n1)-->(n2) " +
-                                    "RETURN n1.id AS id1, n2.id AS id2"
-                        )
-                    parseLink(network, links)
+                links = tx.run(
+                    "MATCH (n1)-->(n2) " +
+                            "RETURN n1.id AS id1, n2.id AS id2"
+                )
 
-                    logger.info { "Successful read links" }
-                } catch (ex: Exception) {
-                    logger.error(ex) { "Cannot read links" }
-
-                    throw when (ex) {
-                        is HandledIOException -> ex
-                        else -> {
-                            tx.rollback()
-                            HandledIOException("Unable to read links")
-                        }
-                    }
-                }
+                parseLink(network, links)
             }
 
-            logger.info { "Successful read graph" }
-        } catch (ex: Exception) {
-            logger.error(ex) { "Cannot read graph" }
+            logger.info { "Links were successfully read" }
+
+        } catch (ex: Neo4jException) {
+            logger.error(ex) { "Unable to read network" }
 
             throw when (ex) {
-                is HandledIOException -> ex
-                is AuthenticationException -> HandledIOException("Wrong username or password")
-                is ClientException -> HandledIOException("Make sure you are trying to connect to the bolt:// URI scheme")
-                else -> HandledIOException("Server error: ${ex.localizedMessage}", ex)
+                is AuthenticationException -> HandledIOException("Wrong username or password", ex)
+                is ClientException -> HandledIOException(
+                    "Make sure you are trying to connect to the bolt:// URI scheme",
+                    ex
+                )
+                is ServiceUnavailableException -> HandledIOException(
+                    "Unable to connect, ensure the database is running and that there is a working network connection to it.",
+                    ex
+                )
+                else -> ex
             }
-
         }
+
+        logger.info { "Network was successfully read" }
+        close()
     }
 
     override fun exportNetwork(network: Network, uri: String, username: String, password: String) {
@@ -92,94 +77,67 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
 
         try {
             session.writeTransaction { tx ->
-                try {
-                    tx.run("MATCH (n) DETACH DELETE n ")
 
-                    logger.info { "Successful clean database" }
-                } catch (ex: Exception) {
-                    logger.error(ex) { "Cannot clean database" }
+                tx.run("MATCH (n) DETACH DELETE n ")
 
-                    tx.rollback()
-                    throw HandledIOException("Unable to clean database")
-                }
+                logger.info { "Database was successfully clean" }
 
                 for (entry in network.nodes) with(entry.value) {
-                    try {
-                        tx.run(
-                            "CREATE (n:Node{id:\$id, community:\$community, centrality:\$centrality})",
-                            mutableMapOf(
-                                "id" to id,
-                                "community" to community,
-                                "centrality" to centrality
-                            ) as Map<String, Any>?
-                        )
-
-                    } catch (ex: Exception) {
-                        logger.error(ex) { "Cannot record nodes" }
-
-                        tx.rollback()
-                        throw HandledIOException("Unable to record nodes")
-                    }
+                    tx.run(
+                        "CREATE (n:Node{id:\$id, community:\$community, centrality:\$centrality})",
+                        mutableMapOf(
+                            "id" to id,
+                            "community" to community,
+                            "centrality" to centrality
+                        ) as Map<String, Any>?
+                    )
                 }
 
-                logger.info { "Successful record nodes" }
+                logger.info { "Nodes were successfully record" }
 
                 for (link in network.links) with(link) {
-                    try {
-                        tx.run(
-                            "MATCH (n1:Node{id:\$id1})  " +
-                                    "MATCH (n2:Node{id:\$id2}) " +
-                                    "CREATE (n1)-[:LINK]->(n2)",
-                            mutableMapOf(
-                                "id1" to n1.id,
-                                "id2" to n2.id
-                            ) as Map<String, Any>?
-                        )
-
-                    } catch (ex: Exception) {
-                        logger.error(ex) { "Cannot record links" }
-
-                        tx.rollback()
-                        throw HandledIOException("Unable to record links")
-                    }
+                    tx.run(
+                        "MATCH (n1:Node{id:\$id1})  " +
+                                "MATCH (n2:Node{id:\$id2}) " +
+                                "CREATE (n1)-[:LINK]->(n2)",
+                        mutableMapOf(
+                            "id1" to n1.id,
+                            "id2" to n2.id
+                        ) as Map<String, Any>?
+                    )
                 }
 
-                logger.info { "Successful record links" }
-
+                logger.info { "Links were successfully record" }
             }
-
-            logger.info { "Successful record graph" }
-        } catch (ex: Exception) {
-            logger.error(ex) { "Cannot record graph" }
+        } catch (ex: Neo4jException) {
+            logger.error(ex) { "Unable to record network" }
 
             throw when (ex) {
-                is HandledIOException -> ex
-                is AuthenticationException -> HandledIOException("Wrong username or password")
-                is ClientException -> HandledIOException("Make sure you are trying to connect to the bolt:// URI scheme")
-                else -> HandledIOException("Network cannot be recorded: ${ex.localizedMessage}")
+                is AuthenticationException -> HandledIOException("Wrong username or password", ex)
+                is ClientException -> HandledIOException("Make sure you are trying to connect to the bolt:// URI scheme", ex)
+                is ServiceUnavailableException -> HandledIOException(
+                    "Unable to connect, ensure the database is running and that there is a working network connection to it.", ex
+                )
+                else -> ex
             }
         }
+        logger.info { "Network was successfully record" }
+        close()
     }
 
     private fun openDriver(uri: String, username: String, password: String) {
         try {
             driver = GraphDatabase.driver(uri, AuthTokens.basic(username, password))
 
-            logger.info { "Successful connection to the server at $uri address" }
-        } catch (ex: Exception) {
+        } catch (ex: IllegalArgumentException) {
             logger.error(ex) { "Cannot connect to the server at $uri address" }
-
-            throw when (ex) {
-                is java.lang.IllegalArgumentException -> HandledIOException("Wrong URI")
-                is ServiceUnavailableException -> HandledIOException(
-                    "Unable to connect, " +
-                            "ensure the database is running and that there is a working network connection to it.",
-                    ex
-                )
-                is SessionExpiredException -> HandledIOException("Session failed, try restarting the app")
-                else -> HandledIOException("Connection failed: ${ex.localizedMessage}")
-            }
+            throw HandledIOException("Wrong URI", ex)
+        } catch (ex: SessionExpiredException) {
+            logger.error(ex) { "Session failed" }
+            throw HandledIOException("Session failed, try restarting the app", ex)
         }
+
+        logger.info { "Connect to the server at $uri address" }
     }
 
     private fun parseNode(network: Network, nodes: Result) {
@@ -209,12 +167,8 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                 addSkippedNodes(network, parsedId)
             }
 
-        } catch (ex: Exception) {
-            throw when (ex) {
-                is Uncoercible -> HandledIOException("Invalid label nodes in the database")
-                is HandledIOException -> ex
-                else -> HandledIOException("Parsing nodes failed")
-            }
+        } catch (ex: Uncoercible) {
+            throw HandledIOException("Invalid label nodes in the database", ex)
         }
     }
 
@@ -225,20 +179,15 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                 val parsedId2 = link["id2"].asInt()
 
                 if (parsedId1 < IOHandler.MIN_NODE_ID || parsedId2 < IOHandler.MIN_NODE_ID) {
-                    throw HandledIOException("id labels must be not less than ${IOHandler.MIN_NODE_ID}")
+                    throw HandledIOException("Id labels must be not less than ${IOHandler.MIN_NODE_ID}")
                 }
 
                 addSkippedNodes(network, max(parsedId1, parsedId2))
 
                 network.addLink(parsedId1, parsedId2)
             }
-
-        } catch (ex: Exception) {
-            throw when (ex) {
-                is Uncoercible -> HandledIOException("Invalid label links in the database")
-                is HandledIOException -> ex
-                else -> HandledIOException("Parsing links failed")
-            }
+        } catch (ex: Uncoercible) {
+            throw HandledIOException("Invalid label links in the database", ex)
         }
     }
 
@@ -248,14 +197,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
     }
 
     override fun close() {
-        try {
-            driver.close()
-
-            logger.info { "Successful disconnection from server" }
-        } catch (ex: Neo4jException) {
-            logger.error(ex) { "Cannot disconnection from server" }
-
-            throw HandledIOException("Unable to close connection")
-        }
+        driver.close()
+        logger.info { "Disconnect from server" }
     }
 }
