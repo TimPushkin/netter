@@ -114,7 +114,6 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                             ) as Map<String, Any>?
                         )
 
-                        logger.info { "Successful record nodes" }
                     } catch (ex: Exception) {
                         logger.error(ex) { "Cannot record nodes" }
 
@@ -122,6 +121,8 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                         throw HandledIOException("Unable to record nodes")
                     }
                 }
+
+                logger.info { "Successful record nodes" }
 
                 for (link in network.links) with(link) {
                     try {
@@ -135,7 +136,6 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                             ) as Map<String, Any>?
                         )
 
-                        logger.info { "Successful record links" }
                     } catch (ex: Exception) {
                         logger.error(ex) { "Cannot record links" }
 
@@ -143,6 +143,9 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                         throw HandledIOException("Unable to record links")
                     }
                 }
+
+                logger.info { "Successful record links" }
+
             }
 
             logger.info { "Successful record graph" }
