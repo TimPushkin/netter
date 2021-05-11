@@ -26,7 +26,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.6")
     implementation("org.slf4j:slf4j-simple:1.7.30")
 
-    implementation ("org.jgrapht", "jgrapht-core", "1.5.1")
+    implementation ("org.jgrapht:jgrapht-core:1.5.1")
 }
 
 application {
