@@ -9,6 +9,17 @@ import ru.spbu.netter.model.Node
 import tornadofx.*
 
 
+private const val LABEL_SCALING = 0.12
+
+private const val MIN_RADIUS = 5.0
+private const val RADIUS_SCALING = 1.5
+
+private const val STROKE_SCALING = 0.2
+
+private const val MAX_HUE = 360.0
+private const val BRIGHTNESS_BOUNDARY = 0.25
+
+
 class NodeView(val node: Node, x: Double, y: Double, private val colorsNum: IntegerProperty) :
     Circle(x, y, 0.0) {
     val label = text(node.id.toString()) {
@@ -28,18 +39,6 @@ class NodeView(val node: Node, x: Double, y: Double, private val colorsNum: Inte
         fillProperty().bind(Bindings.createObjectBinding(::calculateFillColor, colorsNum, node.communityProperty))
         strokeProperty().bind(Bindings.createObjectBinding(::calculateStrokeColor, fillProperty()))
         label.fillProperty().bind(Bindings.createObjectBinding(::calculateLabelColor, fillProperty()))
-    }
-
-    companion object {
-        private const val LABEL_SCALING = 0.12
-
-        private const val MIN_RADIUS = 5.0
-        private const val RADIUS_SCALING = 1.5
-
-        private const val STROKE_SCALING = 0.2
-
-        private const val MAX_HUE = 360.0
-        private const val BRIGHTNESS_BOUNDARY = 0.25
     }
 
     private fun calculateRadius() = MIN_RADIUS + node.centrality * RADIUS_SCALING
