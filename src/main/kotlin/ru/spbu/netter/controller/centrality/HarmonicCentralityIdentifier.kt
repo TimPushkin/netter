@@ -8,16 +8,17 @@ import org.jgrapht.graph.DefaultUndirectedGraph
 import ru.spbu.netter.model.Network
 import tornadofx.Controller
 
+
 private val logger = KotlinLogging.logger {}
+
 
 class HarmonicCentralityIdentifier : Controller(), CentralityIdentifier {
 
     override fun identifyCentrality(network: Network) {
-
         logger.info { "Identifying centrality..." }
 
         val centralityValues = HarmonicCentrality(convertNetwork(network)).scores
-        network.nodes.values.forEach { node ->  
+        network.nodes.values.forEach { node ->
             centralityValues[node.id]?.let { node.centrality = it }
                 ?: throw IllegalStateException("Node ${node.id} not found in the harmonic centrality calculation result")
         }
