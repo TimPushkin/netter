@@ -11,7 +11,7 @@ class ForceAtlas2(
     network: Network,
     private val outboundAttractionDistribution: Boolean = true,
     private val adjustSizes: Boolean = true,
-    private val barnesHutOptimize: Boolean = true,
+    private val barnesHutOptimize: Boolean = false,
     private val linLogMode: Boolean = false,
     private val strongGravityMode: Boolean = false,
     private val edgeWeightInfluence: Double = 1.0,
@@ -26,7 +26,7 @@ class ForceAtlas2(
     private var speed = 1.0
     private var speedEfficiency = 1.0
     private var outboundAttCompensation = 1.0
-    private lateinit var rootRegion: Region
+    private var rootRegion = Region(emptyList())
 
     private val threadCount = 4.coerceAtMost(1.coerceAtLeast(Runtime.getRuntime().availableProcessors() - 1))
     private val currentThreadCount = threadCount
