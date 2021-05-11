@@ -17,8 +17,8 @@ class ForceAtlas2Layout : Controller(), LayoutMethod {
 
         val forceAtlas2Algorithm = ForceAtlas2(network)
 
-        repeat(100) { forceAtlas2Algorithm.start() }
+        repeat(1000) { forceAtlas2Algorithm.start() }
 
-        return forceAtlas2Algorithm.getFaNodes().map { Point2D(it.x, it.y) }
+        return forceAtlas2Algorithm.getResults().map { Point2D(it.x, it.y) }
     }
 }

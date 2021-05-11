@@ -172,5 +172,8 @@ class ForceAtlas2(
         }
     }
 
-    fun getFaNodes(): List<FaNode> = faNodes
+    fun getResults(): List<FaNode> {
+        pool.shutdown()
+        return faNodes
+    }
 }
