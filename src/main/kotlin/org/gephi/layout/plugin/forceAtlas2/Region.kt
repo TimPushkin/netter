@@ -38,6 +38,7 @@ class Region(private val faNodes: List<FaNode>) {
         }
     }
 
+    @Synchronized
     fun buildSubRegions() {
         if (faNodes.size <= 1) return
 
@@ -65,16 +66,16 @@ class Region(private val faNodes: List<FaNode>) {
         if (contents.isEmpty()) return
 
         if (contents.size < faNodes.size) subregions.add(Region(contents))
-        else for (nodeLayout in contents) subregions.add(Region(mutableListOf(nodeLayout)))
+        else for (nodeLayout in contents) subregions.add(Region(listOf(nodeLayout)))
     }
 
-    fun applyForce(nodeLayout: FaNode, force: ForceFactory.RepulsionForce, theta: Double) {
-        if (faNodes.size < 2) force.apply(nodeLayout, faNodes[0])
+    fun applyForce(faNode: FaNode, force: ForceFactory.RepulsionForce, theta: Double) {
+        if (faNodes.size < 2) force.apply(faNode, faNodes[0])
         else {
             val distance =
-                sqrt((nodeLayout.x - massCenterX) * (nodeLayout.x - massCenterX) + (nodeLayout.y - massCenterY) * (nodeLayout.y - massCenterY))
-            if (distance * theta > size) force.apply(nodeLayout, this)
-            else for (subregion in subregions) subregion.applyForce(nodeLayout, force, theta)
+                sqrt((faNode.x - massCenterX) * (faNode.x - massCenterX) + (faNode.y - massCenterY) * (faNode.y - massCenterY))
+            if (distance * theta > size) force.apply(faNode, this)
+            else for (subregion in subregions) subregion.applyForce(faNode, force, theta)
         }
     }
 }

@@ -3,7 +3,6 @@ package org.gephi.layout.plugin.forceAtlas2
 import ru.spbu.netter.model.Network
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
-import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -74,8 +73,8 @@ class ForceAtlas2(
             pool.submit(
                 NodesThread(
                     faNodes,
-                    floor((faNodes.size * (taskNum - 1) / taskCount).toDouble()).toInt(),
-                    floor((faNodes.size * taskNum / taskCount).toDouble()).toInt(),
+                    faNodes.size * (taskNum - 1) / taskCount,
+                    faNodes.size * taskNum / taskCount,
                     barnesHutOptimize,
                     barnesHutTheta,
                     gravity,
@@ -96,7 +95,7 @@ class ForceAtlas2(
 
         val attractionForce = ForceFactory().buildAttraction(
             linLogMode, outboundAttractionDistribution, adjustSizes,
-            1.0 * if (outboundAttractionDistribution) outboundAttCompensation else 1.0,
+            if (outboundAttractionDistribution) outboundAttCompensation else 1.0,
         )
         when (edgeWeightInfluence) {
             0.0 -> for (faLink in faLinks) attractionForce.apply(
@@ -157,7 +156,7 @@ class ForceAtlas2(
                 val swinging =
                     node.mass * sqrt((node.oldDx - node.dx) * (node.oldDx - node.dx) + (node.oldDy - node.dy) * (node.oldDy - node.dy))
                 val df = sqrt(node.dx.pow(2.0) + node.dy.pow(2.0))
-                val factor = (0.1 * speed / (1f + sqrt(speed * swinging)) * df).coerceAtMost(10.0) / df
+                val factor = (0.1 * speed / (1.0 + sqrt(speed * swinging)) * df).coerceAtMost(10.0) / df
 
                 node.x = node.x + node.dx * factor
                 node.y = node.y + node.dy * factor
@@ -168,7 +167,7 @@ class ForceAtlas2(
 
                 val swinging: Double =
                     node.mass * sqrt((node.oldDx - node.dx) * (node.oldDx - node.dx) + (node.oldDy - node.dy) * (node.oldDy - node.dy))
-                val factor = speed / (1f + sqrt(speed * swinging))
+                val factor = speed / (1.0 + sqrt(speed * swinging))
 
                 node.x = node.x + node.dx * factor
                 node.y = node.y + node.dy * factor

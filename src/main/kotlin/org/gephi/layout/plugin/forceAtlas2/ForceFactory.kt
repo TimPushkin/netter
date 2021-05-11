@@ -83,7 +83,7 @@ class ForceFactory {
 
             val distance = sqrt(xDist * xDist + yDist * yDist)
             if (distance > 0) {
-                val factor: Double = coefficient * faNode.mass * gravitation / distance
+                val factor = coefficient * faNode.mass * gravitation / distance
                 faNode.dx -= xDist * factor
                 faNode.dy -= yDist * factor
             }
@@ -129,12 +129,12 @@ class ForceFactory {
         }
 
         override fun apply(faNode: FaNode, gravitation: Double) {
-            val xDist: Double = faNode.x
-            val yDist: Double = faNode.y
+            val xDist = faNode.x
+            val yDist = faNode.y
             val distance = sqrt(xDist * xDist + yDist * yDist)
 
             if (distance > 0) {
-                val factor: Double = coefficient * faNode.mass * gravitation / distance
+                val factor = coefficient * faNode.mass * gravitation / distance
                 faNode.dx -= xDist * factor
                 faNode.dy -= yDist * factor
             }
@@ -217,7 +217,7 @@ class ForceFactory {
             val distance = sqrt(xDist * xDist + yDist * yDist)
 
             if (distance > 0) {
-                val factor: Double = -coefficient * edgeWeight * ln(1 + distance) / distance / faNode1.mass
+                val factor = -coefficient * edgeWeight * ln(1 + distance) / distance / faNode1.mass
                 faNode1.dx += xDist * factor
                 faNode1.dy += yDist * factor
                 faNode2.dx -= xDist * factor
@@ -231,7 +231,7 @@ class ForceFactory {
         override fun apply(faNode1: FaNode, faNode2: FaNode, edgeWeight: Double) {
             val xDist = faNode1.x - faNode2.x
             val yDist = faNode1.y - faNode2.y
-            val distance: Double = sqrt(xDist * xDist + yDist * yDist) - faNode1.size - faNode2.size
+            val distance = sqrt(xDist * xDist + yDist * yDist) - faNode1.size - faNode2.size
 
             if (distance > 0) {
                 val factor = -coefficient * edgeWeight
