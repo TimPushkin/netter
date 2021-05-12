@@ -9,16 +9,16 @@ import kotlin.math.sqrt
 
 class ForceAtlas2(
     network: Network,
-    private val outboundAttractionDistribution: Boolean = true,
+    private val outboundAttractionDistribution: Boolean = false,
     private val adjustSizes: Boolean = true,
     private val barnesHutOptimize: Boolean = false,
     private val linLogMode: Boolean = false,
     private val strongGravityMode: Boolean = false,
     private val edgeWeightInfluence: Double = 1.0,
     private val jitterTolerance: Double = 1.0,
-    private val scalingRatio: Double = 2.0,
+    private val scalingRatio: Double = 10.0,
     private val gravity: Double = 1.0,
-    private val barnesHutTheta: Double = 1.0,
+    private val barnesHutTheta: Double = 1.2,
 ) {
     private val faNodes = mutableListOf<FaNode>()
     private val faLinks = mutableListOf<FaLink>()
