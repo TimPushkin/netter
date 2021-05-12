@@ -36,8 +36,24 @@
  made subject to such option by the copyright holder.
 
  Contributor(s):
+ Alina Shlegel
+ Timofey Pushkin
 
  Portions Copyrighted 2011 Gephi Consortium.
+
+
+ Changes (made in 2021) compared to the original file:
+ - Interfaces Node, Edge, Graph, and GraphModel are replaced with classes
+ Node, Edge, and Graph (written on Kotlin) partially implementing their
+ functionality.
+ - Graph class mentioned above does not implement readLock / readUnlock
+ methods, so their usage is removed.
+ - Interfaces Layout, LayoutBuilder and class LayoutProperty are removed,
+ so is the functionality related to them.
+ - AbstractLayout interface usage is replaced with calculations from its
+ method ensureSafeLayoutNodePositions.
+ - Functionality related to the package org.openide.util is removed.
+ - Dynamic edge weight support is removed.
  */
 package org.gephi.layout.plugin.forceAtlas2;
 

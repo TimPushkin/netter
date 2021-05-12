@@ -36,8 +36,14 @@ Version 3 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 
 Contributor(s):
+Alina Shlegel
+Timofey Pushkin
 
 Portions Copyrighted 2011 Gephi Consortium.
+
+
+Changes (made in 2021) compared to the original file:
+- Interface LayoutData is removed.
  */
 package org.gephi.layout.plugin.forceAtlas2;
 
