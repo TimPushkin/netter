@@ -48,11 +48,11 @@ class Region(private val faNodes: List<FaNode>) {
 
         val topLeftNodes = mutableListOf<FaNode>()
         val bottomLeftNodes = mutableListOf<FaNode>()
-        for (faNode in leftNodes) (if (faNode.y < massCenterY) topLeftNodes else bottomLeftNodes).add(faNode)
+        for (faNode in leftNodes) (if (faNode.y < massCenterY) bottomLeftNodes else topLeftNodes).add(faNode)
 
         val bottomRightNodes = mutableListOf<FaNode>()
         val topRightNodes = mutableListOf<FaNode>()
-        for (faNode in rightNodes) (if (faNode.y < massCenterY) topRightNodes else bottomRightNodes).add(faNode)
+        for (faNode in rightNodes) (if (faNode.y < massCenterY) bottomRightNodes else topRightNodes).add(faNode)
 
         addSubRegion(topLeftNodes)
         addSubRegion(bottomLeftNodes)
