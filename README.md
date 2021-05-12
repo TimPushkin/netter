@@ -1,4 +1,6 @@
-# Netter ![N|Solid](https://github.com/TimPushkin/netter/blob/view/src/main/resources/icon.png)
+# Netter
+
+<img src="https://github.com/TimPushkin/netter/blob/view/src/main/resources/icon.png" width="256" height="256" align="right" />
 
 An app for complex network analysis
 
