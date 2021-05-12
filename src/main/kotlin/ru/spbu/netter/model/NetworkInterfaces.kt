@@ -13,9 +13,18 @@ interface Node {
     val centralityProperty: DoubleProperty
     var centrality: Double
 
+    val xProperty: DoubleProperty
+    var x: Double
+
+    val yProperty: DoubleProperty
+    var y: Double
+
     companion object {
         internal const val DEFAULT_COMMUNITY = 0
         internal const val DEFAULT_CENTRALITY = 1.0
+
+        internal const val DEFAULT_X = 0.0
+        internal const val DEFAULT_Y = 0.0
     }
 }
 

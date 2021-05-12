@@ -21,6 +21,12 @@ class UndirectedNetwork : Network {
 
         override val centralityProperty = SimpleDoubleProperty(this, "centrality", Node.DEFAULT_CENTRALITY)
         override var centrality by centralityProperty
+
+        override val xProperty = SimpleDoubleProperty(this, "x", Node.DEFAULT_X)
+        override var x by xProperty
+
+        override val yProperty = SimpleDoubleProperty(this, "y", Node.DEFAULT_Y)
+        override var y by yProperty
     }
 
     private data class UndirectedLink(override val n1: Node, override val n2: Node) : Link {
