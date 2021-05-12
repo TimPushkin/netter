@@ -164,14 +164,14 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                 val parsedCommunity = node["community"].asInt()
                 val parsedCentrality = node["centrality"].asDouble()
 
-                if (parsedId < IOHandler.MIN_NODE_ID) {
-                    throw HandledIOException("id label must be not less than ${IOHandler.MIN_NODE_ID}")
+                if (parsedId < IOHandlerData.MIN_NODE_ID) {
+                    throw HandledIOException("id label must be not less than ${IOHandlerData.MIN_NODE_ID}")
                 }
-                if (parsedCommunity < IOHandler.MIN_COMMUNITY) {
-                    throw HandledIOException("community label must be not less than ${IOHandler.MIN_COMMUNITY}")
+                if (parsedCommunity < IOHandlerData.MIN_COMMUNITY) {
+                    throw HandledIOException("community label must be not less than ${IOHandlerData.MIN_COMMUNITY}")
                 }
-                if (parsedCentrality < IOHandler.MIN_CENTRALITY) {
-                    throw HandledIOException("centrality label must be not less than ${IOHandler.MIN_CENTRALITY}")
+                if (parsedCentrality < IOHandlerData.MIN_CENTRALITY) {
+                    throw HandledIOException("centrality label must be not less than ${IOHandlerData.MIN_CENTRALITY}")
                 }
 
                 network.addNode(parsedId).apply {
@@ -191,8 +191,8 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                 val parsedId1 = link["id1"].asInt()
                 val parsedId2 = link["id2"].asInt()
 
-                if (parsedId1 < IOHandler.MIN_NODE_ID || parsedId2 < IOHandler.MIN_NODE_ID) {
-                    throw HandledIOException("Id labels must be not less than ${IOHandler.MIN_NODE_ID}")
+                if (parsedId1 < IOHandlerData.MIN_NODE_ID || parsedId2 < IOHandlerData.MIN_NODE_ID) {
+                    throw HandledIOException("Id labels must be not less than ${IOHandlerData.MIN_NODE_ID}")
                 }
 
                 addSkippedNodes(network, max(parsedId1, parsedId2))
@@ -205,7 +205,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
 
     private fun addSkippedNodes(network: Network, addUntilId: Int) {
         var prevId = addUntilId - 1
-        while (prevId >= IOHandler.MIN_NODE_ID && !network.nodes.containsKey(prevId)) network.addNode(prevId--)
+        while (prevId >= IOHandlerData.MIN_NODE_ID && !network.nodes.containsKey(prevId)) network.addNode(prevId--)
     }
 
     override fun close() {
