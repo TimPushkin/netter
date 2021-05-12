@@ -30,7 +30,7 @@ class NetworkView(val network: Network) : Group() {
         placeNodesInCentralityOrder()
     }
 
-    fun applyLayout(coordinates: Array<Point2D>) {
+    fun applyLayout(coordinates: List<Point2D>) {
         nodes.values.forEachIndexed { i, nodeView ->
             nodeView.centerX = coordinates[i].x
             nodeView.centerY = coordinates[i].y

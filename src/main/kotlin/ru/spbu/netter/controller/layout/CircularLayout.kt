@@ -14,15 +14,15 @@ private val logger = KotlinLogging.logger {}
 
 class CircularLayout : Controller(), LayoutMethod {
 
-    override fun layOut(network: Network, center: Point2D, repulsion: Double): Array<Point2D> {
+    override fun layOut(network: Network, center: Point2D, repulsion: Double): List<Point2D> {
         if (network.isEmpty()) {
             logger.info { "There is nothing to lay out: network $network is empty" }
-            return emptyArray()
+            return emptyList()
         }
 
         logger.info { "Placing nodes in a circular shape with repulsion $repulsion..." }
 
-        val coordinates = Array(network.nodes.size) { Point2D(0.0, 0.0) }
+        val coordinates = MutableList(network.nodes.size) { Point2D(0.0, 0.0) }
 
         if (network.nodes.size == 1) {
             coordinates[0] = center

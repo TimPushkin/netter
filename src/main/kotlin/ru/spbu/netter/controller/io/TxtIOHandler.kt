@@ -10,13 +10,12 @@ import java.nio.file.Files
 
 private val logger = KotlinLogging.logger {}
 
+private const val COLUMN_DELIMITER = " "
+private const val LINK_INPUT_COLUMNS_NUM = 2
+private const val NODE_INPUT_COLUMNS_NUM = 3
+
 
 class TxtIOHandler : Controller(), FileIOHandler {
-    companion object {
-        private const val COLUMN_DELIMITER = " "
-        private const val LINK_INPUT_COLUMNS_NUM = 2
-        private const val NODE_INPUT_COLUMNS_NUM = 3
-    }
 
     override fun importNetwork(network: Network, file: File) {
         val parsingMethods = listOf(::parseLink, ::parseNode)
@@ -61,8 +60,8 @@ class TxtIOHandler : Controller(), FileIOHandler {
         val parsedId1 = columns[0].toInt()
         val parsedId2 = columns[1].toInt()
 
-        if (parsedId1 < IOHandler.MIN_NODE_ID || parsedId2 < IOHandler.MIN_NODE_ID) {
-            handleInputError(lineNum, "node ids must be not less than ${IOHandler.MIN_NODE_ID}")
+        if (parsedId1 < IOHandlerData.MIN_NODE_ID || parsedId2 < IOHandlerData.MIN_NODE_ID) {
+            handleInputError(lineNum, "node ids must be not less than ${IOHandlerData.MIN_NODE_ID}")
         }
 
         network.addLink(parsedId1, parsedId2)
@@ -83,16 +82,16 @@ class TxtIOHandler : Controller(), FileIOHandler {
         val parsedCommunity = columns[1].toInt()
         val parsedCentrality = columns[2].toDouble()
 
-        if (parsedId  < IOHandler.MIN_NODE_ID) {
-            handleInputError(lineNum, "node id must be not less than ${IOHandler.MIN_NODE_ID}")
+        if (parsedId  < IOHandlerData.MIN_NODE_ID) {
+            handleInputError(lineNum, "node id must be not less than ${IOHandlerData.MIN_NODE_ID}")
         }
 
-        if (parsedCommunity < IOHandler.MIN_COMMUNITY) {
-            handleInputError(lineNum, "community must be not less than ${IOHandler.MIN_COMMUNITY}")
+        if (parsedCommunity < IOHandlerData.MIN_COMMUNITY) {
+            handleInputError(lineNum, "community must be not less than ${IOHandlerData.MIN_COMMUNITY}")
         }
 
-        if (parsedCentrality < IOHandler.MIN_CENTRALITY) {
-            handleInputError(lineNum, "centrality must be not less than ${IOHandler.MIN_CENTRALITY}")
+        if (parsedCentrality < IOHandlerData.MIN_CENTRALITY) {
+            handleInputError(lineNum, "centrality must be not less than ${IOHandlerData.MIN_CENTRALITY}")
         }
 
         network.addNode(parsedId).apply {
@@ -103,7 +102,7 @@ class TxtIOHandler : Controller(), FileIOHandler {
 
     private fun addSkippedNodes(network: Network, addUntilId: Int) {
         var prevId = addUntilId - 1
-        while (prevId >= IOHandler.MIN_NODE_ID && !network.nodes.containsKey(prevId)) network.addNode(prevId--)
+        while (prevId >= IOHandlerData.MIN_NODE_ID && !network.nodes.containsKey(prevId)) network.addNode(prevId--)
     }
 
     private fun handleInputError(lineNum: Int, message: String): Nothing {
