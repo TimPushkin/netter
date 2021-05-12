@@ -9,8 +9,8 @@ import ru.spbu.netter.view.NetworkView
 import tornadofx.*
 
 
-private const val MIN_ZOOM = 0.2
-private const val ZOOM_SCALING = 0.01
+private const val MIN_ZOOM = 0.03
+private const val ZOOM_SCALING = 0.0005
 
 
 class NetworkNavigator : Controller(), NetworkEventHandler {
