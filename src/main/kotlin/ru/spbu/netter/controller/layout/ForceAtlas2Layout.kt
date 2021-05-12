@@ -14,32 +14,59 @@ import tornadofx.*
 private val logger = KotlinLogging.logger {}
 
 
-class ForceAtlas2Layout : Controller(), LayoutMethod {
+class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
 
-    override fun layOut(network: Network, center: Point2D, repulsion: Double): List<Point2D> {
-        logger.info { "Placing nodes in a nice shape with repulsion $repulsion..." }
+    override fun calculateLayout(
+        network: Network,
+        loopsNum: Int,
+        applyOutboundAttrDistr: Boolean,
+        applyAdjustSizes: Boolean,
+        applyBarnesHut: Boolean,
+        applyLinLogMode: Boolean,
+        applyStrongGravityMode: Boolean,
+        withJitterTolerance: Double,
+        withScalingRatio: Double,
+        withGravity: Double,
+        withBarnesHutTheta: Double,
+    ): List<Point2D> {
+        if (network.isEmpty()) {
+            logger.info { "There is nothing to lay out: network $network is empty" }
+            return emptyList()
+        }
+
+        logger.info { "Placing nodes using $loopsNum loops of ForceAtlas2 with the following parameters:" }
+        logger.info { "-- outboundAttractionDistribution: $applyOutboundAttrDistr" }
+        logger.info { "-- adjustSizes: $applyOutboundAttrDistr" }
+        logger.info { "-- barnesHutOptimize: $applyOutboundAttrDistr" }
+        logger.info { "-- linLogMode: $applyOutboundAttrDistr" }
+        logger.info { "-- strongGravityMode: $applyOutboundAttrDistr" }
+        logger.info { "-- jitterTolerance: $applyOutboundAttrDistr" }
+        logger.info { "-- scalingRatio: $applyOutboundAttrDistr" }
+        logger.info { "-- gravity: $applyOutboundAttrDistr" }
+        logger.info { "-- barnesHutTheta: $applyOutboundAttrDistr" }
 
         val convertedNetwork = convertNetwork(network)
 
         val forceAtlas2Algorithm = ForceAtlas2().apply {
             setGraph(convertedNetwork)
 
-            isOutboundAttractionDistribution = false
-            isAdjustSizes = true
-            isBarnesHutOptimize = true
-            isLinLogMode = false
-            isStrongGravityMode = false
+            isOutboundAttractionDistribution = applyOutboundAttrDistr
+            isAdjustSizes = applyAdjustSizes
+            isBarnesHutOptimize = applyBarnesHut
+            isLinLogMode = applyLinLogMode
+            isStrongGravityMode = applyStrongGravityMode
 
             edgeWeightInfluence = 1.0
-            jitterTolerance = 1.0
-            scalingRatio = 10.0
-            gravity = 1.0
-            barnesHutTheta = 1.2
+
+            jitterTolerance = withJitterTolerance
+            scalingRatio = withScalingRatio
+            gravity = withGravity
+            barnesHutTheta = withBarnesHutTheta
         }
 
         with(forceAtlas2Algorithm) {
             initAlgo()
-            repeat(1000) { goAlgo() }
+            repeat(loopsNum) { goAlgo() }
             endAlgo()
         }
 
