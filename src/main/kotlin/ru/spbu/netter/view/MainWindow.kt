@@ -7,7 +7,7 @@ import ru.spbu.netter.model.*
 import tornadofx.*
 
 
-class MainView : View("Netter") {
+class MainWindow : View("Netter") {
     private val navigationSpace: NavigationSpace by inject()
 
     private val txtIOHandler: FileIOHandler by inject<TxtIOHandler>()
@@ -38,14 +38,6 @@ class MainView : View("Netter") {
             }
 
             menu("Network") {
-                item("Default layout").action {
-                    getRepulsion()?.let { navigationSpace.applyDefaultLayout(it) }
-                }
-
-                item("Smart layout").action {
-                    getRepulsion()?.let { navigationSpace.applySmartLayout(it) }
-                }
-
                 item("Inspect for communities").action {
                     getResolution()?.let { navigationSpace.inspectForCommunities(it) }
                 }
@@ -59,6 +51,8 @@ class MainView : View("Netter") {
                 item("Netter at GitHub").action { hostServices.showDocument("https://github.com/TimPushkin/netter") }
             }
         }
+
+        left<LeftMenu>()
     }
 
     // NavigationSpace initialization

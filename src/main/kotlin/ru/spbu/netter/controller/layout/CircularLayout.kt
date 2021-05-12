@@ -11,10 +11,13 @@ import kotlin.math.sqrt
 
 private val logger = KotlinLogging.logger {}
 
+private const val CENTER_X = 0.0
+private const val CENTER_Y = 0.0
 
-class CircularLayout : Controller(), LayoutMethod {
 
-    override fun layOut(network: Network, center: Point2D, repulsion: Double): List<Point2D> {
+class CircularLayout : Controller(), SimpleLayoutMethod {
+
+    override fun calculateLayout(network: Network, repulsion: Double): List<Point2D> {
         if (network.isEmpty()) {
             logger.info { "There is nothing to lay out: network $network is empty" }
             return emptyList()
@@ -22,6 +25,7 @@ class CircularLayout : Controller(), LayoutMethod {
 
         logger.info { "Placing nodes in a circular shape with repulsion $repulsion..." }
 
+        val center = Point2D(CENTER_X, CENTER_Y)
         val coordinates = MutableList(network.nodes.size) { Point2D(0.0, 0.0) }
 
         if (network.nodes.size == 1) {
