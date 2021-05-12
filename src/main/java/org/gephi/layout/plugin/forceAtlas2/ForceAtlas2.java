@@ -90,6 +90,9 @@ public class ForceAtlas2 {
 
         // Initialise layout data
         for (Node n : nodes) {
+            n.setX(((0.01 + Math.random()) * 1000.0) - 500.0);
+            n.setY(((0.01 + Math.random()) * 1000.0) - 500.0);
+
             if (n.getLayoutData() == null || !(n.getLayoutData() instanceof ForceAtlas2LayoutData)) {
                 ForceAtlas2LayoutData nLayout = new ForceAtlas2LayoutData();
                 n.setLayoutData(nLayout);
