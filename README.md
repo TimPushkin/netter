@@ -2,7 +2,7 @@
 
 <img src="https://github.com/TimPushkin/netter/blob/view/src/main/resources/Netter.png" width="256" height="256" align="right" />
 
-An app for complex network analysis
+An app for complex network analysis.
 
 ## Toolkit
 
@@ -18,15 +18,15 @@ An app for complex network analysis
 - [SQLite](https://www.sqlite.org/index.html) database
 - [Neo4j](https://neo4j.com/) database
 
-More details are available in the _Usage_ section
+More details are available in the _Usage_ section.
 
 ## Get started
 
-- Download the source code or clone the repository
+- Download the source code or clone the repository:
 
        git clone https://github.com/TimPushkin/netter.git
 
-- Run Netter in the downloaded directory
+- Run Netter in the downloaded directory:
 
        ./gradlew run
 
@@ -41,54 +41,104 @@ More details are available in the _Usage_ section
 
 After launch, import a network from a supported format using the top menu bar.
 
-## Network format
+## General IO information
+
+### Network specifications
 
 Networks supported by Netter have the following properties:
 
-- Links are unweighted and undirected
+- Links are unweighted and undirected.
 
-- Self-loops are allowed
+- Self-loops are allowed.
 
-- Unconnected networks are allowed
+- Unconnected networks are allowed.
 
-- Multiple (or "parallel") links are not allowed
+- Multiple (or "parallel") links are not allowed.
 
-- Nodes are defined by unique IDs (non-negative whole numbers)
+- Nodes are defined by unique IDs (non-negative whole numbers).
 
 - Nodes have community (a non-negative whole number) and centrality (a non-negative decimal number) as their main 
-  characteristics
+  characteristics.
 
-- Nodes have two-dimensional coordinates (decimal numbers) for the purpose of network layout
+- Nodes have two-dimensional coordinates (decimal numbers) for the purpose of network layout.
 
-- If a there is a node with ID _N_ in a network, then all the nodes with IDs from _0_ to _N - 1_ are also in the network
+- If there is a node with ID _N_ in a network, then all the nodes with IDs from _0_ to _N - 1_ are also in the network.
+
+### Input
 
 To match the properties above, all input formats have the following properties:
 
-- The format is divided into two parts: links description and nodes description. Node description is fully optional
+- The format is divided into two parts: links' description and nodes' description.
 
-- A link is defined by the IDs of the two nodes it is connecting (the IDs may be equal, and then it is a self-loop link)
+- A link is defined by the IDs of the two nodes it is connecting (the IDs may be equal, then it is a self-looped link).
 
 - When a link is added to a network, its incident nodes are also automatically added with the default characteristics, 
-which are: 0 for community, 1.0 for centrality, and (0.0, 0.0) for coordinates
+which are: 0 for community, 1.0 for centrality, and (0.0, 0.0) for coordinates.
 
 - A node is defined by its unique ID and its main characteristics (community and centrality). Optionally, coordinates 
-may also be provided
+may also be provided.
 
 - When a node with ID _N_ is added (either by adding an incident link or by providing its description), all the missing 
-nodes with IDs from _0_ to _N - 1_ are also automatically added with the default characteristics
+nodes with IDs from _0_ to _N - 1_ are also automatically added with the default characteristics.
 
-All export formats have the following properties:
+### Output
 
-- All links are included for export, just like in the import format
+All output formats have the following properties:
+
+- All links are included for export, just like in the import format.
 
 - All nodes are included for export, and for each node its ID and all of its characteristics (including its coordinates) 
-are exported
+are exported.
 
-## Input / export formats
+## Import - export format specifications
 
-### Text file
+### Plain text file
 
-    TODO
+Input is divided into two blocks: links' description and nodes' description, both of which are optional. The blocks 
+should be divided with an empty line. After the second block there may be either an end of file or an empty line. If it 
+is an empty line, any information after it is not taken into account.
+
+Each line in the links' description block must consist of two IDs separated with a whitespace - these are the IDs of the 
+nodes, which are connected by a link being described. If no further information about the nodes is provided, all of 
+these nodes will have the default parameters. If repetitive links occur in an imported file, only one of them will be 
+added to the network.
+
+In the following example three links - 4-6, 0-1, and 0-10 - will be added to the resulting network (remember, that the 
+network will contain all the skipped nodes too):
+
+    4 6
+    6 4
+    1 0
+    0 8
+
+Each line in the nodes' description must consist of either 3 or 5 columns separated with a whitespace (lines with 
+different columns number may be mixed). In both cases the first column represents the ID of a node being described, the 
+second represents its community, and the third represents its centrality. If the line consists of 5 columns, then the 
+last two represent the coordinates of the node: first x and then y. If several lines describe a node with the same ID, 
+then only the last one will have an effect.
+
+In the following example two nodes - the first one with ID 2, from community 0, with centrality of 0.0, with coordinates 
+(0.0, 0.0), and the second one with ID 4, from community 3, with centrality of 5.0, and with coordinates (0.0, 0.0) -  
+are created (remember, that the resulting network will contain all the skipped nodes too):
+
+    4 2 1.2
+    2 0 0.0 4.6 -22
+    4 3 5
+
+The examples above will be successfully imported separately (into different networks), although the second one must 
+contain a blank line before it. Combining these examples, we will get a single input, that will be also successfully 
+imported (into a single network):
+
+    4 6
+    6 4
+    1 0
+    0 8
+    
+    4 2 1.2
+    2 0 0.0 4.6 -22
+    4 3 5
+
+More examples of the correct inputs may be found in the [test resource files](https://github.com/TimPushkin/netter/tree/dev/src/test/resources/txt-inputs).
 
 ### SQLite
 
@@ -96,15 +146,59 @@ are exported
 
 ### Neo4j
 
-The connection is made according to the `bolt://` URI scheme. Database _username_ and _password_ are required. Nodes
-with the label `NODE` will be read from the database. All the nodes should contain node `id` and may contain additional
-information about `community`, `centrality` and coordinates `x`, `y`
+The connection is made according to the `bolt://` URI scheme. Database credentials such as _username_ and _password_ are 
+required. Nodes with the label `NODE` will be read from the database. All the nodes should contain node `id` and may 
+contain additional information about `community`, `centrality` and coordinates `x`, `y`.
 
-Links with the label `LINK` will be read. They must connect the nodes with the label `NODE`
+Links with the label `LINK` will be read. They must connect the nodes with the label `NODE`.
 
-## Default layout
+## Layout algorithms
 
-After loading the network, the _default circular layout_ will start. You will need to enter the `repulsion` value, in
-this layout the `repulsion` is proportional to the radius of a circle.
+### Circular layout
 
-## algorithms...
+The _circular layout_ places the nodes into a circle.
+
+This layout has the following parameters:
+
+- **Repulsion** (a non-negative decimal number) - it is proportional to the radius of the circle. The greater the 
+repulsion, the wider is the circle.
+
+### ForceAtlas2
+
+The _ForceAtlas2_ layout uses force-directed technics to draw the network.
+
+This layout has the following parameters:
+
+- **Loops number** (positive whole number) - the number of the cycles of the algorithm.
+
+- **Adjust sizes** (checkbox) - prevents nodes from overlapping by their default (unchangeable) size.
+
+- **Barnes-Hut optimization** (checkbox) - enables approximate computation of the repulsion force, increasing the speed 
+of the algorithm.
+
+- **LinLog mode** (checkbox) - enables the usage of a logarithmic attraction force.
+
+- **Strong gravity mode** (checkbox) - sets a strong force that attracts distant nodes to the center.
+
+- **Jitter tolerance** (positive decimal number) - 
+
+- **Scaling ratio** (positive decimal number) - controls the attraction and repulsion forces. The greater the scaling, 
+the sparser the network.
+
+- **Gravity** (decimal number) - defines the force that prevents disconnected components from drifting away. The greater 
+the gravity, the greater the force that attracts nodes to the center.
+
+- **Barnes-Hut theta** (decimal number) - controls the approximate computation of the repulsion force. The greater the 
+theta the less precise the approximation.
+
+## Community detection algorithm
+
+### Leiden algorithm
+
+    TODO
+
+## Centrality identifying algorithm
+
+### Harmonic centrality
+
+    TODO
