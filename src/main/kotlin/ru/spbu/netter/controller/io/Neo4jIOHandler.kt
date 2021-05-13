@@ -33,13 +33,13 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                 parseNode(network, nodes)
             }
         } catch (ex: AuthenticationException) {
-            logger.error(ex) { "Wrong username or password." }
+            logger.error(ex) { "Wrong username or password" }
             throw HandledIOException("Wrong username or password", ex)
         } catch (ex: ClientException) {
-            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme." }
+            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme" }
             throw HandledIOException("Use the bolt:// URI scheme", ex)
         } catch (ex: ServiceUnavailableException) {
-            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it." }
+            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it" }
             throw HandledIOException("Check your network connection", ex)
         }
 
@@ -54,13 +54,13 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                 parseLink(network, links)
             }
         } catch (ex: AuthenticationException) {
-            logger.error(ex) { "Wrong username or password." }
+            logger.error(ex) { "Wrong username or password" }
             throw HandledIOException("Wrong username or password", ex)
         } catch (ex: ClientException) {
-            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme." }
+            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme" }
             throw HandledIOException("Use the bolt:// URI scheme or expected other labels", ex)
         } catch (ex: ServiceUnavailableException) {
-            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it." }
+            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it" }
             throw HandledIOException("Check your network connection", ex)
         }
 
@@ -77,13 +77,13 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                 tx.run("MATCH (n: NODE), (:NODE)-[l:LINK]->(:NODE) DETACH DELETE n, l")
             }
         } catch (ex: AuthenticationException) {
-            logger.error(ex) { "Wrong username or password." }
+            logger.error(ex) { "Wrong username or password" }
             throw HandledIOException("Wrong username or password", ex)
         } catch (ex: ClientException) {
-            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme." }
+            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme" }
             throw HandledIOException("Use the bolt:// URI scheme or expected other labels", ex)
         } catch (ex: ServiceUnavailableException) {
-            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it." }
+            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it" }
             throw HandledIOException("Check your network connection", ex)
         }
 
@@ -105,13 +105,13 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                 }
             }
         } catch (ex: AuthenticationException) {
-            logger.error(ex) { "Wrong username or password." }
+            logger.error(ex) { "Wrong username or password" }
             throw HandledIOException("Wrong username or password", ex)
         } catch (ex: ClientException) {
-            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme." }
+            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme" }
             throw HandledIOException("Use the bolt:// URI scheme or expected other labels", ex)
         } catch (ex: ServiceUnavailableException) {
-            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it." }
+            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it" }
             throw HandledIOException("Check your network connection", ex)
         }
 
@@ -132,13 +132,13 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                 }
             }
         } catch (ex: AuthenticationException) {
-            logger.error(ex) { "Wrong username or password." }
+            logger.error(ex) { "Wrong username or password" }
             throw HandledIOException("Wrong username or password", ex)
         } catch (ex: ClientException) {
-            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme." }
+            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme" }
             throw HandledIOException("Use the bolt:// URI scheme or expected other labels", ex)
         } catch (ex: ServiceUnavailableException) {
-            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it." }
+            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it" }
             throw HandledIOException("Check your network connection", ex)
         }
 
