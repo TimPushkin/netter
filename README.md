@@ -151,7 +151,11 @@ required. Nodes with the label `NODE` will be read from the database. All the no
 contain additional information about `community`, `centrality` and coordinates `x`, `y`.
 
 Links with the label `LINK` will be read. They must connect the nodes with the label `NODE`.
+#### Examples of creating valid nodes and links
 
+    CREATE (n:NODE{ id:$id_value, [community:$community_value], [centrality:$centrality_value], [x:$x_value], [y:$y_value] })
+
+    MATCH (n1:NODE{ id:$id1_value }) MATCH (n2:NODE{ id:$id2_value }) CREATE (n1)-[:LINK]->(n2)
 ## Layout algorithms
 
 ### Circular layout
