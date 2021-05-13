@@ -61,33 +61,6 @@ class UriCredentialsInputForm : Fragment("URI credentials input") {
     }
 }
 
-class RepulsionInputForm : Fragment("Repulsion input") {
-    val repulsion: StringProperty by param()
-
-    private lateinit var enteredRepulsion: TextField
-
-    override val root = form {
-        fieldset {
-            field("Enter repulsion:") {
-                enteredRepulsion = textfield("20.0")
-            }
-        }
-
-        buttonbar {
-            button("OK").setOnAction {
-                if (enteredRepulsion.text.isDouble()) {
-                    repulsion.value = enteredRepulsion.text
-                    close()
-                } else alert(
-                    Alert.AlertType.INFORMATION,
-                    "Wrong repulsion input",
-                    "Repulsion must be a decimal number",
-                )
-            }
-        }
-    }
-}
-
 class ResolutionInputForm : Fragment("Resolution input") {
     val resolution: StringProperty by param()
 
