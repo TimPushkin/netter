@@ -27,6 +27,12 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:1.7.30")
 
     implementation ("org.jgrapht:jgrapht-core:1.5.1")
+
+    implementation("org.xerial", "sqlite-jdbc", "3.34.0")
+
+    implementation("org.jetbrains.exposed:exposed-core:0.31.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.31.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.31.1")
 }
 
 application {

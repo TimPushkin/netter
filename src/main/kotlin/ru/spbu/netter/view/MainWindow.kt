@@ -12,7 +12,7 @@ class MainWindow : View("Netter") {
 
     private val txtIOHandler: FileIOHandler by inject<TxtIOHandler>()
     private val neo4jIOHandler: UriIOHandler by inject<Neo4jIOHandler>()
-
+    private val sqliteIHandler: FileIOHandler by inject<SQLiteIOHandler>()
     override val root = borderpane {
         setPrefSize(960.0, 540.0)
 
@@ -25,7 +25,7 @@ class MainWindow : View("Netter") {
 
                     item("As Neo4j database").action { importFromUri(neo4jIOHandler) }
 
-                    item("As SQLite database").action { TODO("SQLite") }
+                    item("As SQLite database").action { importFromFile(sqliteIHandler) }
                 }
 
                 menu("Export") {
@@ -33,7 +33,7 @@ class MainWindow : View("Netter") {
 
                     item("As Neo4j database").action { exportFromUri(neo4jIOHandler) }
 
-                    item("As SQLite database").action { TODO("SQLite") }
+                    item("As SQLite database").action { exportFromFile(sqliteIHandler) }
                 }.apply { disableProperty().bind(!navigationSpace.isNetworkImportedProperty) }
             }
 
