@@ -47,6 +47,8 @@ class TxtIOHandler : Controller(), FileIOHandler {
 
             if (reader.ready()) logger.warn { "Excessive lines found after blank line $lineNum. Skipping..." }
         }
+
+        if (network.isEmpty()) throw HandledIOException("The provided network is empty")
     }
 
     private fun parseLink(network: Network, columns: List<String>, lineNum: Int) {
