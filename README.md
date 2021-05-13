@@ -156,6 +156,7 @@ Links with the label `LINK` will be read. They must connect the nodes with the l
     CREATE (n:NODE{ id:$id_value, [community:$community_value], [centrality:$centrality_value], [x:$x_value], [y:$y_value] })
 
     MATCH (n1:NODE{ id:$id1_value }) MATCH (n2:NODE{ id:$id2_value }) CREATE (n1)-[:LINK]->(n2)
+
 ## Layout algorithms
 
 ### Circular layout
@@ -164,7 +165,7 @@ The _circular layout_ places the nodes into a circle.
 
 This layout has the following parameters:
 
-- **Repulsion** (a non-negative decimal number) - it is proportional to the radius of the circle. The greater the 
+- **Repulsion** (non-negative decimal number) - it is proportional to the radius of the circle. The greater the 
 repulsion, the wider is the circle.
 
 ### ForceAtlas2
@@ -200,10 +201,17 @@ theta the less precise the approximation.
 
 ### Leiden algorithm
 
-    TODO
+The _Leiden algorithm_ is a community detection algorithm, based on the Louvain algorithm. It provides better partitions 
+in less calculation time, especially for large networks.
+
+This algorithm has the following parameters:
+
+- **Resolution** (positive decimal number) - controls the size of the communities. Higher resolutions lead to more 
+communities.
 
 ## Centrality identifying algorithm
 
 ### Harmonic centrality
 
-    TODO
+_Harmonic centrality_ is a version of closeness centrality, that is able to work with unconnected networks. It is 
+usually used in social network analysis.
