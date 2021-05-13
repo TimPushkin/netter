@@ -22,8 +22,6 @@ More details are available in the _Usage_ section
 
 ## Get started
 
----
-
 - Download the source code or clone the repository
 
        git clone https://github.com/TimPushkin/netter.git
@@ -37,9 +35,9 @@ More details are available in the _Usage_ section
 - Java JDK version 11
 - [Gradle](https://gradle.org/) version 6.8
 
-# Usage
-
 ---
+
+# Usage
 
 After launch, import a network from a supported format using the top menu bar.
 
@@ -98,9 +96,9 @@ are exported
 
 ### Neo4j
 
-The connection is made according to the `bolt://` URI scheme. Database _username_ and _password_ are required. Nodes 
-with the label `NODE` will be read from the database. All the nodes should contain additional information about `id`, 
-`community`, `centrality`
+The connection is made according to the `bolt://` URI scheme. Database _username_ and _password_ are required. Nodes
+with the label `NODE` will be read from the database. All the nodes should contain node `id` and may contain additional
+information about `community`, `centrality` and coordinates `x`, `y`
 
 Links with the label `LINK` will be read. They must connect the nodes with the label `NODE`
 
