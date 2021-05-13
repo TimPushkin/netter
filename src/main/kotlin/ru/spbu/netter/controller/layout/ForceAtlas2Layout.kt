@@ -1,6 +1,5 @@
 package ru.spbu.netter.controller.layout
 
-import javafx.geometry.Point2D
 import mu.KotlinLogging
 import org.gephi.graph.api.Edge
 import org.gephi.graph.api.Graph
@@ -19,7 +18,6 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
     override fun applyLayout(
         network: Network,
         loopsNum: Int,
-        applyOutboundAttrDistr: Boolean,
         applyAdjustSizes: Boolean,
         applyBarnesHut: Boolean,
         applyLinLogMode: Boolean,
@@ -35,7 +33,6 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
         }
 
         logger.info { "Placing nodes using $loopsNum loops of ForceAtlas2 with the following parameters:" }
-        logger.info { "-- outboundAttractionDistribution: $applyOutboundAttrDistr" }
         logger.info { "-- adjustSizes: $applyAdjustSizes" }
         logger.info { "-- barnesHutOptimize: $applyBarnesHut" }
         logger.info { "-- linLogMode: $applyLinLogMode" }
@@ -50,14 +47,13 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
         val forceAtlas2Algorithm = ForceAtlas2().apply {
             setGraph(convertedNetwork)
 
-            isOutboundAttractionDistribution = applyOutboundAttrDistr
+            isOutboundAttractionDistribution = false
             isAdjustSizes = applyAdjustSizes
             isBarnesHutOptimize = applyBarnesHut
             isLinLogMode = applyLinLogMode
             isStrongGravityMode = applyStrongGravityMode
 
             edgeWeightInfluence = 1.0
-
             jitterTolerance = withJitterTolerance
             scalingRatio = withScalingRatio
             gravity = withGravity

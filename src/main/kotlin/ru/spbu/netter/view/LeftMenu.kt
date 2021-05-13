@@ -14,16 +14,15 @@ class LeftMenu : View() {
 
     private val repulsion = SimpleStringProperty(this, "repulsion", "20.0")
 
-    private val loopsNum = SimpleStringProperty(this, "repulsion", "100")
-    private val outboundAttrDistr = SimpleBooleanProperty(this, "repulsion", false)
-    private val adjustSizes = SimpleBooleanProperty(this, "repulsion", true)
-    private val barnesHut = SimpleBooleanProperty(this, "repulsion", true)
-    private val linLog = SimpleBooleanProperty(this, "repulsion", false)
-    private val strongGravity = SimpleBooleanProperty(this, "repulsion", false)
-    private val jitterTolerance = SimpleStringProperty(this, "repulsion", "1.0")
-    private val scaling = SimpleStringProperty(this, "repulsion", "10.0")
-    private val gravity = SimpleStringProperty(this, "repulsion", "1.0")
-    private val barnesHutTheta = SimpleStringProperty(this, "repulsion", "1.2")
+    private val loopsNum = SimpleStringProperty(this, "loopsNum", "100")
+    private val adjustSizes = SimpleBooleanProperty(this, "adjustSizes", true)
+    private val barnesHut = SimpleBooleanProperty(this, "barnesHut", true)
+    private val linLog = SimpleBooleanProperty(this, "linLog", false)
+    private val strongGravity = SimpleBooleanProperty(this, "strongGravity", false)
+    private val jitterTolerance = SimpleStringProperty(this, "jitterTolerance", "1.0")
+    private val scaling = SimpleStringProperty(this, "scaling", "10.0")
+    private val gravity = SimpleStringProperty(this, "gravity", "1.0")
+    private val barnesHutTheta = SimpleStringProperty(this, "barnesHutTheta", "1.2")
 
     override val root = form {
         fieldset("Default layout") {
@@ -44,8 +43,6 @@ class LeftMenu : View() {
 
         fieldset("Smart layout") {
             field("Loops number") { textfield(loopsNum) }
-
-            checkbox("Outbound attraction distribution", outboundAttrDistr)
 
             checkbox("Adjust sizes", adjustSizes)
 
@@ -93,7 +90,6 @@ class LeftMenu : View() {
                         )
                         else -> navigationSpace.applySmartLayout(
                             loopsNum.value.toInt(),
-                            outboundAttrDistr.value,
                             adjustSizes.value,
                             barnesHut.value,
                             linLog.value,

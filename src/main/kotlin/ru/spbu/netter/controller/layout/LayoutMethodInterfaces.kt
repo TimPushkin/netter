@@ -16,7 +16,6 @@ interface SmartLayoutMethod {
     fun applyLayout(
         network: Network,
         loopsNum: Int = 100,
-        applyOutboundAttrDistr: Boolean = false,
         applyAdjustSizes: Boolean = true,
         applyBarnesHut: Boolean = true,
         applyLinLogMode: Boolean = false,
