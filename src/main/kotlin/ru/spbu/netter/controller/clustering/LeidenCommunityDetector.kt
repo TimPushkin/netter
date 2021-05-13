@@ -37,6 +37,8 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
         leidenAlgorithm.improveClustering(convertedNetwork, clustering)
 
         applyClustering(network, clustering)
+
+        logger.info { "Detecting communities has been finished" }
     }
 
     private fun convertNetwork(network: Network): LeidenNetwork {

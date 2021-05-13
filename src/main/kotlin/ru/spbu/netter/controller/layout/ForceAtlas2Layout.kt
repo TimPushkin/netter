@@ -75,7 +75,7 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
             }
         }
 
-        logger.info { "Placing nodes in a smart shape finished" }
+        logger.info { "Placing nodes in a smart shape has been finished" }
     }
 
     private fun convertNetwork(network: Network): Graph {
