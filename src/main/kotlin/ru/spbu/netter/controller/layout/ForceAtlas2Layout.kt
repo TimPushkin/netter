@@ -36,14 +36,14 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
 
         logger.info { "Placing nodes using $loopsNum loops of ForceAtlas2 with the following parameters:" }
         logger.info { "-- outboundAttractionDistribution: $applyOutboundAttrDistr" }
-        logger.info { "-- adjustSizes: $applyOutboundAttrDistr" }
-        logger.info { "-- barnesHutOptimize: $applyOutboundAttrDistr" }
-        logger.info { "-- linLogMode: $applyOutboundAttrDistr" }
-        logger.info { "-- strongGravityMode: $applyOutboundAttrDistr" }
-        logger.info { "-- jitterTolerance: $applyOutboundAttrDistr" }
-        logger.info { "-- scalingRatio: $applyOutboundAttrDistr" }
-        logger.info { "-- gravity: $applyOutboundAttrDistr" }
-        logger.info { "-- barnesHutTheta: $applyOutboundAttrDistr" }
+        logger.info { "-- adjustSizes: $applyAdjustSizes" }
+        logger.info { "-- barnesHutOptimize: $applyBarnesHut" }
+        logger.info { "-- linLogMode: $applyLinLogMode" }
+        logger.info { "-- strongGravityMode: $applyStrongGravityMode" }
+        logger.info { "-- jitterTolerance: $withJitterTolerance" }
+        logger.info { "-- scalingRatio: $withScalingRatio" }
+        logger.info { "-- gravity: $withGravity" }
+        logger.info { "-- barnesHutTheta: $withBarnesHutTheta" }
 
         val convertedNetwork = convertNetwork(network)
 
