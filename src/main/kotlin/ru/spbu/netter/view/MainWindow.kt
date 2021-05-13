@@ -7,7 +7,7 @@ import ru.spbu.netter.model.*
 import tornadofx.*
 
 
-class MainView : View("Netter") {
+class MainWindow : View("Netter") {
     private val navigationSpace: NavigationSpace by inject()
 
     private val txtIOHandler: FileIOHandler by inject<TxtIOHandler>()
@@ -38,14 +38,6 @@ class MainView : View("Netter") {
             }
 
             menu("Network") {
-                item("Default layout").action {
-                    getRepulsion()?.let { navigationSpace.applyDefaultLayout(it) }
-                }
-
-                item("Smart layout").action {
-                    getRepulsion()?.let { navigationSpace.applySmartLayout(it) }
-                }
-
                 item("Inspect for communities").action {
                     getResolution()?.let { navigationSpace.inspectForCommunities(it) }
                 }
@@ -59,12 +51,8 @@ class MainView : View("Netter") {
                 item("Netter at GitHub").action { hostServices.showDocument("https://github.com/TimPushkin/netter") }
             }
         }
-    }
 
-    // NavigationSpace initialization
-
-    private fun initNavigationSpace(network: Network) {
-        getRepulsion()?.let { navigationSpace.initNetworkView(network, it) }
+        left<LeftMenu>()
     }
 
     // Input forms handling
@@ -83,16 +71,6 @@ class MainView : View("Netter") {
         ).openModal(block = true, resizable = false)
 
         return Triple(uri.value, username.value, password.value)
-    }
-
-    private fun getRepulsion(): Double? {
-        with(SimpleStringProperty()) {
-            find<RepulsionInputForm>(mapOf(RepulsionInputForm::repulsion to this)).openModal(
-                block = true,
-                resizable = false,
-            )
-            return value?.toDoubleOrNull()
-        }
     }
 
     private fun getResolution(): Double? {
@@ -122,7 +100,8 @@ class MainView : View("Netter") {
             alert(Alert.AlertType.ERROR, "Network import failed", ex.localizedMessage)
             return
         }
-        initNavigationSpace(network)
+
+        navigationSpace.initNetworkView(network)
     }
 
     private fun exportFromFile(fileIOHandler: FileIOHandler) {
@@ -161,7 +140,8 @@ class MainView : View("Netter") {
             alert(Alert.AlertType.ERROR, "Network import failed", ex.localizedMessage)
             return
         }
-        initNavigationSpace(network)
+
+        navigationSpace.initNetworkView(network)
     }
 
     private fun exportFromUri(uriIOHandler: UriIOHandler) {

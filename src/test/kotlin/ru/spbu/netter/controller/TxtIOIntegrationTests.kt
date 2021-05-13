@@ -23,7 +23,7 @@ internal class TxtIOIntegrationTests {
 
     private val txtIOHandler: FileIOHandler = TxtIOHandler()
     private val communityDetector: CommunityDetector = LeidenCommunityDetector()
-    private val centralityIdentifier: CentralityIdentifier = DegreeCentralityIdentifier()
+    private val centralityIdentifier: CentralityIdentifier = HarmonicCentralityIdentifier()
 
     companion object {
         // Txt IO constants

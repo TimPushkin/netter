@@ -12,7 +12,8 @@ private val logger = KotlinLogging.logger {}
 
 private const val COLUMN_DELIMITER = " "
 private const val LINK_INPUT_COLUMNS_NUM = 2
-private const val NODE_INPUT_COLUMNS_NUM = 3
+private const val NODE_SIMPLE_INPUT_COLUMNS_NUM = 3
+private const val NODE_COORDS_INPUT_COLUMNS_NUM = 5
 
 
 class TxtIOHandler : Controller(), FileIOHandler {
@@ -60,8 +61,8 @@ class TxtIOHandler : Controller(), FileIOHandler {
         val parsedId1 = columns[0].toInt()
         val parsedId2 = columns[1].toInt()
 
-        if (parsedId1 < IOHandler.MIN_NODE_ID || parsedId2 < IOHandler.MIN_NODE_ID) {
-            handleInputError(lineNum, "node ids must be not less than ${IOHandler.MIN_NODE_ID}")
+        if (parsedId1 < IOHandlerData.MIN_NODE_ID || parsedId2 < IOHandlerData.MIN_NODE_ID) {
+            handleInputError(lineNum, "node ids must be not less than ${IOHandlerData.MIN_NODE_ID}")
         }
 
         network.addLink(parsedId1, parsedId2)
@@ -70,8 +71,11 @@ class TxtIOHandler : Controller(), FileIOHandler {
     }
 
     private fun parseNode(network: Network, columns: List<String>, lineNum: Int) {
-        if (columns.size != NODE_INPUT_COLUMNS_NUM) {
-            handleInputError(lineNum, "expected $NODE_INPUT_COLUMNS_NUM columns but was ${columns.size}")
+        if (columns.size != NODE_SIMPLE_INPUT_COLUMNS_NUM && columns.size != NODE_COORDS_INPUT_COLUMNS_NUM) {
+            handleInputError(
+                lineNum,
+                "expected $NODE_SIMPLE_INPUT_COLUMNS_NUM or $NODE_COORDS_INPUT_COLUMNS_NUM columns but was ${columns.size}"
+            )
         }
 
         if (!columns[0].isInt() || !columns[1].isInt() || !columns[2].isDouble()) {
@@ -81,28 +85,41 @@ class TxtIOHandler : Controller(), FileIOHandler {
         val parsedId = columns[0].toInt()
         val parsedCommunity = columns[1].toInt()
         val parsedCentrality = columns[2].toDouble()
+        var parsedX: Double? = null
+        var parsedY: Double? = null
 
-        if (parsedId  < IOHandler.MIN_NODE_ID) {
-            handleInputError(lineNum, "node id must be not less than ${IOHandler.MIN_NODE_ID}")
+        if (parsedId < IOHandlerData.MIN_NODE_ID) {
+            handleInputError(lineNum, "node id must be not less than ${IOHandlerData.MIN_NODE_ID}")
         }
 
-        if (parsedCommunity < IOHandler.MIN_COMMUNITY) {
-            handleInputError(lineNum, "community must be not less than ${IOHandler.MIN_COMMUNITY}")
+        if (parsedCommunity < IOHandlerData.MIN_COMMUNITY) {
+            handleInputError(lineNum, "community must be not less than ${IOHandlerData.MIN_COMMUNITY}")
         }
 
-        if (parsedCentrality < IOHandler.MIN_CENTRALITY) {
-            handleInputError(lineNum, "centrality must be not less than ${IOHandler.MIN_CENTRALITY}")
+        if (parsedCentrality < IOHandlerData.MIN_CENTRALITY) {
+            handleInputError(lineNum, "centrality must be not less than ${IOHandlerData.MIN_CENTRALITY}")
+        }
+
+        if (columns.size == NODE_COORDS_INPUT_COLUMNS_NUM) {
+            if (!columns[3].isDouble() || !columns[4].isDouble()) {
+                handleInputError(lineNum, "node coordinates must be decimals")
+            }
+
+            parsedX = columns[3].toDouble()
+            parsedY = columns[4].toDouble()
         }
 
         network.addNode(parsedId).apply {
             community = parsedCommunity
             centrality = parsedCentrality
+            x = parsedX ?: x
+            y = parsedY ?: y
         }
     }
 
     private fun addSkippedNodes(network: Network, addUntilId: Int) {
         var prevId = addUntilId - 1
-        while (prevId >= IOHandler.MIN_NODE_ID && !network.nodes.containsKey(prevId)) network.addNode(prevId--)
+        while (prevId >= IOHandlerData.MIN_NODE_ID && !network.nodes.containsKey(prevId)) network.addNode(prevId--)
     }
 
     private fun handleInputError(lineNum: Int, message: String): Nothing {
@@ -132,7 +149,7 @@ class TxtIOHandler : Controller(), FileIOHandler {
             writer.newLine()
 
             for (entry in network.nodes) with(entry.value) {
-                writer.write("$id$COLUMN_DELIMITER$community$COLUMN_DELIMITER$centrality\n")
+                writer.write("$id$COLUMN_DELIMITER$community$COLUMN_DELIMITER$centrality$COLUMN_DELIMITER$x$COLUMN_DELIMITER$y\n")
             }
         }
     }

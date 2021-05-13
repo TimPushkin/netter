@@ -13,7 +13,7 @@ class UndirectedNetwork : Network {
 
     override fun addLink(id1: Int, id2: Int): Link = UndirectedLink(addNode(id1), addNode(id2)).also { links.add(it) }
 
-    override fun isEmpty(): Boolean = nodes.isEmpty()
+    override fun isEmpty() = nodes.isEmpty()
 
     private data class UndirectedNode(override val id: Int) : Node {
         override val communityProperty = SimpleIntegerProperty(this, "community", Node.DEFAULT_COMMUNITY)
@@ -21,6 +21,12 @@ class UndirectedNetwork : Network {
 
         override val centralityProperty = SimpleDoubleProperty(this, "centrality", Node.DEFAULT_CENTRALITY)
         override var centrality by centralityProperty
+
+        override val xProperty = SimpleDoubleProperty(this, "x", Node.DEFAULT_X)
+        override var x by xProperty
+
+        override val yProperty = SimpleDoubleProperty(this, "y", Node.DEFAULT_Y)
+        override var y by yProperty
     }
 
     private data class UndirectedLink(override val n1: Node, override val n2: Node) : Link {
