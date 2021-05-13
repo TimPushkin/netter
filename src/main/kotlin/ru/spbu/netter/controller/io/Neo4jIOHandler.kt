@@ -161,6 +161,10 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
     }
 
     private fun parseNode(network: Network, nodes: Result) {
+        if (nodes.list().isEmpty()) {
+            logger.info { "the provided network is empty" }
+            throw HandledIOException("the provided network is empty")
+        }
         var parsedId = IOHandlerData.MIN_NODE_ID - 1
         var parsedCommunity = Node.DEFAULT_COMMUNITY
         var parsedCentrality = Node.DEFAULT_CENTRALITY
