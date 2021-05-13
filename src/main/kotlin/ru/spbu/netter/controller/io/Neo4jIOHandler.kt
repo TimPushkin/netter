@@ -93,11 +93,13 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
             session.writeTransaction { tx ->
                 for (entry in network.nodes) with(entry.value) {
                     tx.run(
-                        "CREATE (n:NODE{id:\$id, community:\$community, centrality:\$centrality})",
+                        "CREATE (n:NODE{id:\$id, community:\$community, centrality:\$centrality, x:\$x, y:$y})",
                         mutableMapOf(
                             "id" to id,
                             "community" to community,
-                            "centrality" to centrality
+                            "centrality" to centrality,
+                            "x" to x,
+                            "y" to y
                         ) as Map<String, Any>?
                     )
                 }
@@ -113,7 +115,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
             throw HandledIOException("Check your network connection", ex)
         }
 
-        logger.info { "Nodes were successfully record" }
+        logger.info { "Nodes were successfully recorded" }
 
         try {
             session.writeTransaction { tx ->
