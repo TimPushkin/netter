@@ -8,6 +8,7 @@ import org.neo4j.driver.Result
 import org.neo4j.driver.exceptions.*
 import org.neo4j.driver.exceptions.value.Uncoercible
 import ru.spbu.netter.model.Network
+import ru.spbu.netter.model.Node
 import tornadofx.Controller
 import java.io.Closeable
 import kotlin.math.max
@@ -27,7 +28,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
             session.readTransaction { tx ->
                 val nodes = tx.run(
                     "MATCH (n:NODE) " +
-                            "RETURN n.id AS id, n.community AS community, n.centrality AS centrality"
+                            "RETURN n.id AS id, n.community AS community, n.centrality AS centrality, n.x AS x, n.y AS y"
                 )
                 parseNode(network, nodes)
             }
@@ -57,7 +58,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
             throw HandledIOException("Wrong username or password", ex)
         } catch (ex: ClientException) {
             logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme." }
-            throw HandledIOException("Use the bolt:// URI scheme", ex)
+            throw HandledIOException("Use the bolt:// URI scheme or expected other labels", ex)
         } catch (ex: ServiceUnavailableException) {
             logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it." }
             throw HandledIOException("Check your network connection", ex)
@@ -80,7 +81,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
             throw HandledIOException("Wrong username or password", ex)
         } catch (ex: ClientException) {
             logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme." }
-            throw HandledIOException("Use the bolt:// URI scheme", ex)
+            throw HandledIOException("Use the bolt:// URI scheme or expected other labels", ex)
         } catch (ex: ServiceUnavailableException) {
             logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it." }
             throw HandledIOException("Check your network connection", ex)
@@ -106,7 +107,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
             throw HandledIOException("Wrong username or password", ex)
         } catch (ex: ClientException) {
             logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme." }
-            throw HandledIOException("Use the bolt:// URI scheme", ex)
+            throw HandledIOException("Use the bolt:// URI scheme or expected other labels", ex)
         } catch (ex: ServiceUnavailableException) {
             logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it." }
             throw HandledIOException("Check your network connection", ex)
@@ -133,7 +134,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
             throw HandledIOException("Wrong username or password", ex)
         } catch (ex: ClientException) {
             logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme." }
-            throw HandledIOException("Use the bolt:// URI scheme", ex)
+            throw HandledIOException("Use the bolt:// URI scheme or expected other labels", ex)
         } catch (ex: ServiceUnavailableException) {
             logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it." }
             throw HandledIOException("Check your network connection", ex)
@@ -158,48 +159,63 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
     }
 
     private fun parseNode(network: Network, nodes: Result) {
-        try {
-            nodes.forEach { node ->
-                val parsedId = node["id"].asInt()
-                val parsedCommunity = node["community"].asInt()
-                val parsedCentrality = node["centrality"].asDouble()
+        var parsedId = IOHandlerData.MIN_NODE_ID - 1
+        var parsedCommunity = Node.DEFAULT_COMMUNITY
+        var parsedCentrality = Node.DEFAULT_CENTRALITY
+        var parsedX = Node.DEFAULT_X
+        var parsedY = Node.DEFAULT_Y
 
-                if (parsedId < IOHandlerData.MIN_NODE_ID) {
-                    throw HandledIOException("id label must be not less than ${IOHandlerData.MIN_NODE_ID}")
-                }
-                if (parsedCommunity < IOHandlerData.MIN_COMMUNITY) {
-                    throw HandledIOException("community label must be not less than ${IOHandlerData.MIN_COMMUNITY}")
-                }
-                if (parsedCentrality < IOHandlerData.MIN_CENTRALITY) {
-                    throw HandledIOException("centrality label must be not less than ${IOHandlerData.MIN_CENTRALITY}")
-                }
-
-                network.addNode(parsedId).apply {
-                    community = parsedCommunity
-                    centrality = parsedCentrality
-                }
-                addSkippedNodes(network, parsedId)
+        nodes.forEach { node ->
+            try {
+                parsedId = node["id"].asInt(parsedId)
+                parsedCommunity = node["community"].asInt(parsedCommunity)
+                parsedCentrality = node["centrality"].asDouble(parsedCentrality)
+                parsedX = node["x"].asDouble(parsedX)
+                parsedY = node["y"].asDouble(parsedY)
+            } catch (ex: Uncoercible) {
+                logger.error(ex) { "Node label type is incompatible" }
+                throw HandledIOException("Invalid nodes label in the database", ex)
             }
-        } catch (ex: Uncoercible) {
-            throw HandledIOException("Invalid label nodes in the database", ex)
+
+            if (parsedId < IOHandlerData.MIN_NODE_ID) {
+                throw HandledIOException("Node must have id label that is not less than ${IOHandlerData.MIN_NODE_ID}")
+            }
+            if (parsedCommunity < IOHandlerData.MIN_COMMUNITY) {
+                throw HandledIOException("community label must be not less than ${IOHandlerData.MIN_COMMUNITY}")
+            }
+            if (parsedCentrality < IOHandlerData.MIN_CENTRALITY) {
+                throw HandledIOException("centrality label must be not less than ${IOHandlerData.MIN_CENTRALITY}")
+            }
+
+            network.addNode(parsedId).apply {
+                community = parsedCommunity
+                centrality = parsedCentrality
+                x = parsedX
+                y = parsedY
+            }
+            addSkippedNodes(network, parsedId)
         }
     }
 
     private fun parseLink(network: Network, links: Result) {
-        try {
-            links.forEach { link ->
-                val parsedId1 = link["id1"].asInt()
-                val parsedId2 = link["id2"].asInt()
+        var parsedId1 = IOHandlerData.MIN_NODE_ID - 1
+        var parsedId2 = IOHandlerData.MIN_NODE_ID - 1
 
-                if (parsedId1 < IOHandlerData.MIN_NODE_ID || parsedId2 < IOHandlerData.MIN_NODE_ID) {
-                    throw HandledIOException("Id labels must be not less than ${IOHandlerData.MIN_NODE_ID}")
-                }
-
-                addSkippedNodes(network, max(parsedId1, parsedId2))
-                network.addLink(parsedId1, parsedId2)
+        links.forEach { link ->
+            try {
+                parsedId1 = link["id1"].asInt(parsedId1)
+                parsedId2 = link["id2"].asInt(parsedId2)
+            } catch (ex: Uncoercible) {
+                logger.error(ex) { "Link label type is incompatible" }
+                throw HandledIOException("Invalid links label in the database", ex)
             }
-        } catch (ex: Uncoercible) {
-            throw HandledIOException("Invalid label links in the database", ex)
+
+            if (parsedId1 < IOHandlerData.MIN_NODE_ID || parsedId2 < IOHandlerData.MIN_NODE_ID) {
+                throw HandledIOException("Id labels must be not less than ${IOHandlerData.MIN_NODE_ID}")
+            }
+
+            addSkippedNodes(network, max(parsedId1, parsedId2))
+            network.addLink(parsedId1, parsedId2)
         }
     }
 
