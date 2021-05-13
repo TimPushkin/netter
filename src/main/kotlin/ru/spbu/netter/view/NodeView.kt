@@ -20,8 +20,7 @@ private const val MAX_HUE = 360.0
 private const val BRIGHTNESS_BOUNDARY = 0.25
 
 
-class NodeView(val node: Node, x: Double, y: Double, private val colorsNum: IntegerProperty) :
-    Circle(x, y, 0.0) {
+class NodeView(val node: Node, private val colorsNum: IntegerProperty) : Circle() {
     val label = text(node.id.toString()) {
         scaleXProperty().bind(radiusProperty() * LABEL_SCALING)
         scaleYProperty().bind(radiusProperty() * LABEL_SCALING)
@@ -34,10 +33,15 @@ class NodeView(val node: Node, x: Double, y: Double, private val colorsNum: Inte
     }
 
     init {
+        centerXProperty().bind(node.xProperty)
+        centerYProperty().bind(node.yProperty)
+
         radiusProperty().bind(Bindings.createDoubleBinding(::calculateRadius, node.centralityProperty))
+
         strokeWidthProperty().bind(Bindings.createDoubleBinding(::calculateStrokeWidth, radiusProperty()))
         fillProperty().bind(Bindings.createObjectBinding(::calculateFillColor, colorsNum, node.communityProperty))
         strokeProperty().bind(Bindings.createObjectBinding(::calculateStrokeColor, fillProperty()))
+
         label.fillProperty().bind(Bindings.createObjectBinding(::calculateLabelColor, fillProperty()))
     }
 

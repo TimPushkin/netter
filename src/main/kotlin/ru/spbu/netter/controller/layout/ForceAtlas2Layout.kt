@@ -16,7 +16,7 @@ private val logger = KotlinLogging.logger {}
 
 class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
 
-    override fun calculateLayout(
+    override fun applyLayout(
         network: Network,
         loopsNum: Int,
         applyOutboundAttrDistr: Boolean,
@@ -28,10 +28,10 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
         withScalingRatio: Double,
         withGravity: Double,
         withBarnesHutTheta: Double,
-    ): List<Point2D> {
+    ) {
         if (network.isEmpty()) {
             logger.info { "There is nothing to lay out: network $network is empty" }
-            return emptyList()
+            return
         }
 
         logger.info { "Placing nodes using $loopsNum loops of ForceAtlas2 with the following parameters:" }
@@ -70,7 +70,14 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
             endAlgo()
         }
 
-        return List(network.nodes.size) { convertedNetwork.nodes[it].run { Point2D(x, y) } }
+        with(convertedNetwork.nodes) {
+            network.nodes.values.forEach {
+                get(it.id).run {
+                    it.x = x
+                    it.y = y
+                }
+            }
+        }
     }
 
     private fun convertNetwork(network: Network): Graph {

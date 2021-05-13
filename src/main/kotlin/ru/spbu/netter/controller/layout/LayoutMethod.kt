@@ -1,20 +1,19 @@
 package ru.spbu.netter.controller.layout
 
 import ru.spbu.netter.model.Network
-import javafx.geometry.Point2D
 
 
 interface SimpleLayoutMethod {
 
-    fun calculateLayout(
+    fun applyLayout(
         network: Network,
-        repulsion: Double = 10.0,
-    ): List<Point2D>
+        repulsion: Double = 20.0,
+    )
 }
 
 interface SmartLayoutMethod {
 
-    fun calculateLayout(
+    fun applyLayout(
         network: Network,
         loopsNum: Int = 100,
         applyOutboundAttrDistr: Boolean = false,
@@ -26,5 +25,5 @@ interface SmartLayoutMethod {
         withScalingRatio: Double = 10.0,
         withGravity: Double = 1.0,
         withBarnesHutTheta: Double = 1.2,
-    ): List<Point2D>
+    )
 }

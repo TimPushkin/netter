@@ -34,15 +34,14 @@ class NavigationSpace : View() {
         }
     }
 
-    fun initNetworkView(network: Network, repulsion: Double) {
+    fun initNetworkView(network: Network) {
         networkView = NetworkView(network)
         isNetworkImported = true
-        applyDefaultLayout(repulsion)
         replaceNetworkView(networkView)
     }
 
     fun applyDefaultLayout(repulsion: Double) {
-        networkView.applyLayout(simpleLayout.calculateLayout(networkView.network, repulsion = repulsion))
+        simpleLayout.applyLayout(networkView.network, repulsion = repulsion)
     }
 
     fun applySmartLayout(
@@ -57,20 +56,18 @@ class NavigationSpace : View() {
         withGravity: Double,
         withBarnesHutTheta: Double,
     ) {
-        networkView.applyLayout(
-            smartLayout.calculateLayout(
-                networkView.network,
-                loopsNum,
-                applyOutboundAttrDistr,
-                applyAdjustSizes,
-                applyBarnesHut,
-                applyLinLogMode,
-                applyStrongGravityMode,
-                withJitterTolerance,
-                withScalingRatio,
-                withGravity,
-                withBarnesHutTheta,
-            )
+        smartLayout.applyLayout(
+            networkView.network,
+            loopsNum,
+            applyOutboundAttrDistr,
+            applyAdjustSizes,
+            applyBarnesHut,
+            applyLinLogMode,
+            applyStrongGravityMode,
+            withJitterTolerance,
+            withScalingRatio,
+            withGravity,
+            withBarnesHutTheta,
         )
     }
 
