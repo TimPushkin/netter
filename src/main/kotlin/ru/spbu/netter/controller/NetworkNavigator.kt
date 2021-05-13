@@ -9,8 +9,8 @@ import ru.spbu.netter.view.NetworkView
 import tornadofx.*
 
 
-private const val MIN_ZOOM = 0.03
-private const val ZOOM_SCALING = 0.0005
+private const val MIN_ZOOM = 0.05
+private const val ZOOM_SCALING = 0.00005
 
 
 class NetworkNavigator : Controller(), NetworkEventHandler {
@@ -39,7 +39,9 @@ class NetworkNavigator : Controller(), NetworkEventHandler {
 
     override fun handleScroll(event: ScrollEvent) {
         getNetworkView(event)?.apply {
-            scaleX = (scaleX + event.deltaY * ZOOM_SCALING).takeIf { it >= MIN_ZOOM } ?: MIN_ZOOM
+            scaleX =
+                (scaleX + event.deltaY * ZOOM_SCALING * (network.nodes.size.toDouble() / (-286) + 50)).takeIf { it >= MIN_ZOOM }
+                    ?: MIN_ZOOM
             scaleY = scaleX
 
             event.consume()

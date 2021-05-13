@@ -35,6 +35,8 @@ class CircularLayout : Controller(), SimpleLayoutMethod {
             it.y = curr.y
             curr = curr.rotated(center, angle)
         }
+
+        logger.info { "Placing nodes in a circular shape finished" }
     }
 
     private fun Point2D.rotated(center: Point2D, angle: Double): Point2D {
