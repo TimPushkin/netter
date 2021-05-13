@@ -46,7 +46,6 @@ class NavigationSpace : View() {
 
     fun applySmartLayout(
         loopsNum: Int,
-        applyOutboundAttrDistr: Boolean,
         applyAdjustSizes: Boolean,
         applyBarnesHut: Boolean,
         applyLinLogMode: Boolean,
@@ -59,7 +58,6 @@ class NavigationSpace : View() {
         smartLayout.applyLayout(
             networkView.network,
             loopsNum,
-            applyOutboundAttrDistr,
             applyAdjustSizes,
             applyBarnesHut,
             applyLinLogMode,
