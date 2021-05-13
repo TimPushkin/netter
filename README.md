@@ -184,7 +184,8 @@ of the algorithm.
 
 - **Strong gravity mode** (checkbox) - sets a strong force that attracts distant nodes to the center.
 
-- **Jitter tolerance** (positive decimal number) - 
+- **Jitter tolerance** (positive decimal number) - controls the allowed amount of swinging of the nodes. The lower the 
+tolerance, the greater the precision.
 
 - **Scaling ratio** (positive decimal number) - controls the attraction and repulsion forces. The greater the scaling, 
 the sparser the network.
