@@ -7,10 +7,11 @@ import javafx.scene.input.ScrollEvent
 import javafx.scene.layout.Pane
 import ru.spbu.netter.view.NetworkView
 import tornadofx.*
+import kotlin.math.sign
 
 
 private const val MIN_ZOOM = 0.05
-private const val ZOOM_SCALING = 0.00005
+private const val ZOOM_SCALING = 0.002
 
 
 class NetworkNavigator : Controller(), NetworkEventHandler {
@@ -40,7 +41,7 @@ class NetworkNavigator : Controller(), NetworkEventHandler {
     override fun handleScroll(event: ScrollEvent) {
         getNetworkView(event)?.apply {
             scaleX =
-                (scaleX + event.deltaY * ZOOM_SCALING * (network.nodes.size.toDouble() / (-286) + 50)).takeIf { it >= MIN_ZOOM }
+                (scaleX + sign(event.deltaY) * ZOOM_SCALING * (network.nodes.size.toDouble() / (-286) + 50)).takeIf { it >= MIN_ZOOM }
                     ?: MIN_ZOOM
             scaleY = scaleX
 
