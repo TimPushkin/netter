@@ -1,6 +1,6 @@
 # Netter
 
-<img src="https://github.com/TimPushkin/netter/blob/view/src/main/resources/Netter.png" width="256" height="256" align="right" />
+<img src="https://github.com/TimPushkin/netter/blob/main/src/main/resources/Netter.png" width="256" height="256" align="right" />
 
 An app for complex network analysis.
 
