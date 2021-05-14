@@ -18,7 +18,7 @@ class NetworkView(val network: Network) : Group() {
         )
     }
 
-    private val nodes = network.nodes.values.associateWith { NodeView(it, 0.0, 0.0, colorsNumProperty) }
+    private val nodes = network.nodes.values.associateWith { NodeView(it, colorsNumProperty) }
     private val links = network.links.associateWith {
         val n1 = nodes[it.n1] ?: throw IllegalStateException("NodeView not found for node ${it.n1}")
         val n2 = nodes[it.n2] ?: throw IllegalStateException("NodeView not found for node ${it.n2}")
@@ -28,13 +28,6 @@ class NetworkView(val network: Network) : Group() {
     init {
         links.values.forEach { add(it) }
         placeNodesInCentralityOrder()
-    }
-
-    fun applyLayout(coordinates: List<Point2D>) {
-        nodes.values.forEachIndexed { i, nodeView ->
-            nodeView.centerX = coordinates[i].x
-            nodeView.centerY = coordinates[i].y
-        }
     }
 
     fun placeNodesInCentralityOrder() {

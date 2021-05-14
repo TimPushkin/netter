@@ -22,6 +22,8 @@ class HarmonicCentralityIdentifier : Controller(), CentralityIdentifier {
             centralityValues[node.id]?.let { node.centrality = it }
                 ?: throw IllegalStateException("Node ${node.id} not found in the harmonic centrality calculation result")
         }
+
+        logger.info { "Identifying centrality has been finished" }
     }
 
     private fun convertNetwork(network: Network): Graph<Int, DefaultEdge> {

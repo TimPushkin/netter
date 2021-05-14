@@ -12,7 +12,8 @@ private val logger = KotlinLogging.logger {}
 
 private const val COLUMN_DELIMITER = " "
 private const val LINK_INPUT_COLUMNS_NUM = 2
-private const val NODE_INPUT_COLUMNS_NUM = 3
+private const val NODE_SIMPLE_INPUT_COLUMNS_NUM = 3
+private const val NODE_COORDS_INPUT_COLUMNS_NUM = 5
 
 
 class TxtIOHandler : Controller(), FileIOHandler {
@@ -46,6 +47,8 @@ class TxtIOHandler : Controller(), FileIOHandler {
 
             if (reader.ready()) logger.warn { "Excessive lines found after blank line $lineNum. Skipping..." }
         }
+
+        if (network.isEmpty()) throw HandledIOException("The provided network is empty")
     }
 
     private fun parseLink(network: Network, columns: List<String>, lineNum: Int) {
@@ -70,8 +73,11 @@ class TxtIOHandler : Controller(), FileIOHandler {
     }
 
     private fun parseNode(network: Network, columns: List<String>, lineNum: Int) {
-        if (columns.size != NODE_INPUT_COLUMNS_NUM) {
-            handleInputError(lineNum, "expected $NODE_INPUT_COLUMNS_NUM columns but was ${columns.size}")
+        if (columns.size != NODE_SIMPLE_INPUT_COLUMNS_NUM && columns.size != NODE_COORDS_INPUT_COLUMNS_NUM) {
+            handleInputError(
+                lineNum,
+                "expected $NODE_SIMPLE_INPUT_COLUMNS_NUM or $NODE_COORDS_INPUT_COLUMNS_NUM columns but was ${columns.size}"
+            )
         }
 
         if (!columns[0].isInt() || !columns[1].isInt() || !columns[2].isDouble()) {
@@ -81,8 +87,10 @@ class TxtIOHandler : Controller(), FileIOHandler {
         val parsedId = columns[0].toInt()
         val parsedCommunity = columns[1].toInt()
         val parsedCentrality = columns[2].toDouble()
+        var parsedX: Double? = null
+        var parsedY: Double? = null
 
-        if (parsedId  < IOHandlerData.MIN_NODE_ID) {
+        if (parsedId < IOHandlerData.MIN_NODE_ID) {
             handleInputError(lineNum, "node id must be not less than ${IOHandlerData.MIN_NODE_ID}")
         }
 
@@ -94,9 +102,20 @@ class TxtIOHandler : Controller(), FileIOHandler {
             handleInputError(lineNum, "centrality must be not less than ${IOHandlerData.MIN_CENTRALITY}")
         }
 
+        if (columns.size == NODE_COORDS_INPUT_COLUMNS_NUM) {
+            if (!columns[3].isDouble() || !columns[4].isDouble()) {
+                handleInputError(lineNum, "node coordinates must be decimals")
+            }
+
+            parsedX = columns[3].toDouble()
+            parsedY = columns[4].toDouble()
+        }
+
         network.addNode(parsedId).apply {
             community = parsedCommunity
             centrality = parsedCentrality
+            x = parsedX ?: x
+            y = parsedY ?: y
         }
     }
 
@@ -132,7 +151,7 @@ class TxtIOHandler : Controller(), FileIOHandler {
             writer.newLine()
 
             for (entry in network.nodes) with(entry.value) {
-                writer.write("$id$COLUMN_DELIMITER$community$COLUMN_DELIMITER$centrality\n")
+                writer.write("$id$COLUMN_DELIMITER$community$COLUMN_DELIMITER$centrality$COLUMN_DELIMITER$x$COLUMN_DELIMITER$y\n")
             }
         }
     }

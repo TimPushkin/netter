@@ -1,6 +1,5 @@
 package ru.spbu.netter.controller.layout
 
-import javafx.geometry.Point2D
 import mu.KotlinLogging
 import org.gephi.graph.api.Edge
 import org.gephi.graph.api.Graph
@@ -16,10 +15,9 @@ private val logger = KotlinLogging.logger {}
 
 class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
 
-    override fun calculateLayout(
+    override fun applyLayout(
         network: Network,
         loopsNum: Int,
-        applyOutboundAttrDistr: Boolean,
         applyAdjustSizes: Boolean,
         applyBarnesHut: Boolean,
         applyLinLogMode: Boolean,
@@ -28,36 +26,34 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
         withScalingRatio: Double,
         withGravity: Double,
         withBarnesHutTheta: Double,
-    ): List<Point2D> {
+    ) {
         if (network.isEmpty()) {
             logger.info { "There is nothing to lay out: network $network is empty" }
-            return emptyList()
+            return
         }
 
         logger.info { "Placing nodes using $loopsNum loops of ForceAtlas2 with the following parameters:" }
-        logger.info { "-- outboundAttractionDistribution: $applyOutboundAttrDistr" }
-        logger.info { "-- adjustSizes: $applyOutboundAttrDistr" }
-        logger.info { "-- barnesHutOptimize: $applyOutboundAttrDistr" }
-        logger.info { "-- linLogMode: $applyOutboundAttrDistr" }
-        logger.info { "-- strongGravityMode: $applyOutboundAttrDistr" }
-        logger.info { "-- jitterTolerance: $applyOutboundAttrDistr" }
-        logger.info { "-- scalingRatio: $applyOutboundAttrDistr" }
-        logger.info { "-- gravity: $applyOutboundAttrDistr" }
-        logger.info { "-- barnesHutTheta: $applyOutboundAttrDistr" }
+        logger.info { "-- adjustSizes: $applyAdjustSizes" }
+        logger.info { "-- barnesHutOptimize: $applyBarnesHut" }
+        logger.info { "-- linLogMode: $applyLinLogMode" }
+        logger.info { "-- strongGravityMode: $applyStrongGravityMode" }
+        logger.info { "-- jitterTolerance: $withJitterTolerance" }
+        logger.info { "-- scalingRatio: $withScalingRatio" }
+        logger.info { "-- gravity: $withGravity" }
+        logger.info { "-- barnesHutTheta: $withBarnesHutTheta" }
 
         val convertedNetwork = convertNetwork(network)
 
         val forceAtlas2Algorithm = ForceAtlas2().apply {
             setGraph(convertedNetwork)
 
-            isOutboundAttractionDistribution = applyOutboundAttrDistr
+            isOutboundAttractionDistribution = false
             isAdjustSizes = applyAdjustSizes
             isBarnesHutOptimize = applyBarnesHut
             isLinLogMode = applyLinLogMode
             isStrongGravityMode = applyStrongGravityMode
 
             edgeWeightInfluence = 1.0
-
             jitterTolerance = withJitterTolerance
             scalingRatio = withScalingRatio
             gravity = withGravity
@@ -70,7 +66,16 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
             endAlgo()
         }
 
-        return List(network.nodes.size) { convertedNetwork.nodes[it].run { Point2D(x, y) } }
+        with(convertedNetwork.nodes) {
+            network.nodes.values.forEach {
+                get(it.id).run {
+                    it.x = x
+                    it.y = y
+                }
+            }
+        }
+
+        logger.info { "Placing nodes in a smart shape has been finished" }
     }
 
     private fun convertNetwork(network: Network): Graph {

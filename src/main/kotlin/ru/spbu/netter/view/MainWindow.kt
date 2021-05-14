@@ -55,12 +55,6 @@ class MainWindow : View("Netter") {
         left<LeftMenu>()
     }
 
-    // NavigationSpace initialization
-
-    private fun initNavigationSpace(network: Network) {
-        getRepulsion()?.let { navigationSpace.initNetworkView(network, it) }
-    }
-
     // Input forms handling
 
     private fun getUriCredentials(): Triple<String?, String?, String?> {
@@ -77,16 +71,6 @@ class MainWindow : View("Netter") {
         ).openModal(block = true, resizable = false)
 
         return Triple(uri.value, username.value, password.value)
-    }
-
-    private fun getRepulsion(): Double? {
-        with(SimpleStringProperty()) {
-            find<RepulsionInputForm>(mapOf(RepulsionInputForm::repulsion to this)).openModal(
-                block = true,
-                resizable = false,
-            )
-            return value?.toDoubleOrNull()
-        }
     }
 
     private fun getResolution(): Double? {
@@ -116,7 +100,8 @@ class MainWindow : View("Netter") {
             alert(Alert.AlertType.ERROR, "Network import failed", ex.localizedMessage)
             return
         }
-        initNavigationSpace(network)
+
+        navigationSpace.initNetworkView(network)
     }
 
     private fun exportFromFile(fileIOHandler: FileIOHandler) {
@@ -155,7 +140,8 @@ class MainWindow : View("Netter") {
             alert(Alert.AlertType.ERROR, "Network import failed", ex.localizedMessage)
             return
         }
-        initNavigationSpace(network)
+
+        navigationSpace.initNetworkView(network)
     }
 
     private fun exportFromUri(uriIOHandler: UriIOHandler) {

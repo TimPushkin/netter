@@ -7,12 +7,13 @@ import javafx.scene.shape.Circle
 import javafx.scene.text.TextBoundsType
 import ru.spbu.netter.model.Node
 import tornadofx.*
+import kotlin.math.pow
 
 
 private const val LABEL_SCALING = 0.12
 
 private const val MIN_RADIUS = 5.0
-private const val RADIUS_SCALING = 1.5
+private const val RADIUS_SCALING = 50.0
 
 private const val STROKE_SCALING = 0.2
 
@@ -20,8 +21,7 @@ private const val MAX_HUE = 360.0
 private const val BRIGHTNESS_BOUNDARY = 0.25
 
 
-class NodeView(val node: Node, x: Double, y: Double, private val colorsNum: IntegerProperty) :
-    Circle(x, y, 0.0) {
+class NodeView(val node: Node, private val colorsNum: IntegerProperty) : Circle() {
     val label = text(node.id.toString()) {
         scaleXProperty().bind(radiusProperty() * LABEL_SCALING)
         scaleYProperty().bind(radiusProperty() * LABEL_SCALING)
@@ -34,14 +34,19 @@ class NodeView(val node: Node, x: Double, y: Double, private val colorsNum: Inte
     }
 
     init {
+        centerXProperty().bind(node.xProperty)
+        centerYProperty().bind(node.yProperty)
+
         radiusProperty().bind(Bindings.createDoubleBinding(::calculateRadius, node.centralityProperty))
+
         strokeWidthProperty().bind(Bindings.createDoubleBinding(::calculateStrokeWidth, radiusProperty()))
         fillProperty().bind(Bindings.createObjectBinding(::calculateFillColor, colorsNum, node.communityProperty))
         strokeProperty().bind(Bindings.createObjectBinding(::calculateStrokeColor, fillProperty()))
+
         label.fillProperty().bind(Bindings.createObjectBinding(::calculateLabelColor, fillProperty()))
     }
 
-    private fun calculateRadius() = MIN_RADIUS + node.centrality * RADIUS_SCALING
+    private fun calculateRadius() = MIN_RADIUS + node.centrality.pow(5.0) * RADIUS_SCALING
 
     private fun calculateStrokeWidth() = radius * STROKE_SCALING
 
