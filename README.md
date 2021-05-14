@@ -73,7 +73,7 @@ To match the properties above, all input formats have the following properties:
 - A link is defined by the IDs of the two nodes it is connecting (the IDs may be equal, then it is a self-looped link).
 
 - When a link is added to a network, its incident nodes are also automatically added with the default characteristics, 
-which are: 0 for community, 1.0 for centrality, and (0.0, 0.0) for coordinates.
+which are: 0 for community, 0.5 for centrality, and (0.0, 0.0) for coordinates.
 
 - A node is defined by its unique ID and its main characteristics (community and centrality). Optionally, coordinates 
 may also be provided.
