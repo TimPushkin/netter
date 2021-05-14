@@ -25,12 +25,19 @@ class SQLiteIOHandler : Controller(), FileIOHandler {
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
         var checkLinks = false
         var checkNodes = false
+        var emptyIndicator = 0L
         try {
             transaction {
                 addLogger(StdOutSqlLogger)
                 for (tblName in SqliteMaster.selectAll()) {
-                    if (tblName[SqliteMaster.tbl_name] == LINKS_TABLE_NAME) checkLinks = true
-                    if (tblName[SqliteMaster.tbl_name] == NODES_TABLE_NAME) checkNodes = true
+                    if (tblName[SqliteMaster.tbl_name] == LINKS_TABLE_NAME) {
+                        checkLinks = true
+                        emptyIndicator += Links.selectAll().count()
+                    }
+                    if (tblName[SqliteMaster.tbl_name] == NODES_TABLE_NAME) {
+                        checkNodes = true
+                        emptyIndicator += Nodes.selectAll().count()
+                    }
                 }
             }
         } catch (ex: ExposedSQLException) {
@@ -38,6 +45,10 @@ class SQLiteIOHandler : Controller(), FileIOHandler {
         }
         if (!checkLinks && !checkNodes)
             throw HandledIOException("Could not find tables by these names: $LINKS_TABLE_NAME, $NODES_TABLE_NAME")
+        if (emptyIndicator == 0L) {
+            logger.info { "The provided network is empty" }
+            throw HandledIOException("The provided network is empty")
+        }
 
         if (checkLinks) parseLinks(network)
         if (checkNodes) parseNodes(network)
