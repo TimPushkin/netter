@@ -11,21 +11,22 @@ import ru.spbu.netter.model.Network
 import java.lang.NumberFormatException
 
 
+private val logger = KotlinLogging.logger {}
+
 private const val LINKS_TABLE_NAME = "links"
 private const val NODES_TABLE_NAME = "nodes"
-
-private val logger = KotlinLogging.logger {}
 
 
 class SQLiteIOHandler : Controller(), FileIOHandler {
 
-
     override fun importNetwork(network: Network, file: File) {
-        logger.info { "imports have started" }
+        logger.info { "Import has started" }
+
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
         var checkLinks = false
         var checkNodes = false
         var emptyIndicator = 0L
+
         try {
             transaction {
                 addLogger(StdOutSqlLogger)
@@ -43,6 +44,7 @@ class SQLiteIOHandler : Controller(), FileIOHandler {
         } catch (ex: ExposedSQLException) {
             throw HandledIOException("File is not a database", ex)
         }
+
         if (!checkLinks && !checkNodes)
             throw HandledIOException("Could not find tables by these names: $LINKS_TABLE_NAME, $NODES_TABLE_NAME")
         if (emptyIndicator == 0L) {
@@ -52,7 +54,8 @@ class SQLiteIOHandler : Controller(), FileIOHandler {
 
         if (checkLinks) parseLinks(network)
         if (checkNodes) parseNodes(network)
-        logger.info { "Import finished" }
+
+        logger.info { "Import has been finished" }
     }
 
     override fun exportNetwork(network: Network, file: File) {
@@ -61,7 +64,9 @@ class SQLiteIOHandler : Controller(), FileIOHandler {
         } catch (ex: SecurityException) {
             throw HandledIOException("Parent dir ${file.toPath().parent} cannot be created: no read-write access", ex)
         }
+
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
+
         transaction {
             try {
                 SchemaUtils.drop(Nodes, Links)
@@ -79,7 +84,7 @@ class SQLiteIOHandler : Controller(), FileIOHandler {
                 }
             }
 
-            logger.info { "Links exported" }
+            logger.info { "Links have been exported" }
 
             for (node in network.nodes) {
                 Nodes.insert {
@@ -90,13 +95,16 @@ class SQLiteIOHandler : Controller(), FileIOHandler {
                     it[y] = node.value.y
                 }
             }
-            logger.info { "Nodes exported" }
+
+            logger.info { "Nodes have been exported" }
         }
-        logger.info { "Export finished" }
+
+        logger.info { "Export has been finished" }
     }
 
     private fun parseNodes(network: Network) {
         logger.info { "Parsing nodes..." }
+
         transaction {
             addLogger(StdOutSqlLogger)
             for (node in Nodes.selectAll()) {
@@ -133,11 +141,13 @@ class SQLiteIOHandler : Controller(), FileIOHandler {
                 }
             }
         }
-        logger.info { "Nodes parsed" }
+
+        logger.info { "Nodes have been parsed" }
     }
 
     private fun parseLinks(network: Network) {
         logger.info { "Parsing links..." }
+
         transaction {
             addLogger(StdOutSqlLogger)
             for (link in Links.selectAll()) {
@@ -158,7 +168,8 @@ class SQLiteIOHandler : Controller(), FileIOHandler {
                 }
             }
         }
-        logger.info { "links imported" }
+
+        logger.info { "Links have been imported" }
     }
 
     private fun addSkippedNodes(network: Network, addUntilId: Int) {
