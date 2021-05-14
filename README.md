@@ -142,7 +142,17 @@ More examples of the correct inputs may be found in the [test resource files](ht
 
 ### SQLite
 
-    TODO
+The input data should be contained in the tables under the names: `links` and `nodes`. The input file may contain either one of these tables or both at the same time.
+
+The `links` table must necessarily contain columns named: `id1` and `id2`.  These columns must contain the values of the vertex ids.
+
+The `nodes` table must contain columns named: `id`, `community`, `centrality`, `x`, `y`. 
+The `id`, `community` and `centrality` columns must necessarily contain data. 
+Columns `x` and `y` may contain values of type `null`.
+
+`id`, `id1`, `id2` and `community` must be Integer. `centrality`, `x` and `y` must be Double.
+
+The output data has the same format.
 
 ### Neo4j
 
