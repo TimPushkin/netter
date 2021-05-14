@@ -18,7 +18,7 @@ An app for complex network analysis.
 - [SQLite](https://www.sqlite.org/index.html) database
 - [Neo4j](https://neo4j.com/) database
 
-More details are available in the _Usage_ section.
+More details are available in the _Documentation_ section.
 
 ## Get started
 
@@ -37,7 +37,7 @@ More details are available in the _Usage_ section.
 
 ---
 
-# Usage
+# Documentation
 
 After launch, import a network from a supported format using the top menu bar.
 
