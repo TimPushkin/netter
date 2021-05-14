@@ -227,8 +227,9 @@ _Harmonic centrality_ is a version of closeness centrality, that is able to work
 usually used in social network analysis.
 
 Harmonic centrality is calculated as
+
 ![equation](https://latex.codecogs.com/gif.latex?C_%7BH%7D%28x%29%20%3D%20%5Csum_%7Bx%5Cneq%20y%7D%5E%7B%7D%20%5Cfrac%7B1%7D%7Bd%28x%2Cy%29%7D)
 
-Where d(x,y) is the distance from x to y
+where `d(x,y)` is the distance from `x` to `y`.
 
-Harmonic centrality can be normalized by dividing by N-1, where N is the number of nodes in the graph.
+Harmonic centrality can be normalized by dividing by `N-1`, where `N` is the number of nodes in the network.
