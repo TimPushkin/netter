@@ -21,7 +21,7 @@ interface Node {
 
     companion object {
         internal const val DEFAULT_COMMUNITY = 0
-        internal const val DEFAULT_CENTRALITY = 1.0
+        internal const val DEFAULT_CENTRALITY = 0.5
 
         internal const val DEFAULT_X = 0.0
         internal const val DEFAULT_Y = 0.0
