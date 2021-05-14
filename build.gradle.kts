@@ -16,10 +16,22 @@ repositories {
 dependencies {
     implementation(kotlin("reflect"))
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.1")
+    testImplementation(platform("org.junit:junit-bom:5.7.1"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+
+    implementation("io.github.microutils:kotlin-logging-jvm:2.0.6")
+    implementation("org.slf4j:slf4j-simple:1.7.30")
 
     implementation("no.tornado:tornadofx:1.7.20")
+
+    implementation("org.jgrapht:jgrapht-core:1.5.1")
+
+    implementation("org.neo4j.driver:neo4j-java-driver:4.2.0")
+
+    implementation("org.xerial:sqlite-jdbc:3.34.0")
+    implementation("org.jetbrains.exposed:exposed-core:0.31.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.31.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.31.1")
 }
 
 application {
