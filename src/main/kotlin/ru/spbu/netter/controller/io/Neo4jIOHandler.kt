@@ -74,7 +74,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
 
         try {
             session.writeTransaction { tx ->
-                tx.run("MATCH (n: NODE), (:NODE)-[l:LINK]->(:NODE) DETACH DELETE n, l")
+                tx.run("MATCH (n:NODE), (:NODE)-[l:LINK]->(:NODE) DETACH DELETE n, l")
             }
         } catch (ex: AuthenticationException) {
             logger.error(ex) { "Wrong username or password" }
@@ -93,14 +93,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
             session.writeTransaction { tx ->
                 for (entry in network.nodes) with(entry.value) {
                     tx.run(
-                        "CREATE (n:NODE{id:\$id, community:\$community, centrality:\$centrality, x:\$x, y:$y})",
-                        mutableMapOf(
-                            "id" to id,
-                            "community" to community,
-                            "centrality" to centrality,
-                            "x" to x,
-                            "y" to y
-                        ) as Map<String, Any>?
+                        "CREATE (n:NODE{id:$id, community:$community, centrality:$centrality, x:$x, y:$y})"
                     )
                 }
             }
@@ -121,13 +114,9 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
             session.writeTransaction { tx ->
                 for (link in network.links) with(link) {
                     tx.run(
-                        "MATCH (n1:NODE{id:\$id1})  " +
-                                "MATCH (n2:NODE{id:\$id2}) " +
-                                "CREATE (n1)-[:LINK]->(n2)",
-                        mutableMapOf(
-                            "id1" to n1.id,
-                            "id2" to n2.id
-                        ) as Map<String, Any>?
+                        "MATCH (n1:NODE{id:${n1.id}})  " +
+                                "MATCH (n2:NODE{id:${n2.id}}) " +
+                                "CREATE (n1)-[:LINK]->(n2)"
                     )
                 }
             }
@@ -161,10 +150,6 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
     }
 
     private fun parseNode(network: Network, nodes: Result) {
-        if (nodes.list().isEmpty()) {
-            logger.info { "The provided network is empty" }
-            throw HandledIOException("The provided network is empty")
-        }
         var parsedId = IOHandlerData.MIN_NODE_ID - 1
         var parsedCommunity = Node.DEFAULT_COMMUNITY
         var parsedCentrality = Node.DEFAULT_CENTRALITY
