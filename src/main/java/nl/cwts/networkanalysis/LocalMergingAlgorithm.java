@@ -34,10 +34,6 @@ import nl.cwts.util.FastMath;
  */
 public class LocalMergingAlgorithm extends CPMClusteringAlgorithm
 {
-    /**
-     * Default randomness parameter.
-     */
-    public static final double DEFAULT_RANDOMNESS = 1e-2;
 
     /**
      * Randomness parameter.
@@ -48,24 +44,6 @@ public class LocalMergingAlgorithm extends CPMClusteringAlgorithm
      * Random number generator.
      */
     protected Random random;
-
-    /**
-     * Constructs a local merging algorithm.
-     */
-    public LocalMergingAlgorithm()
-    {
-        this(new Random());
-    }
-
-    /**
-     * Constructs a local merging algorithm.
-     *
-     * @param random Random number generator
-     */
-    public LocalMergingAlgorithm(Random random)
-    {
-        this(DEFAULT_RESOLUTION, DEFAULT_RANDOMNESS, random);
-    }
 
     /**
      * Constructs a local merging algorithm for a specified resolution
@@ -80,26 +58,6 @@ public class LocalMergingAlgorithm extends CPMClusteringAlgorithm
         super(resolution);
         this.randomness = randomness;
         this.random = random;
-    }
-
-    /**
-     * Returns the randomness parameter.
-     *
-     * @return Randomness
-     */
-    public double getRandomness()
-    {
-        return randomness;
-    }
-
-    /**
-     * Sets the randomness parameter.
-     *
-     * @param randomness Randomness
-     */
-    public void setRandomness(double randomness)
-    {
-        this.randomness = randomness;
     }
 
     /**

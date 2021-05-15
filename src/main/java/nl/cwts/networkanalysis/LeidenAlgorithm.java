@@ -29,10 +29,6 @@ import java.util.Random;
  */
 public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
 {
-    /**
-     * Default randomness parameter.
-     */
-    public static final double DEFAULT_RANDOMNESS = LocalMergingAlgorithm.DEFAULT_RANDOMNESS;
 
     /**
      * Randomness parameter.
@@ -48,24 +44,6 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
      * Random number generator.
      */
     protected Random random;
-
-    /**
-     * Constructs a Leiden algorithm.
-     */
-    public LeidenAlgorithm()
-    {
-        this(new Random());
-    }
-
-    /**
-     * Constructs a Leiden algorithm.
-     *
-     * @param random Random number generator
-     */
-    public LeidenAlgorithm(Random random)
-    {
-        this(DEFAULT_RESOLUTION, DEFAULT_N_ITERATIONS, DEFAULT_RANDOMNESS, random);
-    }
 
     /**
      * Constructs a Leiden algorithm for a specified resolution parameter,
@@ -115,26 +93,6 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
     }
 
     /**
-     * Returns the randomness parameter.
-     *
-     * @return Randomness parameter
-     */
-    public double getRandomness()
-    {
-        return randomness;
-    }
-
-    /**
-     * Returns the local moving algorithm.
-     *
-     * @return Local moving algorithm
-     */
-    public IncrementalCPMClusteringAlgorithm getLocalMovingAlgorithm()
-    {
-        return (IncrementalCPMClusteringAlgorithm)localMovingAlgorithm.clone();
-    }
-
-    /**
      * Sets the resolution parameter.
      *
      * Also sets the resolution parameter for the local moving algorithm.
@@ -146,16 +104,6 @@ public class LeidenAlgorithm extends IterativeCPMClusteringAlgorithm
     {
         super.setResolution(resolution);
         this.localMovingAlgorithm.resolution = resolution;
-    }
-
-    /**
-     * Sets the randomness parameter.
-     *
-     * @param randomness Randomness parameter
-     */
-    public void setRandomness(double randomness)
-    {
-        this.randomness = randomness;
     }
 
     /**

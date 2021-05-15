@@ -36,14 +36,6 @@ public class FastLocalMovingAlgorithm extends IterativeCPMClusteringAlgorithm
 
     /**
      * Constructs a fast local moving algorithm.
-     */
-    public FastLocalMovingAlgorithm()
-    {
-        this(new Random());
-    }
-
-    /**
-     * Constructs a fast local moving algorithm.
      *
      * @param random Random number generator
      */

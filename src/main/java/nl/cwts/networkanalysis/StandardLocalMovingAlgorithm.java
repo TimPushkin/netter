@@ -32,24 +32,6 @@ public class StandardLocalMovingAlgorithm extends IncrementalCPMClusteringAlgori
     protected Random random;
 
     /**
-     * Constructs a standard local moving algorithm.
-     */
-    public StandardLocalMovingAlgorithm()
-    {
-        this(new Random());
-    }
-
-    /**
-     * Constructs a standard local moving algorithm.
-     *
-     * @param random Random number generator
-     */
-    public StandardLocalMovingAlgorithm(Random random)
-    {
-        this(DEFAULT_RESOLUTION, random);
-    }
-
-    /**
      * Constructs a standard local moving algorithm for a specified resolution
      * parameter.
      *
