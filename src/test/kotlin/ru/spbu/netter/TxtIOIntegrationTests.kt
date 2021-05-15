@@ -1,4 +1,4 @@
-package ru.spbu.netter.controller
+package ru.spbu.netter
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
