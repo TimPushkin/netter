@@ -33,14 +33,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                 parseNode(network, nodes)
             }
         } catch (ex: AuthenticationException) {
-            logger.error(ex) { "Wrong username or password" }
-            throw HandledIOException("Wrong username or password", ex)
-        } catch (ex: ClientException) {
-            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme" }
-            throw HandledIOException("Use the bolt:// URI scheme", ex)
-        } catch (ex: ServiceUnavailableException) {
-            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it" }
-            throw HandledIOException("Check your network connection", ex)
+            neo4jException(ex)
         }
 
         logger.info { "Nodes were successfully read" }
@@ -54,14 +47,7 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                 parseLink(network, links)
             }
         } catch (ex: AuthenticationException) {
-            logger.error(ex) { "Wrong username or password" }
-            throw HandledIOException("Wrong username or password", ex)
-        } catch (ex: ClientException) {
-            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme" }
-            throw HandledIOException("Use the bolt:// URI scheme or expected other labels", ex)
-        } catch (ex: ServiceUnavailableException) {
-            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it" }
-            throw HandledIOException("Check your network connection", ex)
+            neo4jException(ex)
         }
 
         logger.info { "Links were successfully read" }
@@ -75,43 +61,15 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
         try {
             session.writeTransaction { tx ->
                 tx.run("MATCH (n:NODE), (:NODE)-[l:LINK]->(:NODE) DETACH DELETE n, l")
-            }
-        } catch (ex: AuthenticationException) {
-            logger.error(ex) { "Wrong username or password" }
-            throw HandledIOException("Wrong username or password", ex)
-        } catch (ex: ClientException) {
-            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme" }
-            throw HandledIOException("Use the bolt:// URI scheme or expected other labels", ex)
-        } catch (ex: ServiceUnavailableException) {
-            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it" }
-            throw HandledIOException("Check your network connection", ex)
-        }
+                logger.info { "Database was successfully cleaned" }
 
-        logger.info { "Database was successfully cleaned" }
-
-        try {
-            session.writeTransaction { tx ->
                 for (entry in network.nodes) with(entry.value) {
                     tx.run(
                         "CREATE (n:NODE{id:$id, community:$community, centrality:$centrality, x:$x, y:$y})"
                     )
                 }
-            }
-        } catch (ex: AuthenticationException) {
-            logger.error(ex) { "Wrong username or password" }
-            throw HandledIOException("Wrong username or password", ex)
-        } catch (ex: ClientException) {
-            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme" }
-            throw HandledIOException("Use the bolt:// URI scheme or expected other labels", ex)
-        } catch (ex: ServiceUnavailableException) {
-            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it" }
-            throw HandledIOException("Check your network connection", ex)
-        }
+                logger.info { "Nodes were successfully recorded" }
 
-        logger.info { "Nodes were successfully recorded" }
-
-        try {
-            session.writeTransaction { tx ->
                 for (link in network.links) with(link) {
                     tx.run(
                         "MATCH (n1:NODE{id:${n1.id}})  " +
@@ -119,19 +77,12 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                                 "CREATE (n1)-[:LINK]->(n2)"
                     )
                 }
+                logger.info { "Links were successfully recorded" }
             }
         } catch (ex: AuthenticationException) {
-            logger.error(ex) { "Wrong username or password" }
-            throw HandledIOException("Wrong username or password", ex)
-        } catch (ex: ClientException) {
-            logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme" }
-            throw HandledIOException("Use the bolt:// URI scheme or expected other labels", ex)
-        } catch (ex: ServiceUnavailableException) {
-            logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it" }
-            throw HandledIOException("Check your network connection", ex)
+            neo4jException(ex)
         }
 
-        logger.info { "Links were successfully recorded" }
         close()
     }
 
@@ -213,6 +164,24 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
     private fun addSkippedNodes(network: Network, addUntilId: Int) {
         var prevId = addUntilId - 1
         while (prevId >= IOHandlerData.MIN_NODE_ID && !network.nodes.containsKey(prevId)) network.addNode(prevId--)
+    }
+
+    private fun neo4jException(ex: Neo4jException) {
+        throw when (ex) {
+            is AuthenticationException -> {
+                logger.error(ex) { "Wrong username or password" }
+                HandledIOException("Wrong username or password", ex)
+            }
+            is ClientException -> {
+                logger.error(ex) { "Make sure you are trying to connect to the bolt:// URI scheme" }
+                HandledIOException("Use the bolt:// URI scheme or expected other labels", ex)
+            }
+            is ServiceUnavailableException -> {
+                logger.error(ex) { "Unable to connect, ensure the database is running and that there is a working network connection to it" }
+                throw HandledIOException("Check your network connection", ex)
+            }
+            else -> ex
+        }
     }
 
     override fun close() {
