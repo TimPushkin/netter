@@ -51,8 +51,8 @@ internal class TxtIOIntegrationTests {
         val id: Int,
         val community: Int = Node.DEFAULT_COMMUNITY,
         val centrality: Double = Node.DEFAULT_CENTRALITY,
-        var x: Double = Node.DEFAULT_X,
-        var y: Double = Node.DEFAULT_Y,
+        val x: Double = Node.DEFAULT_X,
+        val y: Double = Node.DEFAULT_Y,
     )
 
     private fun Network.getSimpleNodes() = nodes.map { it.value.run { SimpleNode(id, community, centrality, x, y) } }
@@ -68,7 +68,7 @@ internal class TxtIOIntegrationTests {
                 val line = reader.readLine()
                 if (line.isEmpty()) break
 
-                line.split(COLUMN_DELIMITER).run {
+                with(line.split(COLUMN_DELIMITER)) {
                     val id1 = get(0).toInt()
                     val id2 = get(1).toInt()
 
@@ -83,26 +83,27 @@ internal class TxtIOIntegrationTests {
                 val line = reader.readLine()
                 if (line.isEmpty()) break
 
-                line.split(COLUMN_DELIMITER).run {
+                with(line.split(COLUMN_DELIMITER)) {
                     val id = get(0).toInt()
 
-                    nodes[id] = SimpleNode(id, get(1).toInt(), get(2).toDouble()).apply {
-                        x = getOrNull(3)?.toDouble() ?: x
-                        y = getOrNull(4)?.toDouble() ?: y
-                    }
+                    nodes[id] = SimpleNode(
+                        id,
+                        get(1).toInt(),
+                        get(2).toDouble(),
+                        getOrNull(3)?.toDouble() ?: Node.DEFAULT_X,
+                        getOrNull(4)?.toDouble() ?: Node.DEFAULT_Y,
+                    )
                 }
             }
         }
 
-        for (i in 0 until (nodes.keys.maxOfOrNull { it } ?: 0)) {
-            if (!nodes.contains(i)) nodes[i] = SimpleNode(i)
-        }
+        for (i in 0 until (nodes.keys.maxOfOrNull { it } ?: 0)) if (!nodes.contains(i)) nodes[i] = SimpleNode(i)
 
         return Pair(nodes, links)
     }
 
     private fun assertCorrectExportWithActions(network: Network, vararg actions: (Network) -> Unit) {
-        for (action in actions) action(network)
+        for (applyAction in actions) applyAction(network)
 
         val expectedNodes = network.getSimpleNodes()
         val expectedLinks = network.getLinksAsPairs()
