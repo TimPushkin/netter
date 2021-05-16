@@ -21,14 +21,14 @@ class NavigationSpace : View() {
 
     private val navigator: NetworkEventHandler = find<NetworkNavigator>()
 
-    override val root = pane().apply {
+    override val root = pane {
         setOnMousePressed { it?.let { navigator.handleMousePressed(it) } }
         setOnMouseDragged { it?.let { navigator.handleMouseDragged(it) } }
         setOnScroll { it?.let { navigator.handleScroll(it) } }
     }
 
     init {
-        root += label("Import a network to be displayed here").apply {
+        root += label("Import a network to be displayed here") {
             translateXProperty().bind((root.widthProperty() - widthProperty()) / 2)
             translateYProperty().bind((root.heightProperty() - heightProperty()) / 2)
         }

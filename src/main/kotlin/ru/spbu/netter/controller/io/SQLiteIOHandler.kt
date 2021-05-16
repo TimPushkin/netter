@@ -23,37 +23,33 @@ class SQLiteIOHandler : Controller(), FileIOHandler {
         logger.info { "Import has started" }
 
         Database.connect("jdbc:sqlite:${file.path}", "org.sqlite.JDBC")
-        var checkLinks = false
-        var checkNodes = false
-        var emptyIndicator = 0L
+
+        var linksAreProvided = false
+        var nodesAreProvided = false
 
         try {
             transaction {
                 addLogger(StdOutSqlLogger)
                 for (tblName in SqliteMaster.selectAll()) {
-                    if (tblName[SqliteMaster.tbl_name] == LINKS_TABLE_NAME) {
-                        checkLinks = true
-                        emptyIndicator += Links.selectAll().count()
-                    }
-                    if (tblName[SqliteMaster.tbl_name] == NODES_TABLE_NAME) {
-                        checkNodes = true
-                        emptyIndicator += Nodes.selectAll().count()
-                    }
+                    if (tblName[SqliteMaster.tblName] == LINKS_TABLE_NAME) linksAreProvided = true
+                    if (tblName[SqliteMaster.tblName] == NODES_TABLE_NAME) nodesAreProvided = true
                 }
             }
         } catch (ex: ExposedSQLException) {
             throw HandledIOException("File is not a database", ex)
         }
 
-        if (!checkLinks && !checkNodes)
+        if (!linksAreProvided && !nodesAreProvided) {
             throw HandledIOException("Could not find tables by these names: $LINKS_TABLE_NAME, $NODES_TABLE_NAME")
-        if (emptyIndicator == 0L) {
+        }
+
+        if (linksAreProvided) parseLinks(network)
+        if (nodesAreProvided) parseNodes(network)
+
+        if (network.isEmpty()) {
             logger.info { "The provided network is empty" }
             throw HandledIOException("The provided network is empty")
         }
-
-        if (checkLinks) parseLinks(network)
-        if (checkNodes) parseNodes(network)
 
         logger.info { "Import has been finished" }
     }
@@ -119,7 +115,7 @@ class SQLiteIOHandler : Controller(), FileIOHandler {
                         throw HandledIOException("node id must be not less than ${IOHandlerData.MIN_NODE_ID}")
                     }
                     if (parsedCommunity < IOHandlerData.MIN_COMMUNITY) {
-                        throw  HandledIOException("community must be not less than ${IOHandlerData.MIN_COMMUNITY}")
+                        throw HandledIOException("community must be not less than ${IOHandlerData.MIN_COMMUNITY}")
                     }
                     if (parsedCentrality < IOHandlerData.MIN_CENTRALITY) {
                         throw HandledIOException("centrality must be not less than ${IOHandlerData.MIN_CENTRALITY}")
@@ -135,7 +131,7 @@ class SQLiteIOHandler : Controller(), FileIOHandler {
                     addSkippedNodes(network, parsedId)
                 } catch (ex: NumberFormatException) {
                     throw HandledIOException(
-                        "Node ids and community must be integers, centrality and coordinates must be double",
+                        "Node ids and community must be integers, centrality and coordinates must be doubles",
                         ex
                     )
                 }
@@ -161,8 +157,8 @@ class SQLiteIOHandler : Controller(), FileIOHandler {
 
                     network.addLink(parsedId1, parsedId2)
 
-                    addSkippedNodes(network, parsedId2)
                     addSkippedNodes(network, parsedId1)
+                    addSkippedNodes(network, parsedId2)
                 } catch (ex: NumberFormatException) {
                     throw HandledIOException("Node ids must be integers", ex)
                 }
@@ -179,7 +175,7 @@ class SQLiteIOHandler : Controller(), FileIOHandler {
 
     object SqliteMaster : Table("sqlite_master") {
         val name = varchar("name", 50)
-        val tbl_name = varchar("tbl_name", 50)
+        val tblName = varchar("tbl_name", 50)
     }
 
     object Nodes : Table(NODES_TABLE_NAME) {

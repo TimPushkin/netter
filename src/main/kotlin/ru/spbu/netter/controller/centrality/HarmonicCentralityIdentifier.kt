@@ -15,6 +15,11 @@ private val logger = KotlinLogging.logger {}
 class HarmonicCentralityIdentifier : Controller(), CentralityIdentifier {
 
     override fun identifyCentrality(network: Network) {
+        if (network.isEmpty()) {
+            logger.info { "There is nothing to inspect for centrality: network $network is empty" }
+            return
+        }
+
         logger.info { "Identifying centrality..." }
 
         val centralityValues = HarmonicCentrality(convertNetwork(network)).scores
@@ -23,13 +28,13 @@ class HarmonicCentralityIdentifier : Controller(), CentralityIdentifier {
                 ?: throw IllegalStateException("Node ${node.id} not found in the harmonic centrality calculation result")
         }
 
-        logger.info { "Identifying centrality has been finished" }
+        logger.info { "Centrality identification has been finished" }
     }
 
     private fun convertNetwork(network: Network): Graph<Int, DefaultEdge> {
         val graph = DefaultUndirectedGraph<Int, DefaultEdge>(DefaultEdge::class.java)
 
-        network.nodes.forEach { graph.addVertex(it.key) }
+        network.nodes.values.forEach { graph.addVertex(it.id) }
         network.links.forEach { graph.addEdge(it.n1.id, it.n2.id) }
 
         return graph

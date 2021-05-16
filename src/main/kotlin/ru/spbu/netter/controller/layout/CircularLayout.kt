@@ -19,7 +19,7 @@ class CircularLayout : Controller(), SimpleLayoutMethod {
 
     override fun applyLayout(network: Network, repulsion: Double) {
         if (network.isEmpty()) {
-            logger.info { "There is nothing to lay out: network $network is empty" }
+            logger.info { "There is nothing to lay out in a circle: network $network is empty" }
             return
         }
 
@@ -27,12 +27,12 @@ class CircularLayout : Controller(), SimpleLayoutMethod {
 
         val center = Point2D(CENTER_X, CENTER_Y)
         val angle = Math.toRadians(360.0 / network.nodes.size)
-        val radius = (repulsion * sqrt(2 / (1 - cos(angle)))).takeIf { it != Double.POSITIVE_INFINITY} ?: 0.0
+        val radius = (repulsion * sqrt(2 / (1 - cos(angle)))).takeIf { it != Double.POSITIVE_INFINITY } ?: 0.0
         var curr = Point2D(0.0, radius)
 
-        network.nodes.values.forEach {
-            it.x = curr.x
-            it.y = curr.y
+        network.nodes.values.withEach {
+            x = curr.x
+            y = curr.y
             curr = curr.rotated(center, angle)
         }
 

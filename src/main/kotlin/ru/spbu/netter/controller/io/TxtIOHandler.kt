@@ -25,8 +25,10 @@ class TxtIOHandler : Controller(), FileIOHandler {
         val bufferedReader = try {
             file.bufferedReader()
         } catch (ex: FileNotFoundException) {
+            logger.error { "Input file ${file.path} not found" }
             throw HandledIOException("Input file not found", ex)
         } catch (ex: SecurityException) {
+            logger.error { "Input file ${file.path} cannot be read: no read access" }
             throw HandledIOException("Input file cannot be read: no read access", ex)
         }
 
@@ -48,7 +50,10 @@ class TxtIOHandler : Controller(), FileIOHandler {
             if (reader.ready()) logger.warn { "Excessive lines found after blank line $lineNum. Skipping..." }
         }
 
-        if (network.isEmpty()) throw HandledIOException("The provided network is empty")
+        if (network.isEmpty()) {
+            logger.error { "The provided network is empty" }
+            throw HandledIOException("The provided network is empty")
+        }
     }
 
     private fun parseLink(network: Network, columns: List<String>, lineNum: Int) {
@@ -125,6 +130,7 @@ class TxtIOHandler : Controller(), FileIOHandler {
     }
 
     private fun handleInputError(lineNum: Int, message: String): Nothing {
+        logger.error { "Incorrect input format on line $lineNum: $message" }
         throw HandledIOException("Incorrect input format on line $lineNum: $message")
     }
 
@@ -132,14 +138,17 @@ class TxtIOHandler : Controller(), FileIOHandler {
         try {
             Files.createDirectories(file.toPath().parent)
         } catch (ex: SecurityException) {
+            logger.error { "Parent dir ${file.toPath().parent} cannot be created: no read-write access" }
             throw HandledIOException("Parent dir ${file.toPath().parent} cannot be created: no read-write access", ex)
         }
 
         val bufferedWriter = try {
             file.bufferedWriter()
         } catch (ex: FileNotFoundException) {
+            logger.error { "Output file ${file.path} cannot be opened or created" }
             throw HandledIOException("Output file cannot be opened or created", ex)
         } catch (ex: SecurityException) {
+            logger.error { "Output file ${file.path} cannot be written: no write access" }
             throw HandledIOException("Output file cannot be written: no write access", ex)
         }
 
@@ -151,7 +160,7 @@ class TxtIOHandler : Controller(), FileIOHandler {
             writer.newLine()
 
             for (entry in network.nodes) with(entry.value) {
-                writer.write("$id$COLUMN_DELIMITER$community$COLUMN_DELIMITER$centrality$COLUMN_DELIMITER$x$COLUMN_DELIMITER$y\n")
+                writer.write(listOf(id, community, centrality, x, y).joinToString(COLUMN_DELIMITER, postfix = "\n"))
             }
         }
     }
