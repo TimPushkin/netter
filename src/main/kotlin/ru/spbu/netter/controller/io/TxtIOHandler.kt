@@ -25,10 +25,10 @@ class TxtIOHandler : Controller(), FileIOHandler {
         val bufferedReader = try {
             file.bufferedReader()
         } catch (ex: FileNotFoundException) {
-            logger.error { "Input file ${file.path} not found" }
+            logger.error(ex) { "Input file ${file.path} not found" }
             throw HandledIOException("Input file not found", ex)
         } catch (ex: SecurityException) {
-            logger.error { "Input file ${file.path} cannot be read: no read access" }
+            logger.error(ex) { "Input file ${file.path} cannot be read: no read access" }
             throw HandledIOException("Input file cannot be read: no read access", ex)
         }
 
@@ -138,17 +138,17 @@ class TxtIOHandler : Controller(), FileIOHandler {
         try {
             Files.createDirectories(file.toPath().parent)
         } catch (ex: SecurityException) {
-            logger.error { "Parent dir ${file.toPath().parent} cannot be created: no read-write access" }
+            logger.error(ex) { "Parent dir ${file.toPath().parent} cannot be created: no read-write access" }
             throw HandledIOException("Parent dir ${file.toPath().parent} cannot be created: no read-write access", ex)
         }
 
         val bufferedWriter = try {
             file.bufferedWriter()
         } catch (ex: FileNotFoundException) {
-            logger.error { "Output file ${file.path} cannot be opened or created" }
+            logger.error(ex) { "Output file ${file.path} cannot be opened or created" }
             throw HandledIOException("Output file cannot be opened or created", ex)
         } catch (ex: SecurityException) {
-            logger.error { "Output file ${file.path} cannot be written: no write access" }
+            logger.error(ex) { "Output file ${file.path} cannot be written: no write access" }
             throw HandledIOException("Output file cannot be written: no write access", ex)
         }
 
