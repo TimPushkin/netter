@@ -21,26 +21,22 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
         openDriver(uri, username, password)
         val session = driver.session()
 
-        var nodes: Result?
         session.handleTransaction(Session::readTransaction) { tx ->
-            nodes = tx.run(
+            val nodes = tx.run(
                 "MATCH (n:NODE) " +
                         "RETURN n.id AS id, n.community AS community, n.centrality AS centrality, n.x AS x, n.y AS y"
             )
-            nodes?.let { parseNodes(network, it) }
-                ?: throw IllegalStateException("Unable to parse nodes: nodes reading has been failed")
+            parseNodes(network, nodes)
         }
 
         logger.info { "Nodes were successfully read" }
 
-        var links: Result?
         session.handleTransaction(Session::readTransaction) { tx ->
-            links = tx.run(
+            val links = tx.run(
                 "MATCH (n1:NODE)-[:LINK]->(n2:NODE) " +
                         "RETURN n1.id AS id1, n2.id AS id2"
             )
-            links?.let { parseLinks(network, it) }
-                ?: throw IllegalStateException("Unable to parse links: links reading has been failed")
+            parseLinks(network, links)
         }
 
         logger.info { "Links were successfully read" }
