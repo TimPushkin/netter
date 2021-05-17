@@ -54,15 +54,21 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
 
         session.handleTransaction(Session::writeTransaction) { tx ->
             tx.run("MATCH (n:NODE), (:NODE)-[l:LINK]->(:NODE) DETACH DELETE n, l")
-            logger.info { "Database was successfully cleaned" }
+        }
 
+        logger.info { "Database was successfully cleaned" }
+
+        session.handleTransaction(Session::writeTransaction) { tx ->
             for (entry in network.nodes) with(entry.value) {
                 tx.run(
                     "CREATE (n:NODE{id:$id, community:$community, centrality:$centrality, x:$x, y:$y})"
                 )
             }
-            logger.info { "Nodes were successfully recorded" }
+        }
 
+        logger.info { "Nodes were successfully recorded" }
+
+        session.handleTransaction(Session::writeTransaction) { tx ->
             for (link in network.links) with(link) {
                 tx.run(
                     "MATCH (n1:NODE{id:${n1.id}})  " +
@@ -70,8 +76,9 @@ class Neo4jIOHandler : Controller(), UriIOHandler, Closeable {
                             "CREATE (n1)-[:LINK]->(n2)"
                 )
             }
-            logger.info { "Links were successfully recorded" }
         }
+
+        logger.info { "Links were successfully recorded" }
 
         close()
     }
