@@ -10,7 +10,7 @@ import tornadofx.*
 import kotlin.math.sign
 
 
-private const val MIN_ZOOM = 0.05
+private const val MIN_ZOOM_SCALE = 0.05
 private const val ZOOM_SCALING = 0.002
 
 
@@ -41,8 +41,8 @@ class NetworkNavigator : Controller(), NetworkEventHandler {
     override fun handleScroll(event: ScrollEvent) {
         getNetworkView(event)?.apply {
             scaleX =
-                (scaleX + sign(event.deltaY) * ZOOM_SCALING * (network.nodes.size.toDouble() / (-286) + 50)).takeIf { it >= MIN_ZOOM }
-                    ?: MIN_ZOOM
+                (scaleX + sign(event.deltaY) * ZOOM_SCALING * (network.nodes.size.toDouble() / (-286) + 50)).takeIf { it >= MIN_ZOOM_SCALE }
+                    ?: MIN_ZOOM_SCALE
             scaleY = scaleX
 
             event.consume()
@@ -53,7 +53,7 @@ class NetworkNavigator : Controller(), NetworkEventHandler {
         require(event.source is Pane) { "Unsupported event source: expected a Pane but was ${event.source::class}" }
 
         with((event.source as Pane).children) {
-            require(isNotEmpty()) { "Unsupported event source children: collection $this is empty" }
+            require(isNotEmpty()) { "Unsupported event source children: children collection $this is empty" }
             return first().takeIf { it is NetworkView } as NetworkView?
         }
     }

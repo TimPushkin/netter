@@ -19,14 +19,14 @@ class NetworkView(val network: Network) : Group() {
     }
 
     private val nodes = network.nodes.values.associateWith { NodeView(it, colorsNumProperty) }
-    private val links = network.links.associateWith {
+    private val links = network.links.map {
         val n1 = nodes[it.n1] ?: throw IllegalStateException("NodeView not found for node ${it.n1}")
         val n2 = nodes[it.n2] ?: throw IllegalStateException("NodeView not found for node ${it.n2}")
         LinkView(n1, n2)
     }
 
     init {
-        links.values.forEach { add(it) }
+        links.forEach { add(it) }
         placeNodesInCentralityOrder()
     }
 

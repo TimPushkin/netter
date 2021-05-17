@@ -21,14 +21,6 @@ public abstract class IterativeCPMClusteringAlgorithm extends IncrementalCPMClus
     protected int nIterations;
 
     /**
-     * Constructs an iterative CPM clustering algorithm.
-     */
-    public IterativeCPMClusteringAlgorithm()
-    {
-        this(DEFAULT_RESOLUTION, DEFAULT_N_ITERATIONS);
-    }
-
-    /**
      * Constructs an iterative CPM clustering algorithm with a specified
      * resolution parameter and number of iterations.
      *
@@ -39,26 +31,6 @@ public abstract class IterativeCPMClusteringAlgorithm extends IncrementalCPMClus
     {
         super(resolution);
 
-        this.nIterations = nIterations;
-    }
-
-    /**
-     * Returns the number of iterations.
-     *
-     * @return Number of iterations
-     */
-    public int getNIterations()
-    {
-        return nIterations;
-    }
-
-    /**
-     * Sets the number of iterations.
-     *
-     * @param nIterations Number of iterations
-     */
-    public void setNIterations(int nIterations)
-    {
         this.nIterations = nIterations;
     }
 

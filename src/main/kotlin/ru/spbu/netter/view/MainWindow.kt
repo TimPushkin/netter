@@ -30,15 +30,19 @@ class MainWindow : View("Netter") {
                 }
 
                 menu("Export") {
+                    disableProperty().bind(!navigationSpace.isNetworkImportedProperty)
+
                     item("As plain text").action { exportFromFile(txtIOHandler) }
 
                     item("As Neo4j database").action { exportFromUri(neo4jIOHandler) }
 
                     item("As SQLite database").action { exportFromFile(sqliteIHandler) }
-                }.apply { disableProperty().bind(!navigationSpace.isNetworkImportedProperty) }
+                }
             }
 
             menu("Network") {
+                disableProperty().bind(!navigationSpace.isNetworkImportedProperty)
+
                 item("Inspect for communities").action {
                     getResolution()?.let { navigationSpace.inspectForCommunities(it) }
                 }
@@ -46,7 +50,7 @@ class MainWindow : View("Netter") {
                 item("Inspect for centrality").action {
                     navigationSpace.inspectForCentrality()
                 }
-            }.apply { disableProperty().bind(!navigationSpace.isNetworkImportedProperty) }
+            }
 
             menu("Help") {
                 item("Netter at GitHub").action { hostServices.showDocument("https://github.com/TimPushkin/netter") }

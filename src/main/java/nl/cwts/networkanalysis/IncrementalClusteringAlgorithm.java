@@ -8,7 +8,7 @@ package nl.cwts.networkanalysis;
  * @author Nees Jan van Eck
  * @author Vincent Traag
  */
-public interface IncrementalClusteringAlgorithm extends ClusteringAlgorithm
+public interface IncrementalClusteringAlgorithm
 {
     /**
      * Improves a clustering of the nodes in a network.

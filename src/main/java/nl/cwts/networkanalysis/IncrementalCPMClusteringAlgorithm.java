@@ -10,13 +10,6 @@ package nl.cwts.networkanalysis;
  */
 public abstract class IncrementalCPMClusteringAlgorithm extends CPMClusteringAlgorithm implements IncrementalClusteringAlgorithm
 {
-    /**
-     * Constructs an incremental CPM clustering algorithm.
-     */
-    public IncrementalCPMClusteringAlgorithm()
-    {
-        this(DEFAULT_RESOLUTION);
-    }
 
     /**
      * Constructs an incremental CPM clustering algorithm with a specified
@@ -27,27 +20,5 @@ public abstract class IncrementalCPMClusteringAlgorithm extends CPMClusteringAlg
     public IncrementalCPMClusteringAlgorithm(double resolution)
     {
         super(resolution);
-    }
-
-    /**
-     * Finds a clustering of the nodes in a network.
-     *
-     * <p>
-     * The clustering is obtained by calling {@link #improveClustering(Network
-     * network, Clustering clustering)} and by providing a singleton clustering
-     * as input to this method.
-     * </p>
-     *
-     * @param network Network
-     *
-     * @return Clustering
-     */
-    public Clustering findClustering(Network network)
-    {
-        Clustering clustering;
-
-        clustering = new Clustering(network.getNNodes());
-        improveClustering(network, clustering);
-        return clustering;
     }
 }

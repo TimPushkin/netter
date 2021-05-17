@@ -11,7 +11,7 @@ import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-// The number of iterations of the algorithm. If equals 0, the algorithm runs until no improvements are possible
+// The number of iterations of the algorithm. If equals 0, the algorithm runs until no more improvements are possible
 private const val ITERATIONS_NUM = 0
 
 // Sets the randomness factor used by the algorithm in its refinement phase
@@ -22,7 +22,7 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
 
     override fun detectCommunities(network: Network, resolution: Double) {
         if (network.isEmpty()) {
-            logger.info { "There is nothing to inspect: network $network is empty" }
+            logger.info { "There is nothing to inspect for communities: network $network is empty" }
             return
         }
 
@@ -35,10 +35,9 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
         val leidenAlgorithm = LeidenAlgorithm(resolution, ITERATIONS_NUM, RANDOMNESS, Random())
 
         leidenAlgorithm.improveClustering(convertedNetwork, clustering)
-
         applyClustering(network, clustering)
 
-        logger.info { "Detecting communities has been finished" }
+        logger.info { "Community detection has been finished" }
     }
 
     private fun convertNetwork(network: Network): LeidenNetwork {
@@ -57,8 +56,6 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
         require(network.nodes.size == clustering.nNodes) {
             "Clustering application failed: network nodes number (${network.nodes.size}) differs from clustering nodes number (${clustering.nNodes})"
         }
-        for (node in network.nodes.values) {
-            node.community = clustering.clusters[node.id]
-        }
+        for (node in network.nodes.values) node.community = clustering.clusters[node.id]
     }
 }

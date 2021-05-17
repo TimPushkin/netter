@@ -25,6 +25,9 @@ class LeftMenu : View() {
     private val barnesHutTheta = SimpleStringProperty(this, "barnesHutTheta", "1.2")
 
     override val root = form {
+        background = Background(BackgroundFill(Color.WHITE, null, null))
+        disableProperty().bind(!navigationSpace.isNetworkImportedProperty)
+
         fieldset("Default layout") {
             field("Repulsion") { textfield(repulsion) }
 
@@ -103,8 +106,5 @@ class LeftMenu : View() {
                 }
             }
         }
-    }.apply {
-        background = Background(BackgroundFill(Color.WHITE, null, null))
-        disableProperty().bind(!navigationSpace.isNetworkImportedProperty)
     }
 }

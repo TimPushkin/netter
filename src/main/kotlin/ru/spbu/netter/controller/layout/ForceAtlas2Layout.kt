@@ -28,7 +28,7 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
         withBarnesHutTheta: Double,
     ) {
         if (network.isEmpty()) {
-            logger.info { "There is nothing to lay out: network $network is empty" }
+            logger.info { "There is nothing to lay out using ForceAtlas2: network $network is empty" }
             return
         }
 
@@ -67,15 +67,15 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
         }
 
         with(convertedNetwork.nodes) {
-            network.nodes.values.forEach {
-                get(it.id).run {
-                    it.x = x
-                    it.y = y
+            network.nodes.values.withEach {
+                get(id).let { resultingNode ->
+                    x = resultingNode.x
+                    y = resultingNode.y
                 }
             }
         }
 
-        logger.info { "Placing nodes in a smart shape has been finished" }
+        logger.info { "Placing nodes using ForceAtlas2 has been finished" }
     }
 
     private fun convertNetwork(network: Network): Graph {

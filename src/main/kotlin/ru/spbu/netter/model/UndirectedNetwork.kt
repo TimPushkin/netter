@@ -32,7 +32,7 @@ class UndirectedNetwork : Network {
     private data class UndirectedLink(override val n1: Node, override val n2: Node) : Link {
 
         override fun equals(other: Any?) =
-            if (other is UndirectedLink) n1 == other.n1 && n2 == other.n2 || n1 == other.n2 && n2 == other.n1 else false
+            other is UndirectedLink && (n1 == other.n1 && n2 == other.n2 || n1 == other.n2 && n2 == other.n1)
 
         override fun hashCode() = n1.hashCode() xor n2.hashCode()
     }

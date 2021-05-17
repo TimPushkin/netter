@@ -37,36 +37,6 @@ public final class FastMath
         return exponent;
     }
 
-    /**
-     * Calculates {@code base ^ exponent} using a fast implementation.
-     *
-     * @param base     Base
-     * @param exponent Exponent
-     *
-     * @return base ^ exponent
-     */
-    public static double fastPow(double base, int exponent)
-    {
-        double power;
-        int i;
-
-        if (exponent > 0)
-        {
-            power = base;
-            for (i = 1; i < exponent; i++)
-                power *= base;
-        }
-        else if (exponent < 0)
-        {
-            power = 1 / base;
-            for (i = -1; i > exponent; i--)
-                power /= base;
-        }
-        else
-            power = 1;
-        return power;
-    }
-
     private FastMath()
     {
     }
