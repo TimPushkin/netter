@@ -39,9 +39,9 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
         } success {
             applyClustering(network, clustering)
 
-            logger.info { "Community detection has been finished" }
+            logger.info { "Leiden community detection has been finished" }
         } fail { ex ->
-            throw RuntimeException("Leiden centrality detection has been failed", ex)
+            throw RuntimeException("Leiden community detection has been failed", ex)
         }
     }
 

@@ -30,9 +30,9 @@ class HarmonicCentralityIdentifier : Controller(), CentralityIdentifier {
                     ?: throw IllegalStateException("Node $id not found in the harmonic centrality calculation result")
             }
 
-            logger.info { "Centrality identification has been finished" }
+            logger.info { "Harmonic centrality identification has been finished" }
         } fail { ex ->
-            throw RuntimeException("Harmonic centrality calculation has been failed", ex)
+            throw RuntimeException("Harmonic centrality identification has been failed", ex)
         }
     }
 
