@@ -30,13 +30,18 @@ class CircularLayout : Controller(), SimpleLayoutMethod {
         val radius = (repulsion * sqrt(2 / (1 - cos(angle)))).takeIf { it != Double.POSITIVE_INFINITY } ?: 0.0
         var curr = Point2D(0.0, radius)
 
-        network.nodes.values.withEach {
-            x = curr.x
-            y = curr.y
-            curr = curr.rotated(center, angle)
-        }
+        runAsync {
+            List(network.nodes.size) { Point2D(curr.x, curr.y).also { curr = curr.rotated(center, angle) } }
+        } success { coordinates ->
+            network.nodes.values.forEachIndexed { i, node ->
+                node.x = coordinates[i].x
+                node.y = coordinates[i].y
+            }
 
-        logger.info { "Placing nodes in a circular shape has been finished" }
+            logger.info { "Placing nodes in a circular shape has been finished" }
+        } fail { ex ->
+            throw RuntimeException("Placing nodes in a circular shape has been failed", ex)
+        }
     }
 
     private fun Point2D.rotated(center: Point2D, angle: Double): Point2D {

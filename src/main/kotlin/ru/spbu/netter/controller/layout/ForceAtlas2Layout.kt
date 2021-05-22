@@ -60,22 +60,26 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
             barnesHutTheta = withBarnesHutTheta
         }
 
-        with(forceAtlas2Algorithm) {
-            initAlgo()
-            repeat(loopsNum) { goAlgo() }
-            endAlgo()
-        }
-
-        with(convertedNetwork.nodes) {
-            network.nodes.values.withEach {
-                get(id).let { resultingNode ->
-                    x = resultingNode.x
-                    y = resultingNode.y
+        runAsync {
+            with(forceAtlas2Algorithm) {
+                initAlgo()
+                repeat(loopsNum) { goAlgo() }
+                endAlgo()
+            }
+        } success {
+            with(convertedNetwork.nodes) {
+                network.nodes.values.withEach {
+                    get(id).let { resultingNode ->
+                        x = resultingNode.x
+                        y = resultingNode.y
+                    }
                 }
             }
-        }
 
-        logger.info { "Placing nodes using ForceAtlas2 has been finished" }
+            logger.info { "Placing nodes using ForceAtlas2 has been finished" }
+        } fail { ex ->
+            throw RuntimeException("Placing nodes using ForceAtlas2 has been failed", ex)
+        }
     }
 
     private fun convertNetwork(network: Network): Graph {

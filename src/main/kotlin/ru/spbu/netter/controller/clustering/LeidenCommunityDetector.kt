@@ -5,7 +5,7 @@ import nl.cwts.networkanalysis.Clustering
 import nl.cwts.networkanalysis.LeidenAlgorithm
 import nl.cwts.networkanalysis.Network as LeidenNetwork
 import ru.spbu.netter.model.Network
-import tornadofx.Controller
+import tornadofx.*
 import java.util.*
 
 
@@ -34,10 +34,15 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
         require(resolution > 0) { "Wrong resolution: resolution must be positive but was $resolution" }
         val leidenAlgorithm = LeidenAlgorithm(resolution, ITERATIONS_NUM, RANDOMNESS, Random())
 
-        leidenAlgorithm.improveClustering(convertedNetwork, clustering)
-        applyClustering(network, clustering)
+        runAsync {
+            leidenAlgorithm.improveClustering(convertedNetwork, clustering)
+        } success {
+            applyClustering(network, clustering)
 
-        logger.info { "Community detection has been finished" }
+            logger.info { "Community detection has been finished" }
+        } fail { ex ->
+            throw RuntimeException("Leiden centrality detection has been failed", ex)
+        }
     }
 
     private fun convertNetwork(network: Network): LeidenNetwork {

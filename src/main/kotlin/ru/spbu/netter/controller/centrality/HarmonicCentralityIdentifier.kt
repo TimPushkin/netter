@@ -6,7 +6,7 @@ import org.jgrapht.alg.scoring.HarmonicCentrality
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DefaultUndirectedGraph
 import ru.spbu.netter.model.Network
-import tornadofx.Controller
+import tornadofx.*
 
 
 private val logger = KotlinLogging.logger {}
@@ -22,13 +22,18 @@ class HarmonicCentralityIdentifier : Controller(), CentralityIdentifier {
 
         logger.info { "Identifying centrality..." }
 
-        val centralityValues = HarmonicCentrality(convertNetwork(network)).scores
-        network.nodes.values.forEach { node ->
-            centralityValues[node.id]?.let { node.centrality = it }
-                ?: throw IllegalStateException("Node ${node.id} not found in the harmonic centrality calculation result")
-        }
+        runAsync {
+            HarmonicCentrality(convertNetwork(network)).scores
+        } success { centralityValues ->
+            network.nodes.values.withEach {
+                centralityValues[id]?.let { centrality = it }
+                    ?: throw IllegalStateException("Node $id not found in the harmonic centrality calculation result")
+            }
 
-        logger.info { "Centrality identification has been finished" }
+            logger.info { "Centrality identification has been finished" }
+        } fail { ex ->
+            throw RuntimeException("Harmonic centrality calculation has been failed", ex)
+        }
     }
 
     private fun convertNetwork(network: Network): Graph<Int, DefaultEdge> {
