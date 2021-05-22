@@ -11,6 +11,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
 dependencies {
@@ -22,7 +23,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.6")
     implementation("org.slf4j:slf4j-simple:1.7.30")
 
-    implementation("no.tornado:tornadofx:1.7.20")
+    implementation("no.tornado:tornadofx:2.0.0-SNAPSHOT")
 
     implementation("org.jgrapht:jgrapht-core:1.5.1")
 
