@@ -1,6 +1,5 @@
 package ru.spbu.netter.view
 
-import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.control.ProgressBar
 import ru.spbu.netter.controller.*
