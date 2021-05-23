@@ -1,22 +1,14 @@
 package ru.spbu.netter.view
 
-import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleIntegerProperty
-import javafx.geometry.Point2D
 import javafx.scene.Group
 import ru.spbu.netter.model.Network
 import tornadofx.*
 
 
 class NetworkView(val network: Network) : Group() {
-    private val colorsNumProperty = SimpleIntegerProperty(this, "colorsNum", calculateColorsNum()).apply {
-        bind(
-            Bindings.createObjectBinding(
-                ::calculateColorsNum,
-                *network.nodes.values.map { it.communityProperty }.toTypedArray()
-            )
-        )
-    }
+    private val colorsNumProperty = SimpleIntegerProperty(this, "colorsNum", calculateColorsNum())
+    private var colorsNum by colorsNumProperty
 
     private val nodes = network.nodes.values.associateWith { NodeView(it, colorsNumProperty) }
     private val links = network.links.map {
@@ -27,15 +19,19 @@ class NetworkView(val network: Network) : Group() {
 
     init {
         links.forEach { add(it) }
-        placeNodesInCentralityOrder()
+        updateNodeOrder()
     }
 
-    fun placeNodesInCentralityOrder() {
+    fun updateNodeOrder() {
         children.retainAll { it is LinkView }
         nodes.values.sortedByDescending { it.node.centrality }.forEach {
             add(it)
             add(it.label)
         }
+    }
+
+    fun updateColorsNum() {
+        colorsNum = calculateColorsNum()
     }
 
     private fun calculateColorsNum() = (network.nodes.values.maxOfOrNull { it.community } ?: -1) + 1

@@ -61,6 +61,6 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
         require(network.nodes.size == clustering.nNodes) {
             "Clustering application failed: network nodes number (${network.nodes.size}) differs from clustering nodes number (${clustering.nNodes})"
         }
-        for (node in network.nodes.values) node.community = clustering.clusters[node.id]
+        with(clustering.clusters) { for (node in network.nodes.values) node.community = get(node.id) }
     }
 }

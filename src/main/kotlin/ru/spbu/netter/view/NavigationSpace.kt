@@ -77,11 +77,12 @@ class NavigationSpace : View() {
 
     fun inspectForCommunities(resolution: Double) {
         communityDetector.detectCommunities(networkView.network, resolution)
+        networkView.updateColorsNum()
     }
 
     fun inspectForCentrality() {
         centralityIdentifier.identifyCentrality(networkView.network)
-        networkView.placeNodesInCentralityOrder()
+        networkView.updateNodeOrder()
     }
 
     private fun replaceNetworkView(newNetworkView: NetworkView) {
