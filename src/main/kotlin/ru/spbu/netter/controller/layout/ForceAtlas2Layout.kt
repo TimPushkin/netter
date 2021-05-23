@@ -14,6 +14,7 @@ private val logger = KotlinLogging.logger {}
 
 
 class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
+    override val status = TaskStatus()
 
     override fun applyLayout(
         network: Network,
@@ -60,7 +61,7 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
             barnesHutTheta = withBarnesHutTheta
         }
 
-        runAsync {
+        runAsync(status) {
             with(forceAtlas2Algorithm) {
                 initAlgo()
                 repeat(loopsNum) { goAlgo() }
@@ -75,7 +76,6 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
                     }
                 }
             }
-
             logger.info { "Placing nodes using ForceAtlas2 has been finished" }
         } fail { ex ->
             throw RuntimeException("Placing nodes using ForceAtlas2 has been failed", ex)

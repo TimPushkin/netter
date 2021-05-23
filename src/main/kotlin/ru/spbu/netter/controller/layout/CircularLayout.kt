@@ -16,6 +16,7 @@ private const val CENTER_Y = 0.0
 
 
 class CircularLayout : Controller(), SimpleLayoutMethod {
+    override val status = TaskStatus()
 
     override fun applyLayout(network: Network, repulsion: Double) {
         if (network.isEmpty()) {
@@ -30,14 +31,13 @@ class CircularLayout : Controller(), SimpleLayoutMethod {
         val radius = (repulsion * sqrt(2 / (1 - cos(angle)))).takeIf { it != Double.POSITIVE_INFINITY } ?: 0.0
         var curr = Point2D(0.0, radius)
 
-        runAsync {
+        runAsync(status) {
             List(network.nodes.size) { Point2D(curr.x, curr.y).also { curr = curr.rotated(center, angle) } }
         } success { coordinates ->
             network.nodes.values.forEachIndexed { i, node ->
                 node.x = coordinates[i].x
                 node.y = coordinates[i].y
             }
-
             logger.info { "Placing nodes in a circular shape has been finished" }
         } fail { ex ->
             throw RuntimeException("Placing nodes in a circular shape has been failed", ex)

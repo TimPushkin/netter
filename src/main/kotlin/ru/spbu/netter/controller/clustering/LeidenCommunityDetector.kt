@@ -19,6 +19,7 @@ private const val RANDOMNESS = 1e-2
 
 
 class LeidenCommunityDetector : Controller(), CommunityDetector {
+    override val status = TaskStatus()
 
     override fun detectCommunities(network: Network, resolution: Double) {
         if (network.isEmpty()) {
@@ -34,11 +35,10 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
         require(resolution > 0) { "Wrong resolution: resolution must be positive but was $resolution" }
         val leidenAlgorithm = LeidenAlgorithm(resolution, ITERATIONS_NUM, RANDOMNESS, Random())
 
-        runAsync {
+        runAsync(status) {
             leidenAlgorithm.improveClustering(convertedNetwork, clustering)
         } success {
             applyClustering(network, clustering)
-
             logger.info { "Leiden community detection has been finished" }
         } fail { ex ->
             throw RuntimeException("Leiden community detection has been failed", ex)

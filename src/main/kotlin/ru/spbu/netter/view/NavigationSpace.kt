@@ -1,6 +1,8 @@
 package ru.spbu.netter.view
 
+import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.scene.control.ProgressBar
 import ru.spbu.netter.controller.*
 import ru.spbu.netter.controller.centrality.*
 import ru.spbu.netter.controller.clustering.*
@@ -25,6 +27,11 @@ class NavigationSpace : View() {
         setOnMousePressed { it?.let { navigator.handleMousePressed(it) } }
         setOnMouseDragged { it?.let { navigator.handleMouseDragged(it) } }
         setOnScroll { it?.let { navigator.handleScroll(it) } }
+
+        with(simpleLayout.status) { progressbar(progress) { visibleWhen { running } } }
+        with(smartLayout.status) { progressbar(progress) { visibleWhen { running } } }
+        with(communityDetector.status) { progressbar(progress) { visibleWhen { running } } }
+        with(centralityIdentifier.status) { progressbar(progress) { visibleWhen { running } } }
     }
 
     init {
@@ -79,7 +86,7 @@ class NavigationSpace : View() {
     }
 
     private fun replaceNetworkView(newNetworkView: NetworkView) {
-        root.children.clear()
+        root.children.retainAll { it is ProgressBar }
         root += newNetworkView.apply {
             translateX = root.width / 2
             translateY = root.height / 2

@@ -1,9 +1,10 @@
 package ru.spbu.netter.controller.layout
 
+import ru.spbu.netter.controller.Statusable
 import ru.spbu.netter.model.Network
 
 
-interface SimpleLayoutMethod {
+interface SimpleLayoutMethod : Statusable {
 
     fun applyLayout(
         network: Network,
@@ -11,7 +12,7 @@ interface SimpleLayoutMethod {
     )
 }
 
-interface SmartLayoutMethod {
+interface SmartLayoutMethod : Statusable {
 
     fun applyLayout(
         network: Network,

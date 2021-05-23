@@ -13,6 +13,7 @@ private val logger = KotlinLogging.logger {}
 
 
 class HarmonicCentralityIdentifier : Controller(), CentralityIdentifier {
+    override val status = TaskStatus()
 
     override fun identifyCentrality(network: Network) {
         if (network.isEmpty()) {
@@ -22,14 +23,13 @@ class HarmonicCentralityIdentifier : Controller(), CentralityIdentifier {
 
         logger.info { "Identifying centrality..." }
 
-        runAsync {
+        runAsync(status) {
             HarmonicCentrality(convertNetwork(network)).scores
         } success { centralityValues ->
             network.nodes.values.withEach {
                 centralityValues[id]?.let { centrality = it }
                     ?: throw IllegalStateException("Node $id not found in the harmonic centrality calculation result")
             }
-
             logger.info { "Harmonic centrality identification has been finished" }
         } fail { ex ->
             throw RuntimeException("Harmonic centrality identification has been failed", ex)
