@@ -63,6 +63,8 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
         }
 
         runAsync(status) {
+            updateMessage("Placing nodes with ForceAtlas2...")
+
             with(forceAtlas2Algorithm) {
                 initAlgo()
                 repeat(loopsNum) { goAlgo() }

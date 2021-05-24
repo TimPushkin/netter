@@ -1,7 +1,11 @@
 package ru.spbu.netter.view
 
 import javafx.beans.property.SimpleBooleanProperty
-import javafx.scene.control.ProgressBar
+import javafx.geometry.Pos
+import javafx.scene.layout.Background
+import javafx.scene.layout.BackgroundFill
+import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
 import ru.spbu.netter.controller.*
 import ru.spbu.netter.controller.centrality.*
 import ru.spbu.netter.controller.clustering.*
@@ -26,17 +30,29 @@ class NavigationSpace : View() {
         setOnMousePressed { it?.let { navigator.handleMousePressed(it) } }
         setOnMouseDragged { it?.let { navigator.handleMouseDragged(it) } }
         setOnScroll { it?.let { navigator.handleScroll(it) } }
-
-        with(simpleLayout.status) { progressbar(progress) { visibleWhen { running } } }
-        with(smartLayout.status) { progressbar(progress) { visibleWhen { running } } }
-        with(communityDetector.status) { progressbar(progress) { visibleWhen { running } } }
-        with(centralityIdentifier.status) { progressbar(progress) { visibleWhen { running } } }
     }
 
     init {
         root += label("Import a network to be displayed here") {
             translateXProperty().bind((root.widthProperty() - widthProperty()) / 2)
             translateYProperty().bind((root.heightProperty() - heightProperty()) / 2)
+        }
+
+        listOf(simpleLayout, smartLayout, communityDetector, centralityIdentifier).forEachIndexed { i, statusable ->
+            root += with(statusable.status) {
+                vbox {
+                    visibleWhen { running }
+
+                    background = Background(BackgroundFill(Color.WHITE, null, null))
+                    alignment = Pos.CENTER
+
+                    translateXProperty().bind(root.widthProperty() - widthProperty())
+                    translateYProperty().bind(heightProperty() * (i + 1))
+
+                    progressbar(progress)
+                    label(message)
+                }
+            }
         }
     }
 
@@ -84,10 +100,10 @@ class NavigationSpace : View() {
     }
 
     private fun replaceNetworkView(newNetworkView: NetworkView) {
-        root.children.retainAll { it is ProgressBar }
-        root += newNetworkView.apply {
+        root.children.retainAll { it is VBox }
+        root.children.add(0, newNetworkView.apply {
             translateX = root.width / 2
             translateY = root.height / 2
-        }
+        })
     }
 }
