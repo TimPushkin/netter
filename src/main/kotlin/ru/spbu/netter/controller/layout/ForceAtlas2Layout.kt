@@ -62,7 +62,7 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
             barnesHutTheta = withBarnesHutTheta
         }
 
-        runAsync(status) {
+        runAsync(true, status) {
             updateMessage("ForceAtlas2 layout")
 
             with(forceAtlas2Algorithm) {

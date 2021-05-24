@@ -35,7 +35,7 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
         require(resolution > 0) { "Wrong resolution: resolution must be positive but was $resolution" }
         val leidenAlgorithm = LeidenAlgorithm(resolution, ITERATIONS_NUM, RANDOMNESS, Random())
 
-        runAsync(status) {
+        runAsync(true, status) {
             updateMessage("Community detection")
 
             leidenAlgorithm.improveClustering(convertedNetwork, clustering)

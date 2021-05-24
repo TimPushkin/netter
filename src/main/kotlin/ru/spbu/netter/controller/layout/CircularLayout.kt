@@ -31,7 +31,7 @@ class CircularLayout : Controller(), SimpleLayoutMethod {
         val radius = (repulsion * sqrt(2 / (1 - cos(angle)))).takeIf { it != Double.POSITIVE_INFINITY } ?: 0.0
         var curr = Point2D(0.0, radius)
 
-        runAsync(status) {
+        runAsync(true, status) {
             updateMessage("Circular layout")
 
             List(network.nodes.size) { Point2D(curr.x, curr.y).also { curr = curr.rotated(center, angle) } }
