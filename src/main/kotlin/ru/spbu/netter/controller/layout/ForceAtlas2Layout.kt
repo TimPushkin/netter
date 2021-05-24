@@ -27,6 +27,7 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
         withScalingRatio: Double,
         withGravity: Double,
         withBarnesHutTheta: Double,
+        executeOnSuccess: () -> Unit,
     ) {
         if (network.isEmpty()) {
             logger.info { "There is nothing to lay out using ForceAtlas2: network $network is empty" }
@@ -76,7 +77,10 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
                     }
                 }
             }
+
             logger.info { "Placing nodes using ForceAtlas2 has been finished" }
+
+            executeOnSuccess()
         } fail { ex ->
             throw RuntimeException("Placing nodes using ForceAtlas2 has been failed", ex)
         }

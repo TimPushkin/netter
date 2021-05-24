@@ -9,6 +9,7 @@ interface SimpleLayoutMethod : Statusable {
     fun applyLayout(
         network: Network,
         repulsion: Double = 20.0,
+        executeOnSuccess: () -> Unit = {},
     )
 }
 
@@ -25,5 +26,6 @@ interface SmartLayoutMethod : Statusable {
         withScalingRatio: Double = 10.0,
         withGravity: Double = 1.0,
         withBarnesHutTheta: Double = 1.2,
+        executeOnSuccess: () -> Unit = {},
     )
 }

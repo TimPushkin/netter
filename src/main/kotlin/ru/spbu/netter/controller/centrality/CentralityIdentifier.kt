@@ -6,5 +6,5 @@ import ru.spbu.netter.model.Network
 
 interface CentralityIdentifier : Statusable {
 
-    fun identifyCentrality(network: Network)
+    fun identifyCentrality(network: Network, executeOnSuccess: () -> Unit = {})
 }

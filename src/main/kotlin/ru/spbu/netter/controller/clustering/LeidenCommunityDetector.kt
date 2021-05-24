@@ -21,7 +21,7 @@ private const val RANDOMNESS = 1e-2
 class LeidenCommunityDetector : Controller(), CommunityDetector {
     override val status = TaskStatus()
 
-    override fun detectCommunities(network: Network, resolution: Double) {
+    override fun detectCommunities(network: Network, resolution: Double, executeOnSuccess: () -> Unit) {
         if (network.isEmpty()) {
             logger.info { "There is nothing to inspect for communities: network $network is empty" }
             return
@@ -39,7 +39,10 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
             leidenAlgorithm.improveClustering(convertedNetwork, clustering)
         } success {
             applyClustering(network, clustering)
+
             logger.info { "Leiden community detection has been finished" }
+
+            executeOnSuccess()
         } fail { ex ->
             throw RuntimeException("Leiden community detection has been failed", ex)
         }

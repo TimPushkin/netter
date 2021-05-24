@@ -9,5 +9,6 @@ interface CommunityDetector : Statusable {
     fun detectCommunities(
         network: Network,
         resolution: Double = 0.2,
+        executeOnSuccess: () -> Unit = {},
     )
 }

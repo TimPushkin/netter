@@ -18,7 +18,7 @@ private const val CENTER_Y = 0.0
 class CircularLayout : Controller(), SimpleLayoutMethod {
     override val status = TaskStatus()
 
-    override fun applyLayout(network: Network, repulsion: Double) {
+    override fun applyLayout(network: Network, repulsion: Double, executeOnSuccess: () -> Unit) {
         if (network.isEmpty()) {
             logger.info { "There is nothing to lay out in a circle: network $network is empty" }
             return
@@ -38,7 +38,10 @@ class CircularLayout : Controller(), SimpleLayoutMethod {
                 node.x = coordinates[i].x
                 node.y = coordinates[i].y
             }
+
             logger.info { "Placing nodes in a circular shape has been finished" }
+
+            executeOnSuccess()
         } fail { ex ->
             throw RuntimeException("Placing nodes in a circular shape has been failed", ex)
         }
