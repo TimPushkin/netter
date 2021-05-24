@@ -49,8 +49,8 @@ class NavigationSpace : View() {
                     translateXProperty().bind(root.widthProperty() - widthProperty())
                     translateYProperty().bind(heightProperty() * (i + 1))
 
-                    progressbar(progress)
                     label(message)
+                    progressbar(progress)
                 }
             }
         }
