@@ -36,7 +36,7 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
         val leidenAlgorithm = LeidenAlgorithm(resolution, ITERATIONS_NUM, RANDOMNESS, Random())
 
         runAsync(status) {
-            updateMessage("Detecting communities...")
+            updateMessage("Community detection")
 
             leidenAlgorithm.improveClustering(convertedNetwork, clustering)
         } success {
