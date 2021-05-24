@@ -67,7 +67,12 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
 
             with(forceAtlas2Algorithm) {
                 initAlgo()
-                repeat(loopsNum) { goAlgo() }
+                loopsNum.toLong().let {
+                    for (i in 1..it) {
+                        updateProgress(i, it)
+                        goAlgo()
+                    }
+                }
                 endAlgo()
             }
         } success {
