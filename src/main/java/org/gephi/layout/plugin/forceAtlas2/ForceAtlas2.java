@@ -54,6 +54,7 @@
  method ensureSafeLayoutNodePositions.
  - Functionality related to the package org.openide.util is removed.
  - Dynamic edge weight support is removed.
+ - Thread pool is modified to create daemon threads.
  */
 package org.gephi.layout.plugin.forceAtlas2;
 
@@ -121,10 +122,14 @@ public class ForceAtlas2 {
             nLayout.dy = 0;
         }
 
-        pool = Executors.newFixedThreadPool(threadCount);
+        pool = Executors.newFixedThreadPool(threadCount, (Runnable r) -> {
+            Thread t = Executors.defaultThreadFactory().newThread(r);
+            t.setDaemon(true);
+            return t;
+        });
         currentThreadCount = threadCount;
     }
-    
+
     private double getEdgeWeight(Edge edge) {
         return edge.getWeight();
     }
