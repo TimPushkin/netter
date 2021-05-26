@@ -2,10 +2,9 @@ package ru.spbu.netter.view
 
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.geometry.Pos
-import javafx.scene.layout.Background
-import javafx.scene.layout.BackgroundFill
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
+import javafx.scene.shape.StrokeType
 import ru.spbu.netter.controller.*
 import ru.spbu.netter.controller.centrality.*
 import ru.spbu.netter.controller.clustering.*
@@ -43,13 +42,16 @@ class NavigationSpace : View() {
                 vbox {
                     visibleWhen { running }
 
-                    background = Background(BackgroundFill(Color.WHITE, null, null))
                     alignment = Pos.CENTER
 
                     translateXProperty().bind(root.widthProperty() - widthProperty())
                     translateYProperty().bind(heightProperty() * (i + 1))
 
-                    label(message)
+                    text(message).apply {
+                        stroke = Color.WHITESMOKE
+                        strokeType = StrokeType.OUTSIDE
+                        strokeWidth = 2.0
+                    }
                     progressbar(progress)
                 }
             }
