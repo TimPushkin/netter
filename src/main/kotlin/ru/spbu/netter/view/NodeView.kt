@@ -41,7 +41,7 @@ class NodeView(val node: Node, private val colorsNum: IntegerProperty) : Circle(
         radiusProperty().bind(Bindings.createDoubleBinding(::calculateRadius, node.centralityProperty))
 
         strokeWidthProperty().bind(Bindings.createDoubleBinding(::calculateStrokeWidth, radiusProperty()))
-        fillProperty().bind(Bindings.createObjectBinding(::calculateFillColor, colorsNum, node.communityProperty))
+        fillProperty().bind(Bindings.createObjectBinding(::calculateFillColor, colorsNum))
         strokeProperty().bind(Bindings.createObjectBinding(::calculateStrokeColor, fillProperty()))
 
         label.fillProperty().bind(Bindings.createObjectBinding(::calculateLabelColor, fillProperty()))

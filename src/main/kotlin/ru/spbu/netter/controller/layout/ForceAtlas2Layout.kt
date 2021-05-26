@@ -14,6 +14,7 @@ private val logger = KotlinLogging.logger {}
 
 
 class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
+    override val status = TaskStatus()
 
     override fun applyLayout(
         network: Network,
@@ -26,6 +27,7 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
         withScalingRatio: Double,
         withGravity: Double,
         withBarnesHutTheta: Double,
+        executeOnSuccess: () -> Unit,
     ) {
         if (network.isEmpty()) {
             logger.info { "There is nothing to lay out using ForceAtlas2: network $network is empty" }
@@ -60,22 +62,35 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
             barnesHutTheta = withBarnesHutTheta
         }
 
-        with(forceAtlas2Algorithm) {
-            initAlgo()
-            repeat(loopsNum) { goAlgo() }
-            endAlgo()
-        }
+        runAsync(true, status) {
+            updateMessage("ForceAtlas2 layout")
 
-        with(convertedNetwork.nodes) {
-            network.nodes.values.withEach {
-                get(id).let { resultingNode ->
-                    x = resultingNode.x
-                    y = resultingNode.y
+            with(forceAtlas2Algorithm) {
+                initAlgo()
+                loopsNum.toLong().let {
+                    for (i in 1..it) {
+                        updateProgress(i, it)
+                        goAlgo()
+                    }
+                }
+                endAlgo()
+            }
+        } success {
+            with(convertedNetwork.nodes) {
+                network.nodes.values.withEach {
+                    get(id).let { resultingNode ->
+                        x = resultingNode.x
+                        y = resultingNode.y
+                    }
                 }
             }
-        }
 
-        logger.info { "Placing nodes using ForceAtlas2 has been finished" }
+            logger.info { "Placing nodes using ForceAtlas2 has been finished" }
+
+            executeOnSuccess()
+        } fail { ex ->
+            throw RuntimeException("Placing nodes using ForceAtlas2 has been failed", ex)
+        }
     }
 
     private fun convertNetwork(network: Network): Graph {

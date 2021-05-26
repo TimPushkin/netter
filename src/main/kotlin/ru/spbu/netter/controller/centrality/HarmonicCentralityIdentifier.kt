@@ -6,15 +6,16 @@ import org.jgrapht.alg.scoring.HarmonicCentrality
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DefaultUndirectedGraph
 import ru.spbu.netter.model.Network
-import tornadofx.Controller
+import tornadofx.*
 
 
 private val logger = KotlinLogging.logger {}
 
 
 class HarmonicCentralityIdentifier : Controller(), CentralityIdentifier {
+    override val status = TaskStatus()
 
-    override fun identifyCentrality(network: Network) {
+    override fun identifyCentrality(network: Network, executeOnSuccess: () -> Unit) {
         if (network.isEmpty()) {
             logger.info { "There is nothing to inspect for centrality: network $network is empty" }
             return
@@ -22,13 +23,22 @@ class HarmonicCentralityIdentifier : Controller(), CentralityIdentifier {
 
         logger.info { "Identifying centrality..." }
 
-        val centralityValues = HarmonicCentrality(convertNetwork(network)).scores
-        network.nodes.values.forEach { node ->
-            centralityValues[node.id]?.let { node.centrality = it }
-                ?: throw IllegalStateException("Node ${node.id} not found in the harmonic centrality calculation result")
-        }
+        runAsync(true, status) {
+            updateMessage("Centrality identification")
 
-        logger.info { "Centrality identification has been finished" }
+            HarmonicCentrality(convertNetwork(network)).scores
+        } success { centralityValues ->
+            network.nodes.values.withEach {
+                centralityValues[id]?.let { centrality = it }
+                    ?: throw IllegalStateException("Node $id not found in the harmonic centrality calculation result")
+            }
+
+            logger.info { "Harmonic centrality identification has been finished" }
+
+            executeOnSuccess()
+        } fail { ex ->
+            throw RuntimeException("Harmonic centrality identification has been failed", ex)
+        }
     }
 
     private fun convertNetwork(network: Network): Graph<Int, DefaultEdge> {

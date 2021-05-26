@@ -1,6 +1,10 @@
 package ru.spbu.netter.view
 
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.geometry.Pos
+import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
+import javafx.scene.shape.StrokeType
 import ru.spbu.netter.controller.*
 import ru.spbu.netter.controller.centrality.*
 import ru.spbu.netter.controller.clustering.*
@@ -31,6 +35,26 @@ class NavigationSpace : View() {
         root += label("Import a network to be displayed here") {
             translateXProperty().bind((root.widthProperty() - widthProperty()) / 2)
             translateYProperty().bind((root.heightProperty() - heightProperty()) / 2)
+        }
+
+        listOf(simpleLayout, smartLayout, communityDetector, centralityIdentifier).forEachIndexed { i, statusable ->
+            root += with(statusable.status) {
+                vbox {
+                    visibleWhen { running }
+
+                    alignment = Pos.CENTER
+
+                    translateXProperty().bind(root.widthProperty() - widthProperty())
+                    translateYProperty().bind(heightProperty() * (i + 1))
+
+                    text(message).apply {
+                        stroke = Color.WHITESMOKE
+                        strokeType = StrokeType.OUTSIDE
+                        strokeWidth = 2.0
+                    }
+                    progressbar(progress)
+                }
+            }
         }
     }
 
@@ -70,19 +94,18 @@ class NavigationSpace : View() {
     }
 
     fun inspectForCommunities(resolution: Double) {
-        communityDetector.detectCommunities(networkView.network, resolution)
+        communityDetector.detectCommunities(networkView.network, resolution) { networkView.updateColorsNum() }
     }
 
     fun inspectForCentrality() {
-        centralityIdentifier.identifyCentrality(networkView.network)
-        networkView.placeNodesInCentralityOrder()
+        centralityIdentifier.identifyCentrality(networkView.network) { networkView.updateNodeOrder() }
     }
 
     private fun replaceNetworkView(newNetworkView: NetworkView) {
-        root.children.clear()
-        root += newNetworkView.apply {
+        root.children.retainAll { it is VBox }
+        root.children.add(0, newNetworkView.apply {
             translateX = root.width / 2
             translateY = root.height / 2
-        }
+        })
     }
 }

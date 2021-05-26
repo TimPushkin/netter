@@ -5,7 +5,7 @@ import nl.cwts.networkanalysis.Clustering
 import nl.cwts.networkanalysis.LeidenAlgorithm
 import nl.cwts.networkanalysis.Network as LeidenNetwork
 import ru.spbu.netter.model.Network
-import tornadofx.Controller
+import tornadofx.*
 import java.util.*
 
 
@@ -19,8 +19,9 @@ private const val RANDOMNESS = 1e-2
 
 
 class LeidenCommunityDetector : Controller(), CommunityDetector {
+    override val status = TaskStatus()
 
-    override fun detectCommunities(network: Network, resolution: Double) {
+    override fun detectCommunities(network: Network, resolution: Double, executeOnSuccess: () -> Unit) {
         if (network.isEmpty()) {
             logger.info { "There is nothing to inspect for communities: network $network is empty" }
             return
@@ -34,10 +35,19 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
         require(resolution > 0) { "Wrong resolution: resolution must be positive but was $resolution" }
         val leidenAlgorithm = LeidenAlgorithm(resolution, ITERATIONS_NUM, RANDOMNESS, Random())
 
-        leidenAlgorithm.improveClustering(convertedNetwork, clustering)
-        applyClustering(network, clustering)
+        runAsync(true, status) {
+            updateMessage("Community detection")
 
-        logger.info { "Community detection has been finished" }
+            leidenAlgorithm.improveClustering(convertedNetwork, clustering)
+        } success {
+            applyClustering(network, clustering)
+
+            logger.info { "Leiden community detection has been finished" }
+
+            executeOnSuccess()
+        } fail { ex ->
+            throw RuntimeException("Leiden community detection has been failed", ex)
+        }
     }
 
     private fun convertNetwork(network: Network): LeidenNetwork {
@@ -56,6 +66,6 @@ class LeidenCommunityDetector : Controller(), CommunityDetector {
         require(network.nodes.size == clustering.nNodes) {
             "Clustering application failed: network nodes number (${network.nodes.size}) differs from clustering nodes number (${clustering.nNodes})"
         }
-        for (node in network.nodes.values) node.community = clustering.clusters[node.id]
+        with(clustering.clusters) { for (node in network.nodes.values) node.community = get(node.id) }
     }
 }

@@ -54,7 +54,7 @@ class NetworkNavigator : Controller(), NetworkEventHandler {
 
         with((event.source as Pane).children) {
             require(isNotEmpty()) { "Unsupported event source children: children collection $this is empty" }
-            return first().takeIf { it is NetworkView } as NetworkView?
+            return find { it is NetworkView } as NetworkView?
         }
     }
 }
