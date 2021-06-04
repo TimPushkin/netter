@@ -28,68 +28,68 @@ class LeftMenu : View() {
         background = Background(BackgroundFill(Color.WHITE, null, null))
         disableProperty().bind(!navigationSpace.isNetworkImportedProperty)
 
-        fieldset("Default layout") {
-            field("Repulsion") { textfield(repulsion) }
+        fieldset(messages["FieldSet_DefaultLayout"]) {
+            field(messages["Field_Repulsion"]) { textfield(repulsion) }
 
             buttonbar {
-                button("Start").setOnAction {
+                button(messages["Button_Start"]).setOnAction {
                     if (repulsion.value.isDouble()) {
                         navigationSpace.applyDefaultLayout(repulsion.value.toDouble())
                     } else alert(
                         Alert.AlertType.INFORMATION,
-                        "Wrong repulsion input",
-                        "Repulsion must be a decimal number",
+                        messages["AlertHeader_WrongRepulsion"],
+                        messages["AlertContent_WrongRepulsion"],
                     )
                 }
             }
         }
 
-        fieldset("Smart layout") {
-            field("Loops number") { textfield(loopsNum) }
+        fieldset(messages["FieldSet_SmartLayout"]) {
+            field(messages["Field_LoopsNum"]) { textfield(loopsNum) }
 
-            checkbox("Adjust sizes", adjustSizes)
+            checkbox(messages["Checkbox_AdjustSizes"], adjustSizes)
 
-            checkbox("Barnes-Hut optimization", barnesHut)
+            checkbox(messages["Checkbox_BarnesHut"], barnesHut)
 
-            checkbox("LinLog mode", linLog)
+            checkbox(messages["Checkbox_LinLog"], linLog)
 
-            checkbox("Strong gravity mode", strongGravity)
+            checkbox(messages["Checkbox_StrongGravity"], strongGravity)
 
-            field("Jitter tolerance") { textfield(jitterTolerance) }
+            field(messages["Field_JitterTolerance"]) { textfield(jitterTolerance) }
 
-            field("Scaling ratio") { textfield(scaling) }
+            field(messages["Field_ScalingRatio"]) { textfield(scaling) }
 
-            field("Gravity") { textfield(gravity) }
+            field(messages["Field_Gravity"]) { textfield(gravity) }
 
-            field("Barnes-Hut theta") { textfield(barnesHutTheta) }
+            field(messages["Field_BarnesHutTheta"]) { textfield(barnesHutTheta) }
 
             buttonbar {
-                button("Start").setOnAction {
+                button(messages["Button_Start"]).setOnAction {
                     when {
                         !loopsNum.value.isInt() || loopsNum.value.toInt() <= 0 -> alert(
                             Alert.AlertType.INFORMATION,
-                            "Wrong loops number input",
-                            "Loops number must be a positive integer",
+                            messages["AlertHeader_WrongLoopsNum"],
+                            messages["AlertContent_WrongLoopsNum"],
                         )
                         !jitterTolerance.value.isDouble() || jitterTolerance.value.toDouble() <= 0 -> alert(
                             Alert.AlertType.INFORMATION,
-                            "Wrong jitter tolerance input",
-                            "Jitter tolerance must be a positive decimal number",
+                            messages["AlertHeader_WrongJitterTolerance"],
+                            messages["AlertContent_WrongJitterTolerance"],
                         )
                         !scaling.value.isDouble() || scaling.value.toDouble() <= 0 -> alert(
                             Alert.AlertType.INFORMATION,
-                            "Wrong scaling input",
-                            "Scaling must be a positive decimal number",
+                            messages["AlertHeader_WrongScalingRatio"],
+                            messages["AlertContent_WrongScalingRatio"],
                         )
                         !gravity.value.isDouble() -> alert(
                             Alert.AlertType.INFORMATION,
-                            "Wrong gravity input",
-                            "Gravity must be a decimal number",
+                            messages["AlertHeader_WrongGravity"],
+                            messages["AlertContent_WrongGravity"],
                         )
                         !barnesHutTheta.value.isDouble() -> alert(
                             Alert.AlertType.INFORMATION,
-                            "Wrong Barnes-Hut theta input",
-                            "Barnes-Hut theta must be a decimal number",
+                            messages["AlertHeader_WrongBarnesHutTheta"],
+                            messages["AlertContent_WrongBarnesHutTheta"],
                         )
                         else -> navigationSpace.applySmartLayout(
                             loopsNum.value.toInt(),

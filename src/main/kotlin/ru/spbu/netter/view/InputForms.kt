@@ -18,36 +18,36 @@ class UriCredentialsInputForm : Fragment("URI credentials input") {
 
     override val root = form {
         fieldset {
-            field("URI:") {
+            field(messages["Field_URI"]) {
                 enteredUri = textfield()
             }
 
-            field("Username:") {
+            field(messages["Field_Username"]) {
                 enteredUsername = textfield()
             }
 
-            field("Password:") {
+            field(messages["Field_Password"]) {
                 enteredPassword = passwordfield()
             }
         }
 
         buttonbar {
-            button("OK").setOnAction {
+            button(messages["Button_OK"]).setOnAction {
                 when {
                     enteredUri.text.isEmpty() -> alert(
                         Alert.AlertType.INFORMATION,
-                        "Wrong URI input",
-                        "URI cannot be empty",
+                        messages["AlertHeader_WrongURI"],
+                        messages["AlertContent_WrongURI"],
                     )
                     enteredUsername.text.isEmpty() -> alert(
                         Alert.AlertType.INFORMATION,
-                        "Wrong username input",
-                        "Username cannot be empty",
+                        messages["AlertHeader_WrongUsername"],
+                        messages["AlertContent_WrongUsername"],
                     )
                     enteredPassword.text.isEmpty() -> alert(
                         Alert.AlertType.INFORMATION,
-                        "Wrong password input",
-                        "Password cannot be empty",
+                        messages["AlertHeader_WrongPassword"],
+                        messages["AlertContent_WrongPassword"],
                     )
                     else -> {
                         uri.value = enteredUri.text
@@ -68,20 +68,20 @@ class ResolutionInputForm : Fragment("Resolution input") {
 
     override val root = form {
         fieldset {
-            field("Enter resolution:") {
+            field(messages["Field_Resolution"]) {
                 enteredResolution = textfield("0.2")
             }
         }
 
         buttonbar {
-            button("OK").setOnAction {
+            button(messages["Button_OK"]).setOnAction {
                 if (enteredResolution.text.isDouble() && enteredResolution.text.toDouble() > 0) {
                     resolution.value = enteredResolution.text
                     close()
                 } else alert(
                     Alert.AlertType.INFORMATION,
-                    "Wrong resolution input",
-                    "Resolution must be a positive decimal number",
+                    messages["AlertHeader_WrongResolution"],
+                    messages["AlertContent_WrongResolution"],
                 )
             }
         }

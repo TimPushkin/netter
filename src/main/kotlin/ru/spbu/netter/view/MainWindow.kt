@@ -5,6 +5,7 @@ import javafx.scene.control.Alert
 import ru.spbu.netter.controller.io.*
 import ru.spbu.netter.model.*
 import tornadofx.*
+import java.util.*
 
 
 class MainWindow : View("Netter") {
@@ -20,40 +21,54 @@ class MainWindow : View("Netter") {
         center<NavigationSpace>()
 
         top = menubar {
-            menu("File") {
-                menu("Import") {
-                    item("As plain text").action { importFromFile(txtIOHandler) }
+            menu(messages["Menu_File"]) {
+                menu(messages["Menu_Import"]) {
+                    item(messages["MenuItem_TextIO"]).action { importFromFile(txtIOHandler) }
 
-                    item("As Neo4j database").action { importFromUri(neo4jIOHandler) }
+                    item(messages["MenuItem_Neo4jIO"]).action { importFromUri(neo4jIOHandler) }
 
-                    item("As SQLite database").action { importFromFile(sqliteIHandler) }
+                    item(messages["MenuItem_SQLiteIO"]).action { importFromFile(sqliteIHandler) }
                 }
 
-                menu("Export") {
+                menu(messages["Menu_Export"]) {
                     disableProperty().bind(!navigationSpace.isNetworkImportedProperty)
 
-                    item("As plain text").action { exportFromFile(txtIOHandler) }
+                    item(messages["MenuItem_TextIO"]).action { exportFromFile(txtIOHandler) }
 
-                    item("As Neo4j database").action { exportFromUri(neo4jIOHandler) }
+                    item(messages["MenuItem_Neo4jIO"]).action { exportFromUri(neo4jIOHandler) }
 
-                    item("As SQLite database").action { exportFromFile(sqliteIHandler) }
+                    item(messages["MenuItem_SQLiteIO"]).action { exportFromFile(sqliteIHandler) }
                 }
             }
 
-            menu("Network") {
+            menu(messages["Menu_Network"]) {
                 disableProperty().bind(!navigationSpace.isNetworkImportedProperty)
 
-                item("Inspect for communities").action {
+                item(messages["MenuItem_CommunityInspection"]).action {
                     getResolution()?.let { navigationSpace.inspectForCommunities(it) }
                 }
 
-                item("Inspect for centrality").action {
+                item(messages["MenuItem_CentralityInspection"]).action {
                     navigationSpace.inspectForCentrality()
                 }
             }
 
-            menu("Help") {
-                item("Netter at GitHub").action { hostServices.showDocument("https://github.com/TimPushkin/netter") }
+            menu(messages["Menu_Appearance"]) {
+                menu(messages["Menu_Language"]) {
+                    item(messages["MenuItem_English"]).action {
+                        FX.locale = Locale.ENGLISH
+                        scene.findUIComponents().forEach { FX.replaceComponent(it) }
+                    }
+
+                    item(messages["MenuItem_Russian"]).action {
+                        FX.locale = Locale("ru")
+                        scene.findUIComponents().forEach { FX.replaceComponent(it) }
+                    }
+                }
+            }
+
+            menu(messages["Menu_Help"]) {
+                item(messages["MenuItem_NetterGitHub"]).action { hostServices.showDocument("https://github.com/TimPushkin/netter") }
             }
         }
 
@@ -91,10 +106,18 @@ class MainWindow : View("Netter") {
     // IO using a file
 
     private fun importFromFile(fileIOHandler: FileIOHandler) {
-        val file = chooseFile("Select a file to import...", emptyArray(), mode = FileChooserMode.Single).firstOrNull()
+        val file = chooseFile(
+            messages["FileChooser_ImportSelection"],
+            emptyArray(),
+            mode = FileChooserMode.Single
+        ).firstOrNull()
 
         if (file == null) {
-            alert(Alert.AlertType.INFORMATION, "No file selected", "You need to select a file to import")
+            alert(
+                Alert.AlertType.INFORMATION,
+                messages["AlertHeader_NoFileSelected"],
+                messages["AlertContent_NoFileSelectedImport"]
+            )
             return
         }
 
@@ -102,7 +125,7 @@ class MainWindow : View("Netter") {
         try {
             fileIOHandler.importNetwork(network, file)
         } catch (ex: HandledIOException) {
-            alert(Alert.AlertType.ERROR, "Network import failed", ex.localizedMessage)
+            alert(Alert.AlertType.ERROR, messages["AlertHeader_ImportFailed"], ex.localizedMessage)
             return
         }
 
@@ -110,17 +133,25 @@ class MainWindow : View("Netter") {
     }
 
     private fun exportFromFile(fileIOHandler: FileIOHandler) {
-        val file = chooseFile("Select a file for export...", emptyArray(), mode = FileChooserMode.Single).firstOrNull()
+        val file = chooseFile(
+            messages["FileChooser_ExportSelection"],
+            emptyArray(),
+            mode = FileChooserMode.Single
+        ).firstOrNull()
 
         if (file == null) {
-            alert(Alert.AlertType.INFORMATION, "No file selected", "You need to select a file for export")
+            alert(
+                Alert.AlertType.INFORMATION,
+                messages["AlertHeader_NoFileSelected"],
+                messages["AlertContent_NoFileSelectedExport"]
+            )
             return
         }
 
         try {
             fileIOHandler.exportNetwork(navigationSpace.networkView.network, file)
         } catch (ex: HandledIOException) {
-            alert(Alert.AlertType.ERROR, "Network export failed", ex.localizedMessage)
+            alert(Alert.AlertType.ERROR, messages["AlertHeader_ExportFailed"], ex.localizedMessage)
         }
     }
 
@@ -132,8 +163,8 @@ class MainWindow : View("Netter") {
         if (uri == null || username == null || password == null) {
             alert(
                 Alert.AlertType.INFORMATION,
-                "Credentials not provided",
-                "You need to provide all credentials to import from URI",
+                messages["AlertHeader_NoCredentials"],
+                messages["AlertContent_NoCredentialsImport"]
             )
             return
         }
@@ -142,7 +173,7 @@ class MainWindow : View("Netter") {
         try {
             uriIOHandler.importNetwork(network, uri, username, password)
         } catch (ex: HandledIOException) {
-            alert(Alert.AlertType.ERROR, "Network import failed", ex.localizedMessage)
+            alert(Alert.AlertType.ERROR, messages["AlertHeader_ImportFailed"], ex.localizedMessage)
             return
         }
 
@@ -155,8 +186,8 @@ class MainWindow : View("Netter") {
         if (uri == null || username == null || password == null) {
             alert(
                 Alert.AlertType.INFORMATION,
-                "Credentials not provided",
-                "You need to provide all credentials to import from URI",
+                messages["AlertHeader_NoCredentials"],
+                messages["AlertContent_NoCredentialsExport"]
             )
             return
         }
@@ -164,7 +195,7 @@ class MainWindow : View("Netter") {
         try {
             uriIOHandler.exportNetwork(navigationSpace.networkView.network, uri, username, password)
         } catch (ex: HandledIOException) {
-            alert(Alert.AlertType.ERROR, "Network export failed", ex.localizedMessage)
+            alert(Alert.AlertType.ERROR, messages["AlertHeader_ExportFailed"], ex.localizedMessage)
         }
     }
 }

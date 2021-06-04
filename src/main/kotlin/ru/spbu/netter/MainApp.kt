@@ -5,4 +5,4 @@ import ru.spbu.netter.view.MainWindow
 import tornadofx.*
 
 
-class MainApp : App(Image("file:src/main/resources/icon.png"), MainWindow::class)
+class MainApp : App(Image("file:src/main/resources/drawable/icon.png"), MainWindow::class)

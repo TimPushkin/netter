@@ -32,7 +32,7 @@ class NavigationSpace : View() {
     }
 
     init {
-        root += label("Import a network to be displayed here") {
+        root += label(messages["Label_ImportNetwork"]) {
             translateXProperty().bind((root.widthProperty() - widthProperty()) / 2)
             translateYProperty().bind((root.heightProperty() - heightProperty()) / 2)
         }
