@@ -63,7 +63,7 @@ class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
         }
 
         runAsync(true, status) {
-            updateMessage("ForceAtlas2 layout")
+            updateMessage(messages["ProgressMessage"])
 
             with(forceAtlas2Algorithm) {
                 initAlgo()

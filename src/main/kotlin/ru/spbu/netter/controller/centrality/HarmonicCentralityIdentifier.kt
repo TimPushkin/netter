@@ -24,7 +24,7 @@ class HarmonicCentralityIdentifier : Controller(), CentralityIdentifier {
         logger.info { "Identifying centrality..." }
 
         runAsync(true, status) {
-            updateMessage("Centrality identification")
+            updateMessage(messages["ProgressMessage"])
 
             HarmonicCentrality(convertNetwork(network)).scores
         } success { centralityValues ->

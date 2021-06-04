@@ -32,7 +32,7 @@ class CircularLayout : Controller(), SimpleLayoutMethod {
         var curr = Point2D(0.0, radius)
 
         runAsync(true, status) {
-            updateMessage("Circular layout")
+            updateMessage(messages["ProgressMessage"])
 
             List(network.nodes.size) { Point2D(curr.x, curr.y).also { curr = curr.rotated(center, angle) } }
         } success { coordinates ->
