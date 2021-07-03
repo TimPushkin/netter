@@ -5,6 +5,7 @@ import javafx.scene.control.Alert
 import javafx.scene.control.PasswordField
 import javafx.scene.control.TextField
 import tornadofx.*
+import java.util.*
 
 
 class UriCredentialsInputForm : Fragment("URI credentials input") {
@@ -16,23 +17,29 @@ class UriCredentialsInputForm : Fragment("URI credentials input") {
     private lateinit var enteredUsername: TextField
     private lateinit var enteredPassword: PasswordField
 
+    init {
+        FX.localeProperty().onChange {
+            messages = ResourceBundle.getBundle(FX.messagesNameProvider(javaClass), FX.locale)
+        }
+    }
+
     override val root = form {
         fieldset {
-            field(messages["Field_URI"]) {
+            field({ messages["Field_URI"] }) {
                 enteredUri = textfield()
             }
 
-            field(messages["Field_Username"]) {
+            field({ messages["Field_Username"] }) {
                 enteredUsername = textfield()
             }
 
-            field(messages["Field_Password"]) {
+            field({ messages["Field_Password"] }) {
                 enteredPassword = passwordfield()
             }
         }
 
         buttonbar {
-            button(messages["Button_OK"]).setOnAction {
+            button({ messages["Button_OK"] }).setOnAction {
                 when {
                     enteredUri.text.isEmpty() -> alert(
                         Alert.AlertType.INFORMATION,
@@ -66,15 +73,21 @@ class ResolutionInputForm : Fragment("Resolution input") {
 
     private lateinit var enteredResolution: TextField
 
+    init {
+        FX.localeProperty().onChange {
+            messages = ResourceBundle.getBundle(FX.messagesNameProvider(javaClass), FX.locale)
+        }
+    }
+
     override val root = form {
         fieldset {
-            field(messages["Field_Resolution"]) {
+            field({ messages["Field_Resolution"] }) {
                 enteredResolution = textfield("0.2")
             }
         }
 
         buttonbar {
-            button(messages["Button_OK"]).setOnAction {
+            button({ messages["Button_OK"] }).setOnAction {
                 if (enteredResolution.text.isDouble() && enteredResolution.text.toDouble() > 0) {
                     resolution.value = enteredResolution.text
                     close()

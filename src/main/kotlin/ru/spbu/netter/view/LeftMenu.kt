@@ -7,6 +7,7 @@ import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
 import javafx.scene.paint.Color
 import tornadofx.*
+import java.util.*
 
 
 class LeftMenu : View() {
@@ -24,15 +25,21 @@ class LeftMenu : View() {
     private val gravity = SimpleStringProperty(this, "gravity", "1.0")
     private val barnesHutTheta = SimpleStringProperty(this, "barnesHutTheta", "1.2")
 
+    init {
+        FX.localeProperty().onChange {
+            messages = ResourceBundle.getBundle(FX.messagesNameProvider(javaClass), FX.locale)
+        }
+    }
+
     override val root = form {
         background = Background(BackgroundFill(Color.WHITE, null, null))
         disableProperty().bind(!navigationSpace.isNetworkImportedProperty)
 
-        fieldset(messages["FieldSet_DefaultLayout"]) {
-            field(messages["Field_Repulsion"]) { textfield(repulsion) }
+        fieldset({ messages["FieldSet_DefaultLayout"] }) {
+            field({ messages["Field_Repulsion"] }) { textfield(repulsion) }
 
             buttonbar {
-                button(messages["Button_Start"]).setOnAction {
+                button({ messages["Button_Start"] }).setOnAction {
                     if (repulsion.value.isDouble()) {
                         navigationSpace.applyDefaultLayout(repulsion.value.toDouble())
                     } else alert(
@@ -44,27 +51,27 @@ class LeftMenu : View() {
             }
         }
 
-        fieldset(messages["FieldSet_SmartLayout"]) {
-            field(messages["Field_LoopsNum"]) { textfield(loopsNum) }
+        fieldset({ messages["FieldSet_SmartLayout"] }) {
+            field({ messages["Field_LoopsNum"] }) { textfield(loopsNum) }
 
-            checkbox(messages["Checkbox_AdjustSizes"], adjustSizes)
+            checkbox({ messages["Checkbox_AdjustSizes"] }, adjustSizes)
 
-            checkbox(messages["Checkbox_BarnesHut"], barnesHut)
+            checkbox({ messages["Checkbox_BarnesHut"] }, barnesHut)
 
-            checkbox(messages["Checkbox_LinLog"], linLog)
+            checkbox({ messages["Checkbox_LinLog"] }, linLog)
 
-            checkbox(messages["Checkbox_StrongGravity"], strongGravity)
+            checkbox({ messages["Checkbox_StrongGravity"] }, strongGravity)
 
-            field(messages["Field_JitterTolerance"]) { textfield(jitterTolerance) }
+            field({ messages["Field_JitterTolerance"] }) { textfield(jitterTolerance) }
 
-            field(messages["Field_ScalingRatio"]) { textfield(scaling) }
+            field({ messages["Field_ScalingRatio"] }) { textfield(scaling) }
 
-            field(messages["Field_Gravity"]) { textfield(gravity) }
+            field({ messages["Field_Gravity"] }) { textfield(gravity) }
 
-            field(messages["Field_BarnesHutTheta"]) { textfield(barnesHutTheta) }
+            field({ messages["Field_BarnesHutTheta"] }) { textfield(barnesHutTheta) }
 
             buttonbar {
-                button(messages["Button_Start"]).setOnAction {
+                button({ messages["Button_Start"] }).setOnAction {
                     when {
                         !loopsNum.value.isInt() || loopsNum.value.toInt() <= 0 -> alert(
                             Alert.AlertType.INFORMATION,

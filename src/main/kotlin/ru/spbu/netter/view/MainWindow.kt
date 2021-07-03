@@ -15,60 +15,60 @@ class MainWindow : View("Netter") {
     private val neo4jIOHandler: UriIOHandler by inject<Neo4jIOHandler>()
     private val sqliteIHandler: FileIOHandler by inject<SQLiteIOHandler>()
 
+    init {
+        FX.localeProperty().onChange {
+            messages = ResourceBundle.getBundle(FX.messagesNameProvider(javaClass), FX.locale)
+        }
+    }
+
     override val root = borderpane {
         setPrefSize(960.0, 540.0)
 
         center<NavigationSpace>()
 
         top = menubar {
-            menu(messages["Menu_File"]) {
-                menu(messages["Menu_Import"]) {
-                    item(messages["MenuItem_TextIO"]).action { importFromFile(txtIOHandler) }
+            menu({ messages["Menu_File"] }) {
+                menu({ messages["Menu_Import"] }) {
+                    item({ messages["MenuItem_TextIO"] }).action { importFromFile(txtIOHandler) }
 
-                    item(messages["MenuItem_Neo4jIO"]).action { importFromUri(neo4jIOHandler) }
+                    item({ messages["MenuItem_Neo4jIO"] }).action { importFromUri(neo4jIOHandler) }
 
-                    item(messages["MenuItem_SQLiteIO"]).action { importFromFile(sqliteIHandler) }
+                    item({ messages["MenuItem_SQLiteIO"] }).action { importFromFile(sqliteIHandler) }
                 }
 
-                menu(messages["Menu_Export"]) {
+                menu({ messages["Menu_Export"] }) {
                     disableProperty().bind(!navigationSpace.isNetworkImportedProperty)
 
-                    item(messages["MenuItem_TextIO"]).action { exportFromFile(txtIOHandler) }
+                    item({ messages["MenuItem_TextIO"] }).action { exportFromFile(txtIOHandler) }
 
-                    item(messages["MenuItem_Neo4jIO"]).action { exportFromUri(neo4jIOHandler) }
+                    item({ messages["MenuItem_Neo4jIO"] }).action { exportFromUri(neo4jIOHandler) }
 
-                    item(messages["MenuItem_SQLiteIO"]).action { exportFromFile(sqliteIHandler) }
+                    item({ messages["MenuItem_SQLiteIO"] }).action { exportFromFile(sqliteIHandler) }
                 }
             }
 
-            menu(messages["Menu_Network"]) {
+            menu({ messages["Menu_Network"] }) {
                 disableProperty().bind(!navigationSpace.isNetworkImportedProperty)
 
-                item(messages["MenuItem_CommunityInspection"]).action {
+                item({ messages["MenuItem_CommunityInspection"] }).action {
                     getResolution()?.let { navigationSpace.inspectForCommunities(it) }
                 }
 
-                item(messages["MenuItem_CentralityInspection"]).action {
+                item({ messages["MenuItem_CentralityInspection"] }).action {
                     navigationSpace.inspectForCentrality()
                 }
             }
 
-            menu(messages["Menu_Appearance"]) {
-                menu(messages["Menu_Language"]) {
-                    item(messages["MenuItem_English"]).action {
-                        FX.locale = Locale.ENGLISH
-                        scene.findUIComponents().forEach { FX.replaceComponent(it) }
-                    }
+            menu({ messages["Menu_Appearance"] }) {
+                menu({ messages["Menu_Language"] }) {
+                    item({ messages["MenuItem_English"] }).action { FX.locale = Locale("en") }
 
-                    item(messages["MenuItem_Russian"]).action {
-                        FX.locale = Locale("ru")
-                        scene.findUIComponents().forEach { FX.replaceComponent(it) }
-                    }
+                    item({ messages["MenuItem_Russian"] }).action { FX.locale = Locale("ru") }
                 }
             }
 
-            menu(messages["Menu_Help"]) {
-                item(messages["MenuItem_NetterGitHub"]).action { hostServices.showDocument("https://github.com/TimPushkin/netter") }
+            menu({ messages["Menu_Help"] }) {
+                item({ messages["MenuItem_NetterGitHub"] }).action { hostServices.showDocument("https://github.com/TimPushkin/netter") }
             }
         }
 

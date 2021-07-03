@@ -11,6 +11,7 @@ import ru.spbu.netter.controller.clustering.*
 import ru.spbu.netter.controller.layout.*
 import ru.spbu.netter.model.Network
 import tornadofx.*
+import java.util.*
 
 
 class NavigationSpace : View() {
@@ -32,7 +33,11 @@ class NavigationSpace : View() {
     }
 
     init {
-        root += label(messages["Label_ImportNetwork"]) {
+        FX.localeProperty().onChange {
+            messages = ResourceBundle.getBundle(FX.messagesNameProvider(javaClass), FX.locale)
+        }
+
+        root += label({ messages["Label_ImportNetwork"] }) {
             translateXProperty().bind((root.widthProperty() - widthProperty()) / 2)
             translateYProperty().bind((root.heightProperty() - heightProperty()) / 2)
         }
