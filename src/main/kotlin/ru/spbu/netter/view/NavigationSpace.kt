@@ -107,7 +107,7 @@ class NavigationSpace : View() {
     private fun replaceNetworkView(newNetworkView: NetworkView) {
         root.children.retainAll { it is VBox }
         root.children.add(0, newNetworkView.apply {
-            // When NavigationSpace gets reloaded, its root's sizes are not yet updated, so 'onChangeOnce' is used
+            // After NavigationSpace gets reloaded, its root's sizes don't update instantly, so 'onChangeOnce' is used
 
             if (root.width != 0.0) translateX = root.width / 2
             else root.widthProperty().onChangeOnce { translateX = root.width / 2 }

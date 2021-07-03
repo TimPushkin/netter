@@ -199,7 +199,7 @@ class MainWindow : View("Netter") {
         }
     }
 
-    // Reload the window (the loaded network, if any, is saved)
+    // Reload the window (the loaded network, if any, is retained)
 
     private fun reload() {
         if (navigationSpace.isNetworkImported) {
