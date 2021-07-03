@@ -55,15 +55,9 @@ class MainWindow : View("Netter") {
 
             menu(messages["Menu_Appearance"]) {
                 menu(messages["Menu_Language"]) {
-                    item(messages["MenuItem_English"]).action {
-                        FX.locale = Locale.ENGLISH
-                        reload()
-                    }
+                    item(messages["MenuItem_English"]).action { updateLocale(Locale.ENGLISH) }
 
-                    item(messages["MenuItem_Russian"]).action {
-                        FX.locale = Locale("ru")
-                        reload()
-                    }
+                    item(messages["MenuItem_Russian"]).action { updateLocale(Locale("ru")) }
                 }
             }
 
@@ -199,9 +193,11 @@ class MainWindow : View("Netter") {
         }
     }
 
-    // Reload the window (the loaded network, if any, is retained)
+    // I18n
 
-    private fun reload() {
+    private fun updateLocale(locale: Locale) {
+        FX.locale = locale
+
         if (navigationSpace.isNetworkImported) {
             val network = navigationSpace.network
             root.scene.findUIComponents().forEach { FX.replaceComponent(it) }
