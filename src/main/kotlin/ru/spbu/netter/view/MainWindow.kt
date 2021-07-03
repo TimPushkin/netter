@@ -57,12 +57,12 @@ class MainWindow : View("Netter") {
                 menu(messages["Menu_Language"]) {
                     item(messages["MenuItem_English"]).action {
                         FX.locale = Locale.ENGLISH
-                        scene.findUIComponents().forEach { FX.replaceComponent(it) }
+                        reload()
                     }
 
                     item(messages["MenuItem_Russian"]).action {
                         FX.locale = Locale("ru")
-                        scene.findUIComponents().forEach { FX.replaceComponent(it) }
+                        reload()
                     }
                 }
             }
@@ -129,7 +129,7 @@ class MainWindow : View("Netter") {
             return
         }
 
-        navigationSpace.initNetworkView(network)
+        navigationSpace.network = network
     }
 
     private fun exportFromFile(fileIOHandler: FileIOHandler) {
@@ -149,7 +149,7 @@ class MainWindow : View("Netter") {
         }
 
         try {
-            fileIOHandler.exportNetwork(navigationSpace.networkView.network, file)
+            fileIOHandler.exportNetwork(navigationSpace.network, file)
         } catch (ex: HandledIOException) {
             alert(Alert.AlertType.ERROR, messages["AlertHeader_ExportFailed"], ex.localizedMessage)
         }
@@ -177,7 +177,7 @@ class MainWindow : View("Netter") {
             return
         }
 
-        navigationSpace.initNetworkView(network)
+        navigationSpace.network = network
     }
 
     private fun exportFromUri(uriIOHandler: UriIOHandler) {
@@ -193,9 +193,19 @@ class MainWindow : View("Netter") {
         }
 
         try {
-            uriIOHandler.exportNetwork(navigationSpace.networkView.network, uri, username, password)
+            uriIOHandler.exportNetwork(navigationSpace.network, uri, username, password)
         } catch (ex: HandledIOException) {
             alert(Alert.AlertType.ERROR, messages["AlertHeader_ExportFailed"], ex.localizedMessage)
         }
+    }
+
+    // Reload the window (the loaded network, if any, is saved)
+
+    private fun reload() {
+        if (navigationSpace.isNetworkImported) {
+            val network = navigationSpace.network
+            root.scene.findUIComponents().forEach { FX.replaceComponent(it) }
+            navigationSpace.network = network
+        } else root.scene.findUIComponents().forEach { FX.replaceComponent(it) }
     }
 }

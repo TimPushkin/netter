@@ -14,9 +14,18 @@ import tornadofx.*
 
 
 class NavigationSpace : View() {
-    lateinit var networkView: NetworkView
+    private lateinit var networkView: NetworkView
+
+    var network: Network
+        get() = networkView.network
+        set(value) {
+            networkView = NetworkView(value)
+            isNetworkImported = true
+            replaceNetworkView(networkView)
+        }
+
     val isNetworkImportedProperty = SimpleBooleanProperty(this, "isNetworkImported", false)
-    private var isNetworkImported by isNetworkImportedProperty
+    var isNetworkImported by isNetworkImportedProperty
 
     private val simpleLayout: SimpleLayoutMethod by inject<CircularLayout>()
     private val smartLayout: SmartLayoutMethod by inject<ForceAtlas2Layout>()
@@ -56,12 +65,6 @@ class NavigationSpace : View() {
                 }
             }
         }
-    }
-
-    fun initNetworkView(network: Network) {
-        networkView = NetworkView(network)
-        isNetworkImported = true
-        replaceNetworkView(networkView)
     }
 
     fun applyDefaultLayout(repulsion: Double) {
@@ -104,8 +107,13 @@ class NavigationSpace : View() {
     private fun replaceNetworkView(newNetworkView: NetworkView) {
         root.children.retainAll { it is VBox }
         root.children.add(0, newNetworkView.apply {
-            translateX = root.width / 2
-            translateY = root.height / 2
+            // When NavigationSpace gets reloaded, its root's sizes are not yet updated, so 'onChangeOnce' is used
+
+            if (root.width != 0.0) translateX = root.width / 2
+            else root.widthProperty().onChangeOnce { translateX = root.width / 2 }
+
+            if (root.height != 0.0) translateY = root.height / 2
+            else root.heightProperty().onChangeOnce { translateY = root.height / 2 }
         })
     }
 }
