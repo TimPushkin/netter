@@ -8,6 +8,7 @@ import org.gephi.layout.plugin.forceAtlas2.ForceAtlas2
 import org.gephi.layout.plugin.forceAtlas2.ForceAtlas2LayoutData
 import ru.spbu.netter.model.Network
 import tornadofx.*
+import java.util.*
 
 
 private val logger = KotlinLogging.logger {}
@@ -15,6 +16,12 @@ private val logger = KotlinLogging.logger {}
 
 class ForceAtlas2Layout : Controller(), SmartLayoutMethod {
     override val status = TaskStatus()
+
+    init {
+        FX.localeProperty().onChange {
+            messages = ResourceBundle.getBundle(FX.messagesNameProvider(javaClass), FX.locale)
+        }
+    }
 
     override fun applyLayout(
         network: Network,

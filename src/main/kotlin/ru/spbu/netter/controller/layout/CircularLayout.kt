@@ -4,6 +4,7 @@ import ru.spbu.netter.model.Network
 import javafx.geometry.Point2D
 import mu.KotlinLogging
 import tornadofx.*
+import java.util.*
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -17,6 +18,12 @@ private const val CENTER_Y = 0.0
 
 class CircularLayout : Controller(), SimpleLayoutMethod {
     override val status = TaskStatus()
+
+    init {
+        FX.localeProperty().onChange {
+            messages = ResourceBundle.getBundle(FX.messagesNameProvider(javaClass), FX.locale)
+        }
+    }
 
     override fun applyLayout(network: Network, repulsion: Double, executeOnSuccess: () -> Unit) {
         if (network.isEmpty()) {

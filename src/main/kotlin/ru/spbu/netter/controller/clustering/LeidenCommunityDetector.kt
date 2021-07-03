@@ -21,6 +21,12 @@ private const val RANDOMNESS = 1e-2
 class LeidenCommunityDetector : Controller(), CommunityDetector {
     override val status = TaskStatus()
 
+    init {
+        FX.localeProperty().onChange {
+            messages = ResourceBundle.getBundle(FX.messagesNameProvider(javaClass), FX.locale)
+        }
+    }
+
     override fun detectCommunities(network: Network, resolution: Double, executeOnSuccess: () -> Unit) {
         if (network.isEmpty()) {
             logger.info { "There is nothing to inspect for communities: network $network is empty" }

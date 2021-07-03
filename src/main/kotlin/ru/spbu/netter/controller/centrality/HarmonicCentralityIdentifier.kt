@@ -7,6 +7,7 @@ import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DefaultUndirectedGraph
 import ru.spbu.netter.model.Network
 import tornadofx.*
+import java.util.*
 
 
 private val logger = KotlinLogging.logger {}
@@ -14,6 +15,12 @@ private val logger = KotlinLogging.logger {}
 
 class HarmonicCentralityIdentifier : Controller(), CentralityIdentifier {
     override val status = TaskStatus()
+
+    init {
+        FX.localeProperty().onChange {
+            messages = ResourceBundle.getBundle(FX.messagesNameProvider(javaClass), FX.locale)
+        }
+    }
 
     override fun identifyCentrality(network: Network, executeOnSuccess: () -> Unit) {
         if (network.isEmpty()) {
