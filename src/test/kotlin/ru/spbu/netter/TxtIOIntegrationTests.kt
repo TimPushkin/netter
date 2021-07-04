@@ -1,8 +1,14 @@
 package ru.spbu.netter
 
+import javafx.application.Platform
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.until
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -14,18 +20,20 @@ import ru.spbu.netter.controller.io.*
 import ru.spbu.netter.controller.layout.*
 import ru.spbu.netter.model.*
 import java.io.File
+import kotlin.reflect.KCallable
 import kotlin.streams.asStream
 
 
+@TestInstance(Lifecycle.PER_CLASS)
 internal class TxtIOIntegrationTests {
     lateinit var network: Network
 
     private val txtIOHandler: FileIOHandler = TxtIOHandler()
 
-    private val simpleLayout: SimpleLayoutMethod = CircularLayout()
-    private val smartLayout: SmartLayoutMethod = ForceAtlas2Layout()
-    private val communityDetector: CommunityDetector = LeidenCommunityDetector()
-    private val centralityIdentifier: CentralityIdentifier = HarmonicCentralityIdentifier()
+    private val simpleLayout = CircularLayout()
+    private val smartLayout = ForceAtlas2Layout()
+    private val communityDetector = LeidenCommunityDetector()
+    private val centralityIdentifier = HarmonicCentralityIdentifier()
 
     companion object {
         // Txt IO constants
@@ -102,8 +110,12 @@ internal class TxtIOIntegrationTests {
         return Pair(nodes, links)
     }
 
-    private fun assertCorrectExportWithActions(network: Network, vararg actions: (Network) -> Unit) {
-        for (applyAction in actions) applyAction(network)
+    private fun assertCorrectExportWithActions(network: Network, vararg actions: KCallable<Unit>) {
+        val flags = MutableList(actions.size) { false }
+        actions.forEachIndexed { i, action ->
+            with(action) { callBy(mapOf(parameters.first() to network, parameters.last() to { flags[i] = true })) }
+        }
+        await until { flags.all { it } }
 
         val expectedNodes = network.getSimpleNodes()
         val expectedLinks = network.getLinksAsPairs()
@@ -119,6 +131,11 @@ internal class TxtIOIntegrationTests {
     }
 
     // Tests
+
+    @BeforeAll
+    fun startUp() {
+        Platform.startup {}
+    }
 
     @BeforeEach
     fun setUp() {
