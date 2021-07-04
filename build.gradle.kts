@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     application
-    kotlin("jvm") version "1.4.32"
+    kotlin("jvm") version "1.5.20"
     id("org.openjfx.javafxplugin") version "0.0.9"
 }
 
@@ -19,6 +19,8 @@ dependencies {
 
     testImplementation(platform("org.junit:junit-bom:5.7.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+
+    testImplementation("org.awaitility:awaitility-kotlin:4.1.0")
 
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.6")
     implementation("org.slf4j:slf4j-simple:1.7.30")
