@@ -3,6 +3,8 @@ package ru.spbu.netter
 import javafx.application.Platform
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
+import org.awaitility.kotlin.withPollInterval
+import org.awaitility.pollinterval.FibonacciPollInterval.fibonacci
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -115,7 +117,7 @@ internal class TxtIOIntegrationTests {
         actions.forEachIndexed { i, action ->
             with(action) { callBy(mapOf(parameters.first() to network, parameters.last() to { flags[i] = true })) }
         }
-        await until { flags.all { it } }
+        await withPollInterval fibonacci() until { flags.all { it } }
 
         val expectedNodes = network.getSimpleNodes()
         val expectedLinks = network.getLinksAsPairs()
