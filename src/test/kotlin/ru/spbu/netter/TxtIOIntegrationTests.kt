@@ -46,7 +46,7 @@ internal class TxtIOIntegrationTests {
 
         private const val PARAMETERIZED_TEST_NAME = "{displayName} <-- {arguments}"
 
-        private val OUTPUT_FILE = File("out/test/txt-integration-test.txt")
+        private val OUTPUT_FILE = File("build/test-outputs/txt-integration-test.txt")
         private val INPUT_FILES = File("src/test/resources/txt-inputs/").listFiles() ?: emptyArray<File>()
 
         object InputsProvider : ArgumentsProvider {
