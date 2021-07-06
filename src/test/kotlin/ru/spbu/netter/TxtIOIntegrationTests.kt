@@ -1,12 +1,10 @@
 package ru.spbu.netter
 
-import javafx.application.Platform
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
 import org.awaitility.kotlin.withPollInterval
 import org.awaitility.pollinterval.FibonacciPollInterval.fibonacci
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.TestInstance
@@ -16,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
+import org.testfx.framework.junit5.ApplicationTest
 import ru.spbu.netter.controller.centrality.*
 import ru.spbu.netter.controller.clustering.*
 import ru.spbu.netter.controller.io.*
@@ -27,7 +26,7 @@ import kotlin.streams.asStream
 
 
 @TestInstance(Lifecycle.PER_CLASS)
-internal class TxtIOIntegrationTests {
+internal class TxtIOIntegrationTests : ApplicationTest() {
     lateinit var network: Network
 
     private val txtIOHandler: FileIOHandler = TxtIOHandler()
@@ -133,11 +132,6 @@ internal class TxtIOIntegrationTests {
     }
 
     // Tests
-
-    @BeforeAll
-    fun startUp() {
-        Platform.startup {}
-    }
 
     @BeforeEach
     fun setUp() {

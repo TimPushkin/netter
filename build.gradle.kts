@@ -22,6 +22,10 @@ dependencies {
 
     testImplementation("org.awaitility:awaitility-kotlin:4.1.0")
 
+    testImplementation("org.testfx:testfx-core:4.0.16-alpha")
+    testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
+    testImplementation("org.testfx:openjfx-monocle:jdk-11+26")
+
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.6")
     implementation("org.slf4j:slf4j-simple:1.7.30")
 
