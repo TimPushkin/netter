@@ -1,4 +1,4 @@
-name: Assemble (build without running tests)
+name: Assemble
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   assemble:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -19,7 +19,7 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
           check-latest: true
-          
+
       - name: Cache Gradle packages
         uses: actions/cache@v2
         with:
