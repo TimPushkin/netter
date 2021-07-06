@@ -1,4 +1,4 @@
-name: Assemble (build without testing)
+name: Test
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  assemble:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,7 +19,7 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
           check-latest: true
-          
+
       - name: Cache Gradle packages
         uses: actions/cache@v2
         with:
@@ -30,8 +30,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Assemble
-        run: ./gradlew clean assemble
+      - name: Run tests
+        run: ./gradlew clean test
 
       - name: Cleanup Gradle Cache
         # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
