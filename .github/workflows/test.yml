@@ -1,4 +1,4 @@
-name: Assemble
+name: Test
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  assemble:
+  test:
     runs-on: macos-latest
 
     steps:
@@ -30,8 +30,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Assemble
-        run: ./gradlew clean assemble
+      - name: Run tests
+        run: ./gradlew test
 
       - name: Cleanup Gradle Cache
         # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
