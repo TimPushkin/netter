@@ -33,7 +33,6 @@ More details are available in the _Documentation_ section.
 ### Requirements
 
 - Java JDK version 11
-- [Gradle](https://gradle.org/) version 6.8
 
 ---
 
